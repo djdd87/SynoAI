@@ -19,6 +19,9 @@ namespace SynoAI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IAIService, AIService>();
+            services.AddScoped<ISynologyService, SynologyService>();
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -27,7 +30,7 @@ namespace SynoAI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IHostApplicationLifetime applicationLifetime, IConfiguration configuration, ILogger<Startup> logger)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration, ILogger<Startup> logger, ISynologyService synologyService)
         {
             Config.Generate(logger, configuration);
 
@@ -47,7 +50,7 @@ namespace SynoAI
                 endpoints.MapControllers();
             });
 
-            Task task = SynologyService.InitialiseAsync(applicationLifetime, logger);
+            Task task = synologyService.InitialiseAsync();
             task.Wait();
         }
     }

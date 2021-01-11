@@ -31,9 +31,34 @@ namespace SynoAI
         public static string Password { get; private set; }
 
         /// <summary>
+        /// The amount of time that needs to have passed between the last call to check the camera and the current call.
+        /// </summary>
+        public static int Delay { get; private set; } = 5000;
+
+        /// <summary>
+        /// The font to use on the image labels.
+        /// </summary>
+        public static string Font { get; private set; }
+        /// <summary>
+        /// The font size to use on the image labels.
+        /// </summary>
+        public static int FontSize { get; private set; }
+        /// <summary>
+        /// The offset from the left of the image boundary box.
+        /// </summary>
+        public static int TextOffsetX { get; private set; }
+        /// <summary>
+        /// The offset from the top of the image boundary box.
+        /// </summary>
+        public static int TextOffsetY { get; private set; }
+
+        /// <summary>
         /// The artificial intelligence system to process the images with.
         /// </summary>
-        public static IAI AI { get; private set; }
+        public static AIType AI { get; private set; }
+        public static string AIUrl { get; private set; }
+        public static int AIMinSizeX { get; private set; }
+        public static int AIMinSizeY { get; private set; }
 
         /// <summary>
         /// The list of cameras.
@@ -56,25 +81,33 @@ namespace SynoAI
             Username = configuration.GetValue<string>("User");
             Password = configuration.GetValue<string>("Password");
 
-            AI = GenerateAI(logger, configuration);
+            Delay = configuration.GetValue<int?>("Delay") ?? 5000;
+            Font = configuration.GetValue<string>("Font") ?? "Tahoma";
+            FontSize = configuration.GetValue<int?>("FontSize") ?? 12;
+            TextOffsetX = configuration.GetValue<int?>("TextOffsetX") ?? 2;
+            TextOffsetY = configuration.GetValue<int?>("TextOffsetY") ?? 2;
+
+            logger.LogInformation("Processing AI config.");
+            IConfigurationSection aiSection = configuration.GetSection("AI");
+            AI = GetAIType(logger, aiSection);
+            AIUrl = aiSection.GetValue<string>("Url");
+            AIMinSizeX = aiSection.GetValue<int>("MinSizeX");
+            AIMinSizeY = aiSection.GetValue<int>("MinSizeY");
+
             Cameras = GenerateCameras(logger, configuration);
             Notifier = GenerateNotifier(logger, configuration);
         }
 
-        private static IAI GenerateAI(ILogger logger, IConfiguration configuration)
+        private static AIType GetAIType(ILogger logger, IConfigurationSection configuration)
         {
-            logger.LogInformation("Processing AI config.");
-
-            IConfigurationSection section = configuration.GetSection("AI");
-            string type = section.GetValue<string>("Type");
-
+            string type = configuration.GetValue<string>("Type");
             if (!Enum.TryParse(type, out AIType ai))
             {
                 logger.LogError($"AI Type '{ type }' is not supported.");
                 throw new NotImplementedException(type);
             }
 
-            return AIFactory.Create(ai, logger, section);
+            return ai;
         }
 
         private static IEnumerable<Camera> GenerateCameras(ILogger logger, IConfiguration configuration)
