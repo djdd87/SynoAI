@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using SynoAI.Exceptions;
 using SynoAI.Models;
 using System;
 using System.Collections.Generic;
@@ -138,7 +137,7 @@ namespace SynoAI.Services
                 if (Cameras.TryGetValue(cameraName, out int id))
                 {                    
                     _logger.LogInformation($"TakeSnapshot-{cameraName}: Found with Synology ID '{id}'.");
-                    string resource = string.Format(URI_CAMERA_SNAPSHOT, id);
+                    string resource = string.Format(URI_CAMERA_SNAPSHOT + $"&profileType={Config.Quality}", id);
 
                     _logger.LogInformation($"TakeSnapshot-{cameraName}: Taking snapshot");
                     HttpResponseMessage response = await client.GetAsync(resource);

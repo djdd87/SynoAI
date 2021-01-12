@@ -27,16 +27,14 @@ namespace SynoAI.Controllers
     {
         private readonly IAIService _aiService;
         private readonly ISynologyService _synologyService;
-        private readonly IConfiguration _configuration;
         private readonly ILogger<CameraController> _logger;
 
         private static ConcurrentDictionary<string, DateTime> _lastCameraChecks = new ConcurrentDictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
 
-        public CameraController(IAIService aiService, ISynologyService synologyService, ILogger<CameraController> logger, IConfiguration configuration)
+        public CameraController(IAIService aiService, ISynologyService synologyService, ILogger<CameraController> logger)
         {
             _aiService = aiService;
             _synologyService = synologyService;
-            _configuration = configuration;
             _logger = logger;
         }
 
@@ -231,7 +229,7 @@ namespace SynoAI.Controllers
         /// </summary>
         /// <param name="camera">The camera to save the image for.</param>
         /// <param name="image">The image to save.</param>
-        private string SaveImage(Camera camera, Image image, string tempFileSuffix = "")
+        private string SaveImage(Camera camera, Image image)
         {
             // TODO - Could introduce JPEG quality? 
             //var jpegQuality = 90;

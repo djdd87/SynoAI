@@ -29,6 +29,14 @@ namespace SynoAI
         /// The password to login to the API with.
         /// </summary>
         public static string Password { get; private set; }
+        
+        /// <summary>
+        /// Sets the profile type, aka Quality, of the image taken by the camera. 
+        /// 0 = High Quality
+        /// 1 = Balanced 
+        /// 2 = Low bandwidth
+        /// </summary>
+        public static int Quality { get; private set; } = 0;
 
         /// <summary>
         /// The amount of time that needs to have passed between the last call to check the camera and the current call.
@@ -81,7 +89,10 @@ namespace SynoAI
             Username = configuration.GetValue<string>("User");
             Password = configuration.GetValue<string>("Password");
 
+            Quality = configuration.GetValue<int>("Quality");
+
             Delay = configuration.GetValue<int?>("Delay") ?? 5000;
+            
             Font = configuration.GetValue<string>("Font") ?? "Tahoma";
             FontSize = configuration.GetValue<int?>("FontSize") ?? 12;
             TextOffsetX = configuration.GetValue<int?>("TextOffsetX") ?? 2;
