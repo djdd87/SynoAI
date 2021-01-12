@@ -241,10 +241,16 @@ namespace SynoAI.Controllers
             //encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, jpegQuality);
             //image.Save(filePath, jpegEncoder, encoderParameters);
 
-            string fileName = $"{camera.Name}_{DateTime.UtcNow:YYYY_MM_DD_HH_mm_ss_FFF}.jpeg";
-            string filePath = $"C:\\Temp\\{fileName}";
+            string directory = $"Captures\\{camera.Name}";
+            if (!Directory.Exists(directory))
+            {
+                _logger.LogInformation($"{camera}: Creating directory '{directory}'.");
+                Directory.CreateDirectory(directory);
+            }
 
-            _logger.LogInformation($"{camera}: Saving image to {filePath}.");
+            string fileName = $"{camera.Name}_{DateTime.UtcNow:YYYY_MM_DD_HH_mm_ss_FFF}.jpeg";
+            string filePath = Path.Combine(directory, fileName);
+            _logger.LogInformation($"{camera}: Saving image to '{filePath}'.");
 
             image.Save(filePath);
 
@@ -260,7 +266,7 @@ namespace SynoAI.Controllers
                 image.Save(filePath, ImageFormat.Jpeg);
             }
 
-            _logger.LogInformation($"{camera}: Imaged saved to {filePath}.");
+            _logger.LogInformation($"{camera}: Imaged saved to '{filePath}'.");
             return filePath;
         }
 
