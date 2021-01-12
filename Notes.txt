@@ -1,0 +1,9 @@
+# Build the docker image
+docker build -t synoai:0.1 .
+    Where 0.1 is the tag and the "." is the current working directory.
+
+# Run the application and map the appsettings.Development.json to the actual appsettings.json
+-- docker run -it --rm -v /run/desktop/mnt/host/c/Projects/GitHub/SynoAI/appsettings.Development.json:/app/appsettings.json -p 8080:80 synoai:0.1
+
+# General docker notes
+ - Added "RUN apt-get update && apt-get install -y libgdiplus" to Docketfile, because libgdiplus doesn't exist by default
