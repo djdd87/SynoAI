@@ -8,6 +8,6 @@ namespace SynoAI.Services
 {
     public interface IAIService
     {
-        Task<IEnumerable<AIPrediction>> ProcessAsync(byte[] image);
+        Task<IEnumerable<AIPrediction>> ProcessAsync(Camera camera, byte[] image);
     }
 }

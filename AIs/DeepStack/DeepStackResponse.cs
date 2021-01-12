@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace SynoAI.Models
+namespace SynoAI.AIs.DeepStack
 {
     /// <summary>
     /// An object representing a response from DeepStack.

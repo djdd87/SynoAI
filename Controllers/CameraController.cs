@@ -77,33 +77,31 @@ namespace SynoAI.Controllers
             IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, imageBytes);
             if (predictions.Count() > 0)
             {
-                // Save the image locally
-                Image image = ProcessImage(camera, imageBytes, predictions);
+                // Process the image
+                Image image = ProcessImage(camera, imageBytes, predictions); 
                 if (image == null)
                 {
-                    // If we get a null image back, then we didn't find anything with a confidence level to process
-                    _logger.LogInformation($"{id}: Nothing was detected by the AI that exceeded the defined confidence level");
+                    // If we get a null image back, then we didn't find anything
+                    _logger.LogInformation($"{id}: Nothing detected by the AI exceededing the defined confidence level");
                 }
                 else
                 {
-                    // Save the image
-                    SaveImage(camera, image);
-
-                    // We have an image, so send it via the notification
-                    //await SendNotification(camera, image);
+                    // Save the image and send the notifications
+                    string filePath = SaveImage(camera, image);
+                    await SendNotification(camera, filePath, predictions.Select(x=> x.Label).Distinct().ToList());
                 }
             }
             else
             {
-                _logger.LogInformation($"{id}: Nothing was detected by the AI");
+                _logger.LogInformation($"{id}: Nothing detected by the AI");
             }
 
-            _logger.LogInformation($"{id}: Finished in {overallStopwatch.ElapsedMilliseconds}ms.");
+            _logger.LogInformation($"{id}: Finished ({overallStopwatch.ElapsedMilliseconds}ms).");
         }
 
-        private async Task SendNotification(Camera camera, Image image)
+        private async Task SendNotification(Camera camera, string filePath, IEnumerable<string> labels)
         {
-            throw new NotImplementedException();
+            await Config.Notifier.Send(camera, filePath, labels, _logger);
         }
 
         /// <summary>
@@ -114,24 +112,22 @@ namespace SynoAI.Controllers
         /// <param name="predictions">The list of predictions to add to the image.</param>
         private Image ProcessImage(Camera camera, byte[] imageBytes, IEnumerable<AIPrediction> predictions)
         {
-            //// Get all the valid predictions, which are all the AI predictions where the confidence from the AI is 
-            //// greater than our camera's threshold, where it's in the list of types and where the size of the object
-            //// is bigger than the defined value.
-            //IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
-            //    x.Confidence >= camera.Threshold &&                                     // Exceeds confidence
-            //    camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase) &&     // Is a type we care about
-            //    x.SizeX >= Config.AIMinSizeX && x.SizeY >= Config.AIMinSizeY)           // Is bigger than the minimum size
-            //    .ToList();
+            // Get all the valid predictions, which are all the AI predictions where the result from the AI is 
+            //  in the list of types and where the size of the object is bigger than the defined value.
+            IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
+                camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase) &&     // Is a type we care about
+                x.SizeX >= Config.AIMinSizeX && x.SizeY >= Config.AIMinSizeY)           // Is bigger than the minimum size
+                .ToList();
 
-            //if (validPredictions.Count() == 0)
-            //{
-            //    // There's nothing to process
-            //    return null;
-            //}
+            if (validPredictions.Count() == 0)
+            {
+                // There's nothing to process
+                return null;
+            }
 
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            _logger.LogInformation($"{camera.Name}: Processing Image.");
+            _logger.LogInformation($"{camera.Name}: Processing image boundaries.");
 
             Image image;
             using (Stream stream = new MemoryStream(imageBytes))
@@ -167,7 +163,7 @@ namespace SynoAI.Controllers
             }
 
             stopwatch.Stop();
-            _logger.LogInformation($"{camera.Name}: Processed Image in {stopwatch.ElapsedMilliseconds}ms.");
+            _logger.LogInformation($"{camera.Name}: Finished processing image boundaries ({stopwatch.ElapsedMilliseconds}ms).");
 
             return image;
         }
@@ -192,7 +188,7 @@ namespace SynoAI.Controllers
             else
             {
                 stopwatch.Stop();
-                _logger.LogInformation($"{cameraName}: Snapshot received in {stopwatch.ElapsedMilliseconds}ms. Saving image.");
+                _logger.LogInformation($"{cameraName}: Snapshot received ({stopwatch.ElapsedMilliseconds}ms).");
             }
 
             return imageBytes;
@@ -210,7 +206,7 @@ namespace SynoAI.Controllers
 
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            IEnumerable<AIPrediction> predictions = await _aiService.ProcessAsync(imageBytes);
+            IEnumerable<AIPrediction> predictions = await _aiService.ProcessAsync(camera, imageBytes);
             if (predictions == null)
             {
                 _logger.LogError($"{camera}: Failed to get get predictions.");
@@ -219,7 +215,7 @@ namespace SynoAI.Controllers
             else
             {
                 stopwatch.Stop();
-                _logger.LogInformation($"{camera}: Predictions received in {stopwatch.ElapsedMilliseconds}ms.");
+                _logger.LogInformation($"{camera}: Predictions received ({stopwatch.ElapsedMilliseconds}ms).");
 
                 foreach (AIPrediction prediction in predictions)
                 {
@@ -235,9 +231,22 @@ namespace SynoAI.Controllers
         /// </summary>
         /// <param name="camera">The camera to save the image for.</param>
         /// <param name="image">The image to save.</param>
-        private void SaveImage(Camera camera, Image image)
+        private string SaveImage(Camera camera, Image image, string tempFileSuffix = "")
         {
-            string filePath = $"C:\\Temp\\{camera.Name}.jpg";
+            // TODO - Could introduce JPEG quality? 
+            //var jpegQuality = 90;
+
+            //ImageCodecInfo jpegEncoder = ImageCodecInfo.GetImageDecoders().First(c => c.FormatID == ImageFormat.Jpeg.Guid);
+            //EncoderParameters encoderParameters = new EncoderParameters(1);
+            //encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, jpegQuality);
+            //image.Save(filePath, jpegEncoder, encoderParameters);
+
+            string fileName = $"{camera.Name}_{DateTime.UtcNow:YYYY_MM_DD_HH_mm_ss_FFF}.jpeg";
+            string filePath = $"C:\\Temp\\{fileName}";
+
+            _logger.LogInformation($"{camera}: Saving image to {filePath}.");
+
+            image.Save(filePath);
 
             try
             {
@@ -245,9 +254,14 @@ namespace SynoAI.Controllers
             }
             catch (ExternalException)
             {
+                _logger.LogWarning($"{camera}: Failed to save image - retrying.");
+
                 image = new Bitmap(image);
                 image.Save(filePath, ImageFormat.Jpeg);
             }
+
+            _logger.LogInformation($"{camera}: Imaged saved to {filePath}.");
+            return filePath;
         }
 
         /// <summary>
@@ -260,7 +274,7 @@ namespace SynoAI.Controllers
             if (_lastCameraChecks.TryGetValue(id, out DateTime lastCheck))
             {
                 TimeSpan timeSpan = DateTime.UtcNow - lastCheck;
-                _logger.LogInformation($"{id}: Camera last checked {timeSpan.Milliseconds}ms");
+                _logger.LogInformation($"{id}: Camera last checked {timeSpan.Milliseconds}ms ago");
 
                 if (timeSpan.TotalMilliseconds < Config.Delay)
                 {

@@ -18,10 +18,10 @@ namespace SynoAI.Services
             _logger = logger;
         }
 
-        public async Task<IEnumerable<AIPrediction>> ProcessAsync(byte[] image)
+        public async Task<IEnumerable<AIPrediction>> ProcessAsync(Camera camera, byte[] image)
         {
             AI ai = GetAI();
-            return await ai.Process(_logger, image);
+            return await ai.Process(_logger, camera, image);
         }
 
         private AI GetAI()

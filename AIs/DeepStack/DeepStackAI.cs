@@ -3,9 +3,11 @@ using Newtonsoft.Json;
 using SynoAI.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace SynoAI.AIs.DeepStack
@@ -14,16 +16,26 @@ namespace SynoAI.AIs.DeepStack
     {
         private const string URL_VISION_DETECTION = "v1/vision/detection";
 
-        public async override Task<IEnumerable<AIPrediction>> Process(ILogger logger, byte[] image)
+        public async override Task<IEnumerable<AIPrediction>> Process(ILogger logger, Camera camera, byte[] image)
         {
-            using (HttpClient client =new HttpClient())
+
+            using (HttpClient client = new HttpClient())
             {
+                decimal minConfidence = camera.Threshold / 100m;
+                string requestJson = JsonConvert.SerializeObject(new DeepStackRequest()
+                {
+                    MinConfidence = minConfidence
+                });
+
                 MultipartFormDataContent multipartContent = new MultipartFormDataContent();
                 multipartContent.Add(new StreamContent(new MemoryStream(image)), "image", "image");
+                multipartContent.Add(new StringContent(requestJson, null, "application/json")); 
 
                 client.BaseAddress = new Uri(Config.AIUrl);
 
-                logger.LogInformation("DeepStackAI: Calling vision detection.");
+                logger.LogInformation("DeepStackAI: Posting snapshot to vision detection.");
+
+                Stopwatch stopwatch = Stopwatch.StartNew();
 
                 HttpResponseMessage response = await client.PostAsync(URL_VISION_DETECTION, multipartContent);
                 if (response.IsSuccessStatusCode)
@@ -31,8 +43,10 @@ namespace SynoAI.AIs.DeepStack
                     DeepStackResponse deepStackResponse = await GetResponse(response);
                     if (deepStackResponse.Success)
                     {
-                        logger.LogInformation("DeepStackAI: Success.");
-                        return deepStackResponse.Predictions.Select(x => new AIPrediction()
+                        stopwatch.Stop();
+
+                        logger.LogInformation($"DeepStackAI: Processed successfully ({stopwatch.ElapsedMilliseconds}ms).");
+                        return deepStackResponse.Predictions.Where(x=> x.Confidence >= minConfidence).Select(x => new AIPrediction()
                         {
                             Confidence = x.Confidence * 100,
                             Label = x.Label,
