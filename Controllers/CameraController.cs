@@ -147,7 +147,7 @@ namespace SynoAI.Controllers
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
-                foreach (AIPrediction prediction in predictions)
+                foreach (AIPrediction prediction in validPredictions)
                 {
                     // Write out anything detected that was above the minimum size
                     if (prediction.SizeX >= Config.AIMinSizeX && prediction.SizeY >= Config.AIMinSizeY)
