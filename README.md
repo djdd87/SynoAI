@@ -21,9 +21,17 @@ I made this application mostly for myself in order to improve upon Christopher A
 * [Deepstack](https://deepstack.cc/)
 
 ## Supported Notifications
-* [Pushbullet](https://www.pushbullet.com/)
-* HomeAssistant (TODO)
-* Webhooks (TODO)
+### [Pushbullet](https://www.pushbullet.com/)
+```json
+{
+  "Type": "Pushbullet",
+  "ApiKey": "0.123456789"
+}
+```
+
+### Planned:
+* HomeAssistant
+* Webhooks
 
 ## Configuration
 The configuration instructions below are primarily aimed at running SynoAI in a docker container on DSM (Synology's operating system). Docker will be required anyway as Deepstack is assumed to be setup inside a Docker container. It is entirely possible to run SynoAI on a webserver instead, or to install it on a Docker instance that's not running on your Synology NAS, however that is outside the scope of these instructions. Additionally, the configuration of the third party notification systems (e.g. generating a Pushbullet API Key) is outside the scope of these instructions and can be found on the respective applications help guides.
@@ -105,7 +113,7 @@ services:
     }
   },
 
-  "Url": "http://192.168.0.0:5000",
+  "Url": "http://10.0.0.10:5000",
   "User": "SynologyUser",
   "Password": "SynologyPassword",
 
@@ -116,10 +124,10 @@ services:
     "MinSizeY": 100
   },
 
-  "Notifier": {
+  "Notifiers": [{
     "Type": "Pushbullet",
     "ApiKey": "0.123456789"
-  },
+  }],
 
   "Cameras": [
     {
