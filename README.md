@@ -21,7 +21,7 @@ I made this application mostly for myself in order to improve upon Christopher A
 ## Supported AIs
 * [Deepstack](https://deepstack.cc/)
 
-## Supported Notification Integrations
+## Supported Notifications
 * [Pushbullet](https://www.pushbullet.com/)
 * HomeAssistant (TODO)
 * Webhooks (TODO)
