@@ -102,7 +102,7 @@ The next step is to configure actions inside Surveillance Station that will call
   * Event: Motion Detected
 * Click next to open the Action tab and enter;
   * Action device: Webhook
-  * URL: http://{YourIP}:{YourPort}/Camera/{CameraName}, e.g. http://10.0.0.10:8080/CameraDriveway, where
+  * URL: http://{YourIP}:{YourPort}/Camera/{CameraName}, e.g. http://10.0.0.10:8080/Camera/Driveway, where
     * YourIP: Is the IP of your NAS, or the Docker server where SynoAI is deployed
     * YourPort: The port that the SynoAI image is listening on as you configured above.
     * CameraName: The name of the camera, e.g. Driveway
