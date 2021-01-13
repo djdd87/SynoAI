@@ -225,7 +225,7 @@ If issues are encountered, to get more verbose information in the logs, change t
 ```json  
 "Logging": {
   "LogLevel": {
-    "Default": "Information"
+    "Default": "Information",
     "Microsoft": "Warning",
     "Microsoft.Hosting.Lifetime": "Information"
   }
