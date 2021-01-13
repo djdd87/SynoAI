@@ -37,7 +37,25 @@ The top level steps are:
 TODO
 
 ### Configure SynoAI
-TODO
+The following instructions explain how to set up the SynoAI image using the Docker app built into DSM. For docker-compose, see the example file in the src, or in the documentation below.
+* Create a folder called synoai (this will contain your Captures directory and appsettings.json)
+* Put your appsettings.json file in the folder
+* Create a folder called Captures 
+* Open Docker in DSM
+* Download the SynoAI:latest image by either;
+** 1) Searching the registry for djdd87/SynoAI
+** 2) Going to the image tab and;
+*** Add > Add from URL
+*** Enter https://hub.docker.com/r/djdd87/synoai
+* Run the image
+* Enter a name for the image, e.g. synoai
+* Edit the advanced settings
+* Enable auto restarts
+* On the volumes tab;
+** Add a file mapping from your appsettings.json to /app/appsettings.json
+** Add a folder mapping from your captures directory to /app/Captures (optional)
+* On the port settings tab;
+** Enter a port mapping to port 80, e.g. 8080
 
 ### Create Action Rules
 TODO
