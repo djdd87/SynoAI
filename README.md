@@ -13,6 +13,7 @@ I made this application mostly for myself in order to improve upon Christopher A
 
 ## Features
 * Triggered via an Action Rule from Synology Surveillance Station
+* Works using the camera name and requires no technical knowledge of the Surveillance Station API in order to retrieve the unique camera ID
 * Uses an AI for object/person detection
 * Produces an output image with highlighted objects using the original image at the point of motion detection
 * Sends notification(s) at the point of notification with the processed image attached.
@@ -46,6 +47,7 @@ TODO
 
 ### Configure SynoAI
 The following instructions explain how to set up the SynoAI image using the Docker app built into DSM. For docker-compose, see the example file in the src, or in the documentation below.
+
 * Create a folder called synoai (this will contain your Captures directory and appsettings.json)
 * Put your appsettings.json file in the folder
 * Create a folder called Captures 
@@ -66,7 +68,36 @@ The following instructions explain how to set up the SynoAI image using the Dock
    * Enter a port mapping to port 80, e.g. 8080
 
 ### Create Action Rules
-TODO
+The next step is to configure actions inside Surveillance Station that will call the SynoAI API. 
+
+* Open up Surveillance Station
+* Open Action Rules
+* Create a new rule and enter;
+  * Name: A name for the action e.g. Trigger SynoAI - Driveway
+  * Rule type: Triggered (Default)
+  * Action type: Interruptible (Default)
+* Click next to open the Event tab and enter;
+  * Event source: Camera
+  * Device: Your camera, e.g. Driveway
+  * Event: Motion Detected
+* Click next to open the Action tab and enter;
+  * Action device: Webhook
+  * URL: http://{YourIP}:{YourPort}/Camera/{CameraName}, e.g. http://10.0.0.10:8080/CameraDriveway, where
+    * YourIP: Is the IP of your NAS, or the Docker server where SynoAI is deployed
+    * YourPort: The port that the SynoAI image is listening on as you configured above.
+    * CameraName: The name of the camera, e.g. Driveway
+  * Username: Blank
+  * Password: Blank
+  * Method: GET
+  * Times: 1
+* Click test send and if everything is set up correctly, then you'll get a green tick
+* Click next and the action will now be created.
+
+### Summary
+
+Congratulations, you should now have a trigger calling the SynoAI API for your camera every time Surveillance Station detects motion. In order to set up multiple cameras, just create a new Action Rule for each camera.
+
+Note that SynoAI is still reliant on Surveillance Station detecting the motion, so this will need some tuning on your part. However, it's now possible to up the sensitivity and avoid false-positives as SynoAI will only notify you (via your preferred notification system/app) when an object is detected, e.g. a Person.
 
 ## Docker
 SynoAI can be installed as a docker image, which is [available from DockerHub](https://hub.docker.com/r/djdd87/synoai).
