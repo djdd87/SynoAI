@@ -7,19 +7,37 @@ The problem with sssAI that this project is designed to solve is that it relies 
 
 SynoAI aims to solve this problem by side-stepping the Synology notifications entirely by allowing other notification systems to be used.
 
+## Features
+* Triggered via an Action Rule from Synology Surveillance Station
+* Processes the image to look for specific objects using an AI
+* Produces an output image, using the original image at the point of motion detection
+* Draws boxes over the original image to show where objects were detected
+* Sends any number of notifications at the point of notification with the processed image attached.
+
 ## Supported AIs
-- [Deepstack](https://deepstack.cc/)
+* [Deepstack](https://deepstack.cc/)
 
 ## Supported Notification Integrations
-- [Pushbullet](https://www.pushbullet.com/)
-- HomeAssistant (TODO)
-- Webhooks (TODO)
+* [Pushbullet](https://www.pushbullet.com/)
+* HomeAssistant (TODO)
+* Webhooks (TODO)
 
 ## Docker
 SynoAI can be installed as a docker image, which is [available from DockerHub](https://hub.docker.com/r/djdd87/synoai).
 
 ### Docker Configuration
+The image can be pulled using the Docker cli by calling:
+```
+docker pull djdd87/synoai:latest
+```
+To run the image a volume must be specified to map your appsettings.json file. Additionally a port needs mapping to port 80 in order to trigger the API. Optionally, the Captures directory can also be mapped to easily expose all the images output from SynoAI.
 
+```
+docker run 
+  -v /path/appsettings.json:/app/appsettings.json 
+  -v /path/captures:/app/Captures 
+  -p 8080:80 djdd87/synoai:latest
+```
 
 ### Docker-Compose
 ```yaml
@@ -27,7 +45,7 @@ version: '3.4'
 
 services:
   synoai:
-    image: synoai
+    image: djdd87/synoai:latest
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -72,7 +90,7 @@ services:
       "Threshold": 45
     },
     {
-      "Name": "Back Door",
+      "Name": "BackDoor",
       "Types": [ "Person" ],
       "Threshold": 30
     }
