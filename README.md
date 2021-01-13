@@ -30,9 +30,22 @@ I made this application mostly for myself in order to improve upon Christopher A
 }
 ```
 
-### Planned:
-* HomeAssistant
-* Webhooks
+### Webhook 
+The webhook notification will POST an image to the specified URL with a specified field name.
+
+```json
+{
+  "Url": "http://servername/resource",
+  "Method": "POST",
+  "Field": "image"
+}
+```
+* Url [required]: The URL to send the image to
+* Method [optional] (Default: ```POST```): The HTTP method to use, e.g. POST, PUT
+* Field [optional] (Default: ```image```): The field name of the image in the POST data.
+
+### HomeAssistant
+Integration with HomeAssistant can be achieved using the [Push](https://www.home-assistant.io/integrations/push/) integration by following the instructions on that page by calling the HomeAssistant webhook using the SynoAI Webhook notification. 
 
 ## Caveats
 * SynoAI still relies on Surveillance Station triggering the motion alerts
