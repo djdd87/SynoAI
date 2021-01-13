@@ -199,10 +199,18 @@ services:
     "MinSizeY": 100
   },
 
-  "Notifiers": [{
-    "Type": "Pushbullet",
-    "ApiKey": "0.123456789"
-  }],
+  "Notifiers": [
+    {
+      "Type": "Pushbullet",
+      "ApiKey": "0.123456789"
+    },
+    {
+      "Type": "Webhook",
+      "Url": "http://server/images",
+      "Method": "POST",
+      "Field": "image"
+    }
+  ],
 
   "Cameras": [
     {
