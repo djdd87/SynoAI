@@ -74,6 +74,12 @@ namespace SynoAI
         public static IEnumerable<Camera> Cameras { get; private set; }
 
         /// <summary>
+        /// Whether the captured image should draw all predictions over the min size (false), or whether to only draw around
+        /// predictions that exist in the camera's types list.
+        /// </summary>
+        public static bool DrawAllPredictions {get; private set; }
+
+        /// <summary>
         /// The list of possible notifiers.
         /// </summary>
         public static INotifier Notifier { get; private set; }
@@ -92,7 +98,8 @@ namespace SynoAI
             Quality = configuration.GetValue<int>("Quality");
 
             Delay = configuration.GetValue<int?>("Delay") ?? 5000;
-            
+            DrawAllPredictions = configuration.GetValue<bool>("DrawAllPredictions");
+
             Font = configuration.GetValue<string>("Font") ?? "Tahoma";
             FontSize = configuration.GetValue<int?>("FontSize") ?? 12;
             TextOffsetX = configuration.GetValue<int?>("TextOffsetX") ?? 2;

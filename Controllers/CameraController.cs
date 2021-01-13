@@ -75,7 +75,6 @@ namespace SynoAI.Controllers
             IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, imageBytes);
 
             // Remove any predictions that aren't in the list of types our camera should be reporting
-            predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
             if (predictions.Count() > 0)
             {
                 // Process the image
@@ -83,12 +82,15 @@ namespace SynoAI.Controllers
                 if (image == null)
                 {
                     // If we get a null image back, then we didn't find anything
-                    _logger.LogInformation($"{id}: Nothing detected by the AI exceededing the defined confidence level");
+                    _logger.LogInformation($"{id}: Nothing detected by the AI exceeding the defined confidence level");
                 }
                 else
                 {
                     // Save the image and send the notifications
                     string filePath = SaveImage(camera, image);
+                    
+                    // Limit the predictions to just those defined by the camera
+                    predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
                     await SendNotification(camera, filePath, predictions.Select(x=> x.Label).Distinct().ToList());
                 }
             }
@@ -147,7 +149,7 @@ namespace SynoAI.Controllers
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
-                foreach (AIPrediction prediction in validPredictions)
+                foreach (AIPrediction prediction in (Config.DrawAllPredictions ? predictions : validPredictions))
                 {
                     // Write out anything detected that was above the minimum size
                     if (prediction.SizeX >= Config.AIMinSizeX && prediction.SizeY >= Config.AIMinSizeY)
