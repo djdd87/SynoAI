@@ -12,7 +12,7 @@ SynoAI aims to solve this problem by side-stepping the Synology notifications en
 * Processes the image to look for specific objects using an AI
 * Produces an output image, using the original image at the point of motion detection
 * Draws boxes over the original image to show where objects were detected
-* Sends any number of notifications at the point of notification with the processed image attached.
+* Sends notification(s) at the point of notification with the processed image attached.
 
 ## Supported AIs
 * [Deepstack](https://deepstack.cc/)
@@ -21,6 +21,23 @@ SynoAI aims to solve this problem by side-stepping the Synology notifications en
 * [Pushbullet](https://www.pushbullet.com/)
 * HomeAssistant (TODO)
 * Webhooks (TODO)
+
+## Configuration
+The configuration instructions below are primarily aimed at running SynoAI in a docker container on DSM (Synology's operating system). Docker will be required anyway as Deepstack is assumed to be setup inside a Docker container. It is entirely possible to run SynoAI on a webserver instead, or to install it on a Docker instance that's not running on your Synology NAS, however that is outside the scope of these instructions. Additionally, the configuration of the third party notification systems (e.g. generating a Pushbullet API Key) is outside the scope of these instructions and can be found on the respective applications help guides.
+
+The top level steps are:
+* Setup the Deepstack Docker image on DSM
+* Setup the SynoAI image on DSM
+* Add Action Rules to Synology Surveillance Station's motion alerts in order to trigger the SynoAI API.
+
+### Configure Deepstack
+TODO
+
+### Configure SynoAI
+TODO
+
+### Create Action Rules
+TODO
 
 ## Docker
 SynoAI can be installed as a docker image, which is [available from DockerHub](https://hub.docker.com/r/djdd87/synoai).
