@@ -15,3 +15,5 @@ services:
       - ASPNETCORE_URLS=http://+:80
     volumes:
       - ~/.vsdbg:/remote_debugger:rw
+      - ./appsettings.Development.json:/app/appsettings.json
+      - ./Captures:/app/Captures

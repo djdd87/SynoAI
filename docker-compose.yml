@@ -10,3 +10,6 @@ services:
       dockerfile: ./Dockerfile
     ports:
       - 80
+    volumes:
+      - /docker/synoai/captures:/app/Captures
+      - /docker/synoai/appsettings.json:/app/appsettings.json

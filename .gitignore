@@ -365,3 +365,4 @@ FodyWeavers.xsd
 appsettings.Development.json
 PrivateNotes.txt
 Captures
+docker-compose.debug.yml
