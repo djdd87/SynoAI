@@ -182,9 +182,9 @@ services:
 {
   "Logging": {
     "LogLevel": {
-      "Default": "Information",
+      "Default": "Warning",
       "Microsoft": "Warning",
-      "Microsoft.Hosting.Lifetime": "Information"
+      "Microsoft.Hosting.Lifetime": "Warning"
     }
   },
 
@@ -218,3 +218,17 @@ services:
   ]
 }
 ```
+
+## Logging/Debugging
+If issues are encountered, to get more verbose information in the logs, change the logging to the following:
+
+```json  
+"Logging": {
+  "LogLevel": {
+    "Default": "Information"
+    "Microsoft": "Warning",
+    "Microsoft.Hosting.Lifetime": "Information"
+  }
+}
+```
+This will output the full information log and help identify where things are going wrong, as well as displaying the confidence percentages from Deepstack.
