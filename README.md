@@ -13,15 +13,14 @@ I made this application mostly for myself in order to improve upon Christopher A
 
 ## Features
 * Triggered via an Action Rule from Synology Surveillance Station
-* Processes the image to look for specific objects using an AI
-* Produces an output image, using the original image at the point of motion detection
-* Draws boxes over the original image to show where objects were detected
+* Uses an AI for object/person detection
+* Produces an output image with highlighted objects using the original image at the point of motion detection
 * Sends notification(s) at the point of notification with the processed image attached.
 
 ## Supported AIs
 * [Deepstack](https://deepstack.cc/)
 
-## Supported Notification Integrations
+## Supported Notifications
 * [Pushbullet](https://www.pushbullet.com/)
 * HomeAssistant (TODO)
 * Webhooks (TODO)
