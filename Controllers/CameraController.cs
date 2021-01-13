@@ -73,6 +73,9 @@ namespace SynoAI.Controllers
 
             // Use the AI to get the valid predictions
             IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, imageBytes);
+
+            // Remove any predictions that aren't in the list of types our camera should be reporting
+            predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
             if (predictions.Count() > 0)
             {
                 // Process the image
