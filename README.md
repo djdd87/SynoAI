@@ -7,6 +7,10 @@ The problem with sssAI that this project is designed to solve is that it relies 
 
 SynoAI aims to solve this problem by side-stepping the Synology notifications entirely by allowing other notification systems to be used.
 
+## Buy Me A Coffee! :coffee:
+
+I made this application mostly for myself in order to improve upon Christopher Adams' original idea and don't expect anything in returne. However, if you find it useful and would like to buy me a coffee, feel free to do it at [__Buy me a coffee! :coffee:__](https://www.buymeacoffee.com/djdd87). This is entirely optional, but would be appreciated! Or even better, help supported this project by contributing changes such as expanding the supported notification systems (or even AIs).
+
 ## Features
 * Triggered via an Action Rule from Synology Surveillance Station
 * Processes the image to look for specific objects using an AI
