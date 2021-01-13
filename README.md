@@ -70,7 +70,7 @@ The top level steps are:
 * Setup the SynoAI image on DSM
 * Add Action Rules to Synology Surveillance Station's motion alerts in order to trigger the SynoAI API.
 
-### Configure Deepstack
+### 1) Configure Deepstack
 The following instructions explain how to set up the Deepstack image using the Docker app built into DSM. Before continuing, you'll need to obtain a *free* API key from [Deepstack](https://deepstack.css). 
 
 * Download the deepquestai/deepstack image by either;
@@ -89,7 +89,7 @@ The following instructions explain how to set up the Deepstack image using the D
 * Open a webbrowser and go to the Deepstack page by navigating to http://{YourIP}:{YourDeepstackPort}
 * If you've set everything up successfully then you will be able to enter your API key in here and move onto the next step.
    
-### Configure SynoAI
+### 2) Configure SynoAI
 The following instructions explain how to set up the SynoAI image using the Docker app built into DSM. For docker-compose, see the example file in the src, or in the documentation below.
 
 * Create a folder called synoai (this will contain your Captures directory and appsettings.json)
@@ -111,7 +111,7 @@ The following instructions explain how to set up the SynoAI image using the Dock
 * On the port settings tab;
    * Enter a port mapping to port 80 from an available port on your NAS, e.g. 8080
 
-### Create Action Rules
+### 3) Create Action Rules
 The next step is to configure actions inside Surveillance Station that will call the SynoAI API. 
 
 * Open up Surveillance Station
