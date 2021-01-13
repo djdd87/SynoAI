@@ -21,14 +21,25 @@ I made this application mostly for myself in order to improve upon Christopher A
 ## Supported AIs
 * [Deepstack](https://deepstack.cc/)
 
-## Supported Notifications
-### [Pushbullet](https://www.pushbullet.com/)
+## Notifications
+
+Multiple notifications can be triggered when an object is detected. Each notification will have a defined "Type" and the sections below explain how each notification should be defined.
+
+Supported notifications:
+
+* Pushbullet
+* Webhook
+
+### Pushbullet
+The [Pushbullet](https://www.pushbullet.com/) notification will send an image and a message containing a list of detected object types. An API key will need to be obtained from your Pushbullet account. Currently the notification will be sent to all devices that the API key belongs to.
+
 ```json
 {
   "Type": "Pushbullet",
   "ApiKey": "0.123456789"
 }
 ```
+* ApiKey [required]: The API key for the Pushbullet service
 
 ### Webhook 
 The webhook notification will POST an image to the specified URL with a specified field name.
