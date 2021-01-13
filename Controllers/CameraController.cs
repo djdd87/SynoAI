@@ -239,14 +239,16 @@ namespace SynoAI.Controllers
             //encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, jpegQuality);
             //image.Save(filePath, jpegEncoder, encoderParameters);
 
-            string directory = $"Captures\\{camera.Name}";
+            string directory = $"Captures";
+            directory = Path.Combine(directory, camera.Name);
+
             if (!Directory.Exists(directory))
             {
                 _logger.LogInformation($"{camera}: Creating directory '{directory}'.");
                 Directory.CreateDirectory(directory);
             }
 
-            string fileName = $"{camera.Name}_{DateTime.UtcNow:YYYY_MM_DD_HH_mm_ss_FFF}.jpeg";
+            string fileName = $"{camera.Name}_{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_FFF}.jpeg";
             string filePath = Path.Combine(directory, fileName);
             _logger.LogInformation($"{camera}: Saving image to '{filePath}'.");
 
