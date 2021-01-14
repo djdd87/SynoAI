@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SynoAI.Notifiers.Pushbullet;
+using SynoAI.Notifiers.Webhook;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,9 @@ namespace SynoAI.Notifiers
             {
                 case NotifierType.Pushbullet:
                     factory = new PushbulletFactory();
+                    break;
+                case NotifierType.Webhook:
+                    factory = new WebhookFactory();
                     break;
                 default:
                     throw new NotImplementedException(type.ToString());

@@ -3,12 +3,9 @@ using Newtonsoft.Json;
 using SynoAI.Models;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace SynoAI.Notifiers.Pushbullet

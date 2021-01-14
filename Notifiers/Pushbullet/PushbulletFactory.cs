@@ -1,9 +1,5 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SynoAI.Notifiers.Pushbullet
 {
@@ -12,7 +8,7 @@ namespace SynoAI.Notifiers.Pushbullet
         public override INotifier Create(ILogger logger, IConfigurationSection section)
         {
             string apiKey = section.GetValue<string>("ApiKey");
-            logger.LogInformation("Processing Pushbullet Config: Api Key: {0}", apiKey);
+            logger.LogInformation("Processing Pushbullet Config", apiKey);
 
             return new Pushbullet()
             {

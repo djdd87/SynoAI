@@ -14,9 +14,9 @@ namespace SynoAI.Notifiers
         /// Sends a notification message and image using the Pushbullet API.
         /// </summary>
         Pushbullet,
-        ///// <summary>
-        ///// Calls a fire and forget webhook where the webhook will be responsible for sending the notifications.
-        ///// </summary>
-        //Webhook,
+        /// <summary>
+        /// Calls a webhook with the image attached.
+        /// </summary>
+        Webhook
     }
 }
