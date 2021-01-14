@@ -227,7 +227,9 @@ services:
 }
 ```
 
-## Logging/Debugging
+## Problems/Debugging
+
+### Logging
 If issues are encountered, to get more verbose information in the logs, change the logging to the following:
 
 ```json  
@@ -240,3 +242,15 @@ If issues are encountered, to get more verbose information in the logs, change t
 }
 ```
 This will output the full information log and help identify where things are going wrong, as well as displaying the confidence percentages from Deepstack.
+
+### Common Synology Error Codes
+* 100: Unknown error
+* 101: Invalid parameters
+* 102: API does not exist
+* 103: Method does not exist
+* 104: This API version is not supported
+* 105: Insufficient user privilege
+  * If this occurs, check your username and password, or;
+  * Try creating a specific user for Synology Surveillance Station
+* 106: Connection time out
+* 107: Multiple login detected
