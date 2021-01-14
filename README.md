@@ -11,6 +11,30 @@ SynoAI aims to solve this problem by side-stepping the Synology notifications en
 
 I made this application mostly for myself in order to improve upon Christopher Adams' original idea and don't expect anything in return. However, if you find it useful and would like to buy me a coffee, feel free to do it at [__Buy me a coffee! :coffee:__](https://buymeacoff.ee/djdd87). This is entirely optional, but would be appreciated! Or even better, help supported this project by contributing changes such as expanding the supported notification systems (or even AIs).
 
+## Table of Contents
+
+* [Features](#features)  
+* [Support AIs](#supported-ais)  
+* [Notifications](#notifications)
+  * [Pushbullet](#pushbullet)
+  * [Webhook](#webhook)
+  * [HomeAssistant](#homeassistant)
+* [Caveats](#caveats)
+* [Configuration](#configuration)
+  * [1) Configure Deepstack](#1-configure-deepstack)
+  * [2) Configure SynoAI](#2-configure-synoai)
+  * [3) Create Action Rules](#3-create-action-rules)
+  * [Summary](#summary)
+* [Docker](#docker)
+  * [Docker Configuration](#docker-configuration)
+  * [Docker Compose](#docker-compose)
+* [Example appsettings.json](#example-appsettingsjson)
+* [Problems/Debugging](#problemsdebugging)
+  * [Logging](#logging)
+  * [Common Synology Error Codes](#common-synology-error-codes)
+
+## Headers
+
 ## Features
 * Triggered via an Action Rule from Synology Surveillance Station
 * Works using the camera name and requires no technical knowledge of the Surveillance Station API in order to retrieve the unique camera ID
