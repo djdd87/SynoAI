@@ -82,7 +82,7 @@ namespace SynoAI
         /// <summary>
         /// The list of possible notifiers.
         /// </summary>
-        public static INotifier Notifier { get; private set; }
+        public static IEnumerable<INotifier> Notifiers { get; private set; }
 
         /// <summary>
         /// Generates the configuration from the provided IConfiguration.
@@ -113,7 +113,7 @@ namespace SynoAI
             AIMinSizeY = aiSection.GetValue<int>("MinSizeY");
 
             Cameras = GenerateCameras(logger, configuration);
-            Notifier = GenerateNotifier(logger, configuration);
+            Notifiers = GenerateNotifiers(logger, configuration);
         }
 
         private static AIType GetAIType(ILogger logger, IConfigurationSection configuration)
@@ -136,20 +136,27 @@ namespace SynoAI
             return section.Get<List<Camera>>();
         }
 
-        private static INotifier GenerateNotifier(ILogger logger, IConfiguration configuration)
+        private static IEnumerable<INotifier> GenerateNotifiers(ILogger logger, IConfiguration configuration)
         {
             logger.LogInformation("Processing notifier config.");
 
-            IConfigurationSection section = configuration.GetSection("Notifier");
-            string type = section.GetValue<string>("Type");
+            List<INotifier> notifiers = new List<INotifier>();
 
-            if (!Enum.TryParse(type, out NotifierType notifier))
+            IConfigurationSection section = configuration.GetSection("Notifiers");
+            foreach (IConfigurationSection child in section.GetChildren())
             {
-                logger.LogError($"Notifier Type '{ type }' is not supported.");
-                throw new NotImplementedException(type);
+                string type = child.GetValue<string>("Type");
+
+                if (!Enum.TryParse(type, out NotifierType notifier))
+                {
+                    logger.LogError($"Notifier Type '{ type }' is not supported.");
+                    throw new NotImplementedException(type);
+                }
+
+                notifiers.Add(NotifierFactory.Create(notifier, logger, child));
             }
 
-            return NotifierFactory.Create(notifier, logger, section);
+            return notifiers;
         }
     }
 }

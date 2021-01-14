@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SynoAI.AIs;
 using SynoAI.Models;
+using SynoAI.Notifiers;
 using SynoAI.Services;
 using System;
 using System.Collections.Concurrent;
@@ -91,7 +92,7 @@ namespace SynoAI.Controllers
                     
                     // Limit the predictions to just those defined by the camera
                     predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
-                    await SendNotification(camera, filePath, predictions.Select(x=> x.Label).Distinct().ToList());
+                    await SendNotifications(camera, filePath, predictions.Select(x=> x.Label).Distinct().ToList());
                 }
             }
             else
@@ -102,9 +103,15 @@ namespace SynoAI.Controllers
             _logger.LogInformation($"{id}: Finished ({overallStopwatch.ElapsedMilliseconds}ms).");
         }
 
-        private async Task SendNotification(Camera camera, string filePath, IEnumerable<string> labels)
+        private async Task SendNotifications(Camera camera, string filePath, IEnumerable<string> labels)
         {
-            await Config.Notifier.Send(camera, filePath, labels, _logger);
+            List<Task> tasks = new List<Task>();
+            foreach (INotifier notifier in Config.Notifiers)
+            {
+                tasks.Add(notifier.Send(camera, filePath, labels, _logger));
+            }
+
+            await Task.WhenAll(tasks);
         }
 
         /// <summary>
