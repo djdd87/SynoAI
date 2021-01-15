@@ -18,9 +18,10 @@ namespace SynoAI.AIs.DeepStack
 
         public async override Task<IEnumerable<AIPrediction>> Process(ILogger logger, Camera camera, byte[] image)
         {
-
             using (HttpClient client = new HttpClient())
             {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
                 decimal minConfidence = camera.Threshold / 100m;
                 string requestJson = JsonConvert.SerializeObject(new DeepStackRequest()
                 {
@@ -33,9 +34,7 @@ namespace SynoAI.AIs.DeepStack
 
                 client.BaseAddress = new Uri(Config.AIUrl);
 
-                logger.LogInformation("DeepStackAI: Posting snapshot to vision detection.");
-
-                Stopwatch stopwatch = Stopwatch.StartNew();
+                logger.LogInformation("{camera.Name}: DeepStackAI: Posting snapshot to vision detection.");
 
                 HttpResponseMessage response = await client.PostAsync(URL_VISION_DETECTION, multipartContent);
                 if (response.IsSuccessStatusCode)
@@ -43,10 +42,7 @@ namespace SynoAI.AIs.DeepStack
                     DeepStackResponse deepStackResponse = await GetResponse(response);
                     if (deepStackResponse.Success)
                     {
-                        stopwatch.Stop();
-
-                        logger.LogInformation($"DeepStackAI: Processed successfully ({stopwatch.ElapsedMilliseconds}ms).");
-                        return deepStackResponse.Predictions.Where(x=> x.Confidence >= minConfidence).Select(x => new AIPrediction()
+                        IEnumerable<AIPrediction> predictions = deepStackResponse.Predictions.Where(x=> x.Confidence >= minConfidence).Select(x => new AIPrediction()
                         {
                             Confidence = x.Confidence * 100,
                             Label = x.Label,
@@ -55,15 +51,19 @@ namespace SynoAI.AIs.DeepStack
                             MinX = x.MinX,
                             MinY = x.MinY
                         }).ToList();
+                        
+                        stopwatch.Stop();
+                        logger.LogInformation($"{camera.Name}: DeepStackAI: Processed successfully ({stopwatch.ElapsedMilliseconds}ms).");
+                        return predictions;
                     }
                     else
                     {
-                        logger.LogWarning("DeepStackAI: Failed with unknown error.");
+                        logger.LogWarning($"{camera.Name}: DeepStackAI: Failed with unknown error.");
                     }
                 }
                 else
                 {
-                    logger.LogWarning($"DeepStackAI: Failed to call API with HTTP status code '{response.StatusCode}'.");
+                    logger.LogWarning($"{camera.Name}: DeepStackAI: Failed to call API with HTTP status code '{response.StatusCode}'.");
                 }
 
                 return null;

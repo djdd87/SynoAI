@@ -107,6 +107,8 @@ namespace SynoAI.Controllers
 
         private async Task SendNotifications(Camera camera, string filePath, IEnumerable<string> labels)
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             List<Task> tasks = new List<Task>();
             foreach (INotifier notifier in Config.Notifiers)
             {
@@ -114,6 +116,8 @@ namespace SynoAI.Controllers
             }
 
             await Task.WhenAll(tasks);
+
+            _logger.LogInformation($"{camera.Name}: Notifications sent ({stopwatch.ElapsedMilliseconds}ms).");
         }
 
         /// <summary>
@@ -124,6 +128,8 @@ namespace SynoAI.Controllers
         /// <param name="predictions">The list of predictions to add to the image.</param>
         private Image ProcessImage(Camera camera, byte[] imageBytes, IEnumerable<AIPrediction> predictions)
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             // Get all the valid predictions, which are all the AI predictions where the result from the AI is 
             //  in the list of types and where the size of the object is bigger than the defined value.
             IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
@@ -137,15 +143,12 @@ namespace SynoAI.Controllers
                 return null;
             }
 
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
             _logger.LogInformation($"{camera.Name}: Processing image boundaries.");
 
             // Keep the stream open as per MSDN guidelines - https://docs.microsoft.com/en-us/dotnet/api/system.drawing.image.fromstream
             // "You must keep the stream open for the lifetime of the Image." If we don't do this, then we'll end up with a generic GDI+
             // exception when saving the image. We'll just dispose the image in the caller.
             Image image = Image.FromStream(new MemoryStream(imageBytes));
-
             if (Config.DrawMode == DrawMode.Off)
             {
                 _logger.LogInformation($"{camera.Name}: Draw mode is Off. Skipping image boundaries.");
@@ -158,10 +161,6 @@ namespace SynoAI.Controllers
                 Font font = new Font(Config.Font, Config.FontSize, FontStyle.Regular);
                 Brush brush = new SolidBrush(Color.Yellow);
                 Pen border = new Pen(brush);
-
-                g.SmoothingMode = SmoothingMode.AntiAlias;
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
                 foreach (AIPrediction prediction in (Config.DrawMode == DrawMode.All ? predictions : validPredictions))
                 {
@@ -221,8 +220,6 @@ namespace SynoAI.Controllers
         {
             _logger.LogInformation($"{camera}: Processing.");
 
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
             IEnumerable<AIPrediction> predictions = await _aiService.ProcessAsync(camera, imageBytes);
             if (predictions == null)
             {
@@ -231,9 +228,6 @@ namespace SynoAI.Controllers
             }
             else
             {
-                stopwatch.Stop();
-                _logger.LogInformation($"{camera}: Predictions received ({stopwatch.ElapsedMilliseconds}ms).");
-
                 foreach (AIPrediction prediction in predictions)
                 {
                     _logger.LogInformation($"{camera}: {prediction.Label} ({prediction.Confidence}%)");
@@ -250,6 +244,8 @@ namespace SynoAI.Controllers
         /// <param name="image">The image to save.</param>
         private string SaveImage(Camera camera, Image image)
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             // TODO - Could introduce JPEG quality? 
             //var jpegQuality = 90;
 
@@ -273,7 +269,8 @@ namespace SynoAI.Controllers
 
             image.Save(filePath, ImageFormat.Jpeg);
 
-            _logger.LogInformation($"{camera}: Imaged saved to '{filePath}'.");
+            stopwatch.Stop();
+            _logger.LogInformation($"{camera}: Imaged saved to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
             return filePath;
         }
 
