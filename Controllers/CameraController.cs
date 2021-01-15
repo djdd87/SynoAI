@@ -156,29 +156,48 @@ namespace SynoAI.Controllers
             }
 
             // Draw the predictions
+            Stopwatch w1 = Stopwatch.StartNew();
+            Stopwatch w2 = Stopwatch.StartNew();
+            Stopwatch w3 = new Stopwatch();
+            Stopwatch w4 = new Stopwatch();
+            Stopwatch w5 = new Stopwatch();
             using (Graphics g = Graphics.FromImage(image))
             {
+                w2.Stop();
+
                 Font font = new Font(Config.Font, Config.FontSize, FontStyle.Regular);
                 Brush brush = new SolidBrush(Color.Yellow);
                 Pen border = new Pen(brush);
 
+                w3 = Stopwatch.StartNew();
                 foreach (AIPrediction prediction in (Config.DrawMode == DrawMode.All ? predictions : validPredictions))
                 {
                     // Write out anything detected that was above the minimum size
                     if (prediction.SizeX >= Config.AIMinSizeX && prediction.SizeY >= Config.AIMinSizeY)
                     {
-                        decimal confidence = Math.Floor(prediction.Confidence);
+                        decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
                         string label = $"{prediction.Label} ({confidence}%)";
 
+                        w4.Start();
                         g.DrawRectangle(border, new Rectangle(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY));
+                        w4.Stop();
+                        
+                        w5.Start();
                         g.DrawString(label, font, brush,
                             prediction.MinX + Config.TextOffsetX,
                             prediction.MinY + Config.TextOffsetY);
+                        w5.Stop();
                     }
                 }
+                w3.Stop();
             }
 
             stopwatch.Stop();
+            _logger.LogInformation($"{camera.Name}: W1 ({w1.ElapsedMilliseconds}ms).");
+            _logger.LogInformation($"{camera.Name}: W2 ({w2.ElapsedMilliseconds}ms).");
+            _logger.LogInformation($"{camera.Name}: W3 ({w3.ElapsedMilliseconds}ms).");
+            _logger.LogInformation($"{camera.Name}: W4 ({w4.ElapsedMilliseconds}ms).");
+            _logger.LogInformation($"{camera.Name}: W5 ({w5.ElapsedMilliseconds}ms).");
             _logger.LogInformation($"{camera.Name}: Finished processing image boundaries ({stopwatch.ElapsedMilliseconds}ms).");
 
             return image;
