@@ -148,7 +148,9 @@ namespace SynoAI.Controllers
             // Keep the stream open as per MSDN guidelines - https://docs.microsoft.com/en-us/dotnet/api/system.drawing.image.fromstream
             // "You must keep the stream open for the lifetime of the Image." If we don't do this, then we'll end up with a generic GDI+
             // exception when saving the image. We'll just dispose the image in the caller.
+            Stopwatch w0 = Stopwatch.StartNew();
             Image image = Image.FromStream(new MemoryStream(imageBytes));
+            w0.Stop();
             if (Config.DrawMode == DrawMode.Off)
             {
                 _logger.LogInformation($"{camera.Name}: Draw mode is Off. Skipping image boundaries.");
@@ -193,6 +195,7 @@ namespace SynoAI.Controllers
             }
 
             stopwatch.Stop();
+            _logger.LogInformation($"{camera.Name}: W0 ({w1.ElapsedMilliseconds}ms).");
             _logger.LogInformation($"{camera.Name}: W1 ({w1.ElapsedMilliseconds}ms).");
             _logger.LogInformation($"{camera.Name}: W2 ({w2.ElapsedMilliseconds}ms).");
             _logger.LogInformation($"{camera.Name}: W3 ({w3.ElapsedMilliseconds}ms).");
