@@ -40,7 +40,8 @@ I made this application mostly for myself in order to improve upon Christopher A
 * Works using the camera name and requires no technical knowledge of the Surveillance Station API in order to retrieve the unique camera ID
 * Uses an AI for object/person detection
 * Produces an output image with highlighted objects using the original image at the point of motion detection
-* Sends notification(s) at the point of notification with the processed image attached.
+* Sends notification(s) at the point of notification with the processed image attached
+* The AI does not need to run on the Synology box and can be run on an another server.
 
 ## Config
 
