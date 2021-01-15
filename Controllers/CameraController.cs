@@ -195,7 +195,7 @@ namespace SynoAI.Controllers
             }
 
             stopwatch.Stop();
-            _logger.LogInformation($"{camera.Name}: W0 ({w1.ElapsedMilliseconds}ms).");
+            _logger.LogInformation($"{camera.Name}: W0 ({w0.ElapsedMilliseconds}ms).");
             _logger.LogInformation($"{camera.Name}: W1 ({w1.ElapsedMilliseconds}ms).");
             _logger.LogInformation($"{camera.Name}: W2 ({w2.ElapsedMilliseconds}ms).");
             _logger.LogInformation($"{camera.Name}: W3 ({w3.ElapsedMilliseconds}ms).");
