@@ -36,12 +36,12 @@ namespace SynoAI
         /// 1 = Balanced 
         /// 2 = Low bandwidth
         /// </summary>
-        public static int Quality { get; private set; } = 0;
+        public static CameraQuality Quality { get; private set; }
 
         /// <summary>
         /// The amount of time that needs to have passed between the last call to check the camera and the current call.
         /// </summary>
-        public static int Delay { get; private set; } = 5000;
+        public static int Delay { get; private set; }
 
         /// <summary>
         /// The font to use on the image labels.
@@ -97,37 +97,24 @@ namespace SynoAI
             Username = configuration.GetValue<string>("User");
             Password = configuration.GetValue<string>("Password");
 
-            Quality = configuration.GetValue<int>("Quality");
+            Quality = configuration.GetValue<CameraQuality>("Quality", CameraQuality.Balanced);
 
-            Delay = configuration.GetValue<int?>("Delay") ?? 5000;
-            DrawMode = configuration.GetValue<DrawMode>("DrawMode");
+            Delay = configuration.GetValue<int>("Delay", 5000);
+            DrawMode = configuration.GetValue<DrawMode>("DrawMode", DrawMode.Matches);
 
-            Font = configuration.GetValue<string>("Font") ?? "Tahoma";
-            FontSize = configuration.GetValue<int?>("FontSize") ?? 12;
-            TextOffsetX = configuration.GetValue<int?>("TextOffsetX") ?? 2;
-            TextOffsetY = configuration.GetValue<int?>("TextOffsetY") ?? 2;
+            Font = configuration.GetValue<string>("Font", "Tahoma");
+            FontSize = configuration.GetValue<int>("FontSize", 12);
+            TextOffsetX = configuration.GetValue<int>("TextOffsetX", 2);
+            TextOffsetY = configuration.GetValue<int>("TextOffsetY", 2);
 
-            logger.LogInformation("Processing AI config.");
             IConfigurationSection aiSection = configuration.GetSection("AI");
-            AI = GetAIType(logger, aiSection);
+            AI = aiSection.GetValue<AIType>("Type", AIType.DeepStack);
             AIUrl = aiSection.GetValue<string>("Url");
-            AIMinSizeX = aiSection.GetValue<int>("MinSizeX");
-            AIMinSizeY = aiSection.GetValue<int>("MinSizeY");
+            AIMinSizeX = aiSection.GetValue<int>("MinSizeX", 50);
+            AIMinSizeY = aiSection.GetValue<int>("MinSizeY", 50);
 
             Cameras = GenerateCameras(logger, configuration);
             Notifiers = GenerateNotifiers(logger, configuration);
-        }
-
-        private static AIType GetAIType(ILogger logger, IConfigurationSection configuration)
-        {
-            string type = configuration.GetValue<string>("Type");
-            if (!Enum.TryParse(type, out AIType ai))
-            {
-                logger.LogError($"AI Type '{ type }' is not supported.");
-                throw new NotImplementedException(type);
-            }
-
-            return ai;
         }
 
         private static IEnumerable<Camera> GenerateCameras(ILogger logger, IConfiguration configuration)
