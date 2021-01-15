@@ -15,6 +15,7 @@ I made this application mostly for myself in order to improve upon Christopher A
 
 * [Features](#features)  
 * [Support AIs](#supported-ais)  
+  * [Deepstack](#deepstack)
 * [Notifications](#notifications)
   * [Pushbullet](#pushbullet)
   * [Webhook](#webhook)
