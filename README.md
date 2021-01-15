@@ -33,8 +33,6 @@ I made this application mostly for myself in order to improve upon Christopher A
   * [Logging](#logging)
   * [Common Synology Error Codes](#common-synology-error-codes)
 
-## Headers
-
 ## Features
 * Triggered via an Action Rule from Synology Surveillance Station
 * Works using the camera name and requires no technical knowledge of the Surveillance Station API in order to retrieve the unique camera ID
@@ -44,6 +42,30 @@ I made this application mostly for myself in order to improve upon Christopher A
 
 ## Supported AIs
 * [Deepstack](https://deepstack.cc/)
+
+In order to specify the AI to use, set the Type property against the AI section in the config:
+
+```json
+"AI": {
+  "Type": "DeepStack"
+}
+```
+
+### Deepstack
+
+The Deepstack API is a free to use AI that can identify objects, faces and more. Currently SynoAI makes use of the object detection model, which allows detection of people, cars, bicycles, trucks and even giraffes! For a full list of supported types see the [Deepstack documentation](https://docs.deepstack.cc/object-detection/#classes).
+
+```json
+"AI": {
+  "Type": "DeepStack",
+  "Url": "http://10.0.0.10:83",
+  "MinSizeX": 100,
+  "MinSizeY": 100
+}
+```
+* Url [required]: The URL of the AI to POST the image to
+* MinSizeX [required]: The minimum size in pixels that the object must be to trigger a change
+* MinSizeY [required]: The minimum size in pixels that the object must be to trigger a change.
 
 ## Notifications
 
