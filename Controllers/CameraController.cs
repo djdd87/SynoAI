@@ -79,20 +79,22 @@ namespace SynoAI.Controllers
             if (predictions.Count() > 0)
             {
                 // Process the image
-                Image image = ProcessImage(camera, imageBytes, predictions); 
-                if (image == null)
+                using (Image image = ProcessImage(camera, imageBytes, predictions))
                 {
-                    // If we get a null image back, then we didn't find anything
-                    _logger.LogInformation($"{id}: Nothing detected by the AI exceeding the defined confidence level");
-                }
-                else
-                {
-                    // Save the image and send the notifications
-                    string filePath = SaveImage(camera, image);
-                    
-                    // Limit the predictions to just those defined by the camera
-                    predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
-                    await SendNotifications(camera, filePath, predictions.Select(x=> x.Label).Distinct().ToList());
+                    if (image == null)
+                    {
+                        // If we get a null image back, then we didn't find anything
+                        _logger.LogInformation($"{id}: Nothing detected by the AI exceeding the defined confidence level");
+                    }
+                    else
+                    {
+                        // Save the image and send the notifications
+                        string filePath = SaveImage(camera, image);
+                        
+                        // Limit the predictions to just those defined by the camera
+                        predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
+                        await SendNotifications(camera, filePath, predictions.Select(x=> x.Label).Distinct().ToList());
+                    }
                 }
             }
             else
@@ -139,10 +141,15 @@ namespace SynoAI.Controllers
 
             _logger.LogInformation($"{camera.Name}: Processing image boundaries.");
 
-            Image image;
-            using (Stream stream = new MemoryStream(imageBytes))
+            // Keep the stream open as per MSDN guidelines - https://docs.microsoft.com/en-us/dotnet/api/system.drawing.image.fromstream
+            // "You must keep the stream open for the lifetime of the Image." If we don't do this, then we'll end up with a generic GDI+
+            // exception when saving the image. We'll just dispose the image in the caller.
+            Image image = Image.FromStream(new MemoryStream(imageBytes));
+
+            if (Config.DrawMode == DrawMode.Off)
             {
-                image = Image.FromStream(stream);
+                _logger.LogInformation($"{camera.Name}: Draw mode is Off. Skipping image boundaries.");
+                return image;
             }
 
             // Draw the predictions
@@ -156,7 +163,7 @@ namespace SynoAI.Controllers
                 g.InterpolationMode = InterpolationMode.HighQualityBicubic;
                 g.PixelOffsetMode = PixelOffsetMode.HighQuality;
 
-                foreach (AIPrediction prediction in (Config.DrawAllPredictions ? predictions : validPredictions))
+                foreach (AIPrediction prediction in (Config.DrawMode == DrawMode.All ? predictions : validPredictions))
                 {
                     // Write out anything detected that was above the minimum size
                     if (prediction.SizeX >= Config.AIMinSizeX && prediction.SizeY >= Config.AIMinSizeY)
@@ -212,7 +219,7 @@ namespace SynoAI.Controllers
         /// <returns>A list of predictions, or null on failure.</returns>
         private async Task<IEnumerable<AIPrediction>> GetAIPredications(Camera camera, byte[] imageBytes)
         {
-            _logger.LogInformation($"{camera}: Processing .");
+            _logger.LogInformation($"{camera}: Processing.");
 
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -264,19 +271,7 @@ namespace SynoAI.Controllers
             string filePath = Path.Combine(directory, fileName);
             _logger.LogInformation($"{camera}: Saving image to '{filePath}'.");
 
-            image.Save(filePath);
-
-            try
-            {
-                image.Save(filePath, ImageFormat.Jpeg);
-            }
-            catch (ExternalException)
-            {
-                _logger.LogWarning($"{camera}: Failed to save image - retrying.");
-
-                image = new Bitmap(image);
-                image.Save(filePath, ImageFormat.Jpeg);
-            }
+            image.Save(filePath, ImageFormat.Jpeg);
 
             _logger.LogInformation($"{camera}: Imaged saved to '{filePath}'.");
             return filePath;
