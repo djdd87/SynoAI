@@ -13,7 +13,8 @@ I made this application mostly for myself in order to improve upon Christopher A
 
 ## Table of Contents
 
-* [Features](#features)  
+* [Features](#features)
+* [Config](#config)
 * [Support AIs](#supported-ais)  
   * [Deepstack](#deepstack)
 * [Notifications](#notifications)
@@ -40,6 +41,25 @@ I made this application mostly for myself in order to improve upon Christopher A
 * Uses an AI for object/person detection
 * Produces an output image with highlighted objects using the original image at the point of motion detection
 * Sends notification(s) at the point of notification with the processed image attached.
+
+## Config
+
+An example appsettings.json configuration file can be found [here](#example-appsettingsjson) and all configuration for notifications and AI can be found under their respective sections. The following are the top level configs for communication with Synology Surveillance Station:
+
+* Url [required]: The URL and port of your NAS, e.g. http://{IP}:{Port}
+* User [required]: The user that will be used to request API snapshots
+* Password [required]: The password of the user above
+* Cameras [required]: An array of camera objects
+  * Name: [required]: The name of the camera on Surveillance Station
+  * Types: [required]: An array of types that will trigger a notification when detected by the AI, e.g. ["Person", "Car"]
+  * Threshold [required]: An integer denoting the required confidence of the AI to trigger the notification, e.g. 40 means that the AI must be 40% sure that the object detected was a person before SynoAI sends a notification.
+* Notifiers [required]: See [notifications](#notifications)
+* Delay [optiona] (Default: 5000): The period of time in milliseconds (ms) that must occur between the last motion detection of camera and the next time it'll be processed. i.e. if your delay is set to 5000 and your camera reports motion 4 seconds after it had already reported motion to SynoAI, then the check will be ignored. However, if the report from Surveillance Station is more than 5000ms, then the cameras image will be processed.
+* DrawAllPredictions [optional] (Default: false): Whether to draw all predictions from the AI on the capture image, i.e. if your camera is only looking for people, but there's a car in the image, then setting DrawAllPredictions to true will draw a boundary box drawn over it
+* Font [optiona] (Default: Tahoma): The font to use when labelling the boundary boxes on the output image
+* FontSize [optiona] (Default: 12): The size of the font to use when labelling the boundary boxes on the output image
+* TextOffsetX [optional] (Default: 2) : The number of pixels to offset the label from the left of the inside of the boundary image on the output image
+* TextOffsetY [optional] (Default: 2) : The number of pixels to offset the label from the top of the inside of the boundary image on the output image.
 
 ## Supported AIs
 * [Deepstack](https://deepstack.cc/)
