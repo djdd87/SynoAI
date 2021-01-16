@@ -99,7 +99,10 @@ namespace SynoAI.Services
                         _logger.LogError($"API: Failed due to error code '{response.Error.Code}'");
                     }
                 }
-                _logger.LogError($"API: Failed due to HTTP status code '{result.StatusCode}'");
+                else
+                {
+                    _logger.LogError($"API: Failed due to HTTP status code '{result.StatusCode}'");
+                }
             }
         }
 
