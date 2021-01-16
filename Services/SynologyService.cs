@@ -80,7 +80,10 @@ namespace SynoAI.Services
                             _logger.LogError($"Login: Failed due to error code '{response.Error.Code}'");
                         }
                     }
-                    _logger.LogError($"Login: Failed due to HTTP status code '{result.StatusCode}'");
+                    else
+                    {
+                        _logger.LogError($"Login: Failed due to HTTP status code '{result.StatusCode}'");
+                    }
                 }
             }
 
