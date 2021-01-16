@@ -27,6 +27,7 @@ I made this application mostly for myself in order to improve upon Christopher A
   * [2) Configure SynoAI](#2-configure-synoai)
   * [3) Create Action Rules](#3-create-action-rules)
   * [Summary](#summary)
+* [Updating](#updating)
 * [Docker](#docker)
   * [Docker Configuration](#docker-configuration)
   * [Docker Compose](#docker-compose)
@@ -213,6 +214,16 @@ The next step is to configure actions inside Surveillance Station that will call
 Congratulations, you should now have a trigger calling the SynoAI API for your camera every time Surveillance Station detects motion. In order to set up multiple cameras, just create a new Action Rule for each camera.
 
 Note that SynoAI is still reliant on Surveillance Station detecting the motion, so this will need some tuning on your part. However, it's now possible to up the sensitivity and avoid false-positives as SynoAI will only notify you (via your preferred notification system/app) when an object is detected, e.g. a Person.
+
+## Updating
+
+If you have followed the above instructions to setup the container using the DSM UI, then the following instructions are how to correctly update:
+
+* Pull the :latest image down again from the Image tab
+* Wait until DSM shows an alert to say that djdd87/synoai has finished downloading
+* Stop your SynoAI container
+* Select the container and go to Actions > Clear
+* Start the container.
 
 ## Docker
 SynoAI can be installed as a docker image, which is [available from DockerHub](https://hub.docker.com/r/djdd87/synoai).
