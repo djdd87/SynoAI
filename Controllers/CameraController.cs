@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SkiaSharp;
 using SynoAI.AIs;
 using SynoAI.Models;
 using SynoAI.Notifiers;
@@ -79,7 +80,7 @@ namespace SynoAI.Controllers
             if (predictions.Count() > 0)
             {
                 // Process the image
-                using (Image image = ProcessImage(camera, imageBytes, predictions))
+                using (SKBitmap image = ProcessImage(camera, imageBytes, predictions))
                 {
                     if (image == null)
                     {
@@ -107,6 +108,8 @@ namespace SynoAI.Controllers
 
         private async Task SendNotifications(Camera camera, string filePath, IEnumerable<string> labels)
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             List<Task> tasks = new List<Task>();
             foreach (INotifier notifier in Config.Notifiers)
             {
@@ -114,6 +117,8 @@ namespace SynoAI.Controllers
             }
 
             await Task.WhenAll(tasks);
+
+            _logger.LogInformation($"{camera.Name}: Notifications sent ({stopwatch.ElapsedMilliseconds}ms).");
         }
 
         /// <summary>
@@ -122,8 +127,10 @@ namespace SynoAI.Controllers
         /// <param name="camera">The camera the image came from.</param>
         /// <param name="imageBytes">The image data.</param>
         /// <param name="predictions">The list of predictions to add to the image.</param>
-        private Image ProcessImage(Camera camera, byte[] imageBytes, IEnumerable<AIPrediction> predictions)
+        private SKBitmap ProcessImage(Camera camera, byte[] imageBytes, IEnumerable<AIPrediction> predictions)
         {
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
             // Get all the valid predictions, which are all the AI predictions where the result from the AI is 
             //  in the list of types and where the size of the object is bigger than the defined value.
             IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
@@ -137,15 +144,10 @@ namespace SynoAI.Controllers
                 return null;
             }
 
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
             _logger.LogInformation($"{camera.Name}: Processing image boundaries.");
 
-            // Keep the stream open as per MSDN guidelines - https://docs.microsoft.com/en-us/dotnet/api/system.drawing.image.fromstream
-            // "You must keep the stream open for the lifetime of the Image." If we don't do this, then we'll end up with a generic GDI+
-            // exception when saving the image. We'll just dispose the image in the caller.
-            Image image = Image.FromStream(new MemoryStream(imageBytes));
-
+            // Load the bitmap
+            SKBitmap image = SKBitmap.Decode(new MemoryStream(imageBytes));
             if (Config.DrawMode == DrawMode.Off)
             {
                 _logger.LogInformation($"{camera.Name}: Draw mode is Off. Skipping image boundaries.");
@@ -153,28 +155,31 @@ namespace SynoAI.Controllers
             }
 
             // Draw the predictions
-            using (Graphics g = Graphics.FromImage(image))
+            using (SKCanvas canvas = new SKCanvas(image))
             {
-                Font font = new Font(Config.Font, Config.FontSize, FontStyle.Regular);
-                Brush brush = new SolidBrush(Color.Yellow);
-                Pen border = new Pen(brush);
-
-                g.SmoothingMode = SmoothingMode.AntiAlias;
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-
                 foreach (AIPrediction prediction in (Config.DrawMode == DrawMode.All ? predictions : validPredictions))
                 {
                     // Write out anything detected that was above the minimum size
                     if (prediction.SizeX >= Config.AIMinSizeX && prediction.SizeY >= Config.AIMinSizeY)
                     {
-                        decimal confidence = Math.Floor(prediction.Confidence);
+                        decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
                         string label = $"{prediction.Label} ({confidence}%)";
 
-                        g.DrawRectangle(border, new Rectangle(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY));
-                        g.DrawString(label, font, brush,
-                            prediction.MinX + Config.TextOffsetX,
-                            prediction.MinY + Config.TextOffsetY);
+                        SKRect rectangle = SKRect.Create(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY);
+                        SKPaint paint = new SKPaint 
+                        {
+                            Style = SKPaintStyle.Stroke,
+                            Color = SKColors.Red
+                        };
+
+                        // draw fill
+                        canvas.DrawRect(rectangle, paint);
+                        
+                        int x = prediction.MinX + Config.TextOffsetX;
+                        int y = prediction.MinY + Config.FontSize + Config.TextOffsetY;
+
+                        SKFont font = new SKFont(SKTypeface.FromFamilyName(Config.Font), Config.FontSize);
+                        canvas.DrawText(label, x, y, font, paint);
                     }
                 }
             }
@@ -221,8 +226,6 @@ namespace SynoAI.Controllers
         {
             _logger.LogInformation($"{camera}: Processing.");
 
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
             IEnumerable<AIPrediction> predictions = await _aiService.ProcessAsync(camera, imageBytes);
             if (predictions == null)
             {
@@ -231,9 +234,6 @@ namespace SynoAI.Controllers
             }
             else
             {
-                stopwatch.Stop();
-                _logger.LogInformation($"{camera}: Predictions received ({stopwatch.ElapsedMilliseconds}ms).");
-
                 foreach (AIPrediction prediction in predictions)
                 {
                     _logger.LogInformation($"{camera}: {prediction.Label} ({prediction.Confidence}%)");
@@ -244,19 +244,13 @@ namespace SynoAI.Controllers
         }
 
         /// <summary>
-        /// Due to some odd GDI+ exceptions in development, this method safely saves the image.
+        /// Saves the image to the camera's capture directory.
         /// </summary>
         /// <param name="camera">The camera to save the image for.</param>
         /// <param name="image">The image to save.</param>
-        private string SaveImage(Camera camera, Image image)
+        private string SaveImage(Camera camera, SKBitmap image)
         {
-            // TODO - Could introduce JPEG quality? 
-            //var jpegQuality = 90;
-
-            //ImageCodecInfo jpegEncoder = ImageCodecInfo.GetImageDecoders().First(c => c.FormatID == ImageFormat.Jpeg.Guid);
-            //EncoderParameters encoderParameters = new EncoderParameters(1);
-            //encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, jpegQuality);
-            //image.Save(filePath, jpegEncoder, encoderParameters);
+            Stopwatch stopwatch = Stopwatch.StartNew();
 
             string directory = $"Captures";
             directory = Path.Combine(directory, camera.Name);
@@ -271,9 +265,20 @@ namespace SynoAI.Controllers
             string filePath = Path.Combine(directory, fileName);
             _logger.LogInformation($"{camera}: Saving image to '{filePath}'.");
 
-            image.Save(filePath, ImageFormat.Jpeg);
-
-            _logger.LogInformation($"{camera}: Imaged saved to '{filePath}'.");
+            using (FileStream saveStream = new FileStream(filePath, FileMode.CreateNew))
+            {
+                bool saved = image.Encode(saveStream, SKEncodedImageFormat.Jpeg, 100);
+                if (saved)
+                {    
+                    _logger.LogInformation($"{camera}: Imaged saved to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
+                }
+                else
+                {
+                    _logger.LogInformation($"{camera}: Failed to save image to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
+                }
+            }
+            
+            stopwatch.Stop();
             return filePath;
         }
 

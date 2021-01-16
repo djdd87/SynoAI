@@ -139,17 +139,17 @@ namespace SynoAI.Services
 
                 if (Cameras.TryGetValue(cameraName, out int id))
                 {                    
-                    _logger.LogInformation($"TakeSnapshot-{cameraName}: Found with Synology ID '{id}'.");
+                    _logger.LogInformation($"{cameraName}: Found with Synology ID '{id}'.");
                     string resource = string.Format(URI_CAMERA_SNAPSHOT + $"&profileType={Config.Quality}", id);
 
-                    _logger.LogInformation($"TakeSnapshot-{cameraName}: Taking snapshot");
+                    _logger.LogInformation($"{cameraName}: Taking snapshot");
                     HttpResponseMessage response = await client.GetAsync(resource);
                     response.EnsureSuccessStatusCode();
 
                     if (response.Content.Headers.ContentType.MediaType == "image/jpeg")
                     {
                         // Only return the bytes when we have a valid image back
-                        _logger.LogInformation($"TakeSnapshot-{cameraName}: Reading snapshot");
+                        _logger.LogInformation($"{cameraName}: Reading snapshot");
                         return await response.Content.ReadAsByteArrayAsync();
                     }
                     else
@@ -159,17 +159,17 @@ namespace SynoAI.Services
                         if (errorResponse.Success)
                         {
                             // This should never happen, but let's add logging just in case
-                            _logger.LogError($"TakeSnapshot-{cameraName}: Failed to get snapshot, but the API reported success.");
+                            _logger.LogError($"{cameraName}: Failed to get snapshot, but the API reported success.");
                         }
                         else
                         {
-                            _logger.LogError($"TakeSnapshot-{cameraName}: Failed to get snapshot with error code '{errorResponse.Error.Code}'");
+                            _logger.LogError($"{cameraName}: Failed to get snapshot with error code '{errorResponse.Error.Code}'");
                         }
                     }
                 }
                 else
                 {
-                    _logger.LogError($"TakeSnapshot: The camera with the name '{cameraName}' was not found in the Synology camera list.");
+                    _logger.LogError($"The camera with the name '{cameraName}' was not found in the Synology camera list.");
                 }
 
                 return null;
