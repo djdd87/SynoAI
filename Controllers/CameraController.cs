@@ -146,12 +146,8 @@ namespace SynoAI.Controllers
 
             _logger.LogInformation($"{camera.Name}: Processing image boundaries.");
 
-            // Keep the stream open as per MSDN guidelines - https://docs.microsoft.com/en-us/dotnet/api/system.drawing.image.fromstream
-            // "You must keep the stream open for the lifetime of the Image." If we don't do this, then we'll end up with a generic GDI+
-            // exception when saving the image. We'll just dispose the image in the caller.
-            Stopwatch w0 = Stopwatch.StartNew();
+            // Load the bitmap
             SKBitmap image = SKBitmap.Decode(new MemoryStream(imageBytes));
-            w0.Stop();
             if (Config.DrawMode == DrawMode.Off)
             {
                 _logger.LogInformation($"{camera.Name}: Draw mode is Off. Skipping image boundaries.");
@@ -159,17 +155,8 @@ namespace SynoAI.Controllers
             }
 
             // Draw the predictions
-            Stopwatch w1 = Stopwatch.StartNew();
-            Stopwatch w2 = Stopwatch.StartNew();
-            Stopwatch w3 = new Stopwatch();
-            Stopwatch w4 = new Stopwatch();
-            Stopwatch w5 = new Stopwatch();
-
             using (SKCanvas canvas = new SKCanvas(image))
             {
-                w2.Stop();
-
-                w3 = Stopwatch.StartNew();
                 foreach (AIPrediction prediction in (Config.DrawMode == DrawMode.All ? predictions : validPredictions))
                 {
                     // Write out anything detected that was above the minimum size
@@ -178,8 +165,6 @@ namespace SynoAI.Controllers
                         decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
                         string label = $"{prediction.Label} ({confidence}%)";
 
-                        w4.Start();
-                        
                         SKRect rectangle = SKRect.Create(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY);
                         SKPaint paint = new SKPaint 
                         {
@@ -189,33 +174,17 @@ namespace SynoAI.Controllers
 
                         // draw fill
                         canvas.DrawRect(rectangle, paint);
-
-                        w4.Stop();
                         
-                        w5.Start();
+                        int x = prediction.MinX + Config.TextOffsetX;
+                        int y = prediction.MinY + Config.FontSize + Config.TextOffsetY;
+
                         SKFont font = new SKFont(SKTypeface.FromFamilyName(Config.Font), Config.FontSize);
-                        
-                        SKPoint point = new SKPoint(
-                            prediction.MinX + Config.FontSize + Config.TextOffsetX, 
-                            prediction.MinY + Config.FontSize + Config.TextOffsetY);
-
-                        canvas.DrawText(label, point, paint);
-                        //g.DrawString(label, font, brush,
-                        //    prediction.MinX + Config.TextOffsetX,
-                        //    prediction.MinY + Config.TextOffsetY);
-                        w5.Stop();
+                        canvas.DrawText(label, x, y, font, paint);
                     }
                 }
-                w3.Stop();
             }
 
             stopwatch.Stop();
-            _logger.LogInformation($"{camera.Name}: W0 ({w0.ElapsedMilliseconds}ms).");
-            _logger.LogInformation($"{camera.Name}: W1 ({w1.ElapsedMilliseconds}ms).");
-            _logger.LogInformation($"{camera.Name}: W2 ({w2.ElapsedMilliseconds}ms).");
-            _logger.LogInformation($"{camera.Name}: W3 ({w3.ElapsedMilliseconds}ms).");
-            _logger.LogInformation($"{camera.Name}: W4 ({w4.ElapsedMilliseconds}ms).");
-            _logger.LogInformation($"{camera.Name}: W5 ({w5.ElapsedMilliseconds}ms).");
             _logger.LogInformation($"{camera.Name}: Finished processing image boundaries ({stopwatch.ElapsedMilliseconds}ms).");
 
             return image;
@@ -275,21 +244,13 @@ namespace SynoAI.Controllers
         }
 
         /// <summary>
-        /// Due to some odd GDI+ exceptions in development, this method safely saves the image.
+        /// Saves the image to the camera's capture directory.
         /// </summary>
         /// <param name="camera">The camera to save the image for.</param>
         /// <param name="image">The image to save.</param>
         private string SaveImage(Camera camera, SKBitmap image)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
-
-            // TODO - Could introduce JPEG quality? 
-            //var jpegQuality = 90;
-
-            //ImageCodecInfo jpegEncoder = ImageCodecInfo.GetImageDecoders().First(c => c.FormatID == ImageFormat.Jpeg.Guid);
-            //EncoderParameters encoderParameters = new EncoderParameters(1);
-            //encoderParameters.Param[0] = new EncoderParameter(Encoder.Quality, jpegQuality);
-            //image.Save(filePath, jpegEncoder, encoderParameters);
 
             string directory = $"Captures";
             directory = Path.Combine(directory, camera.Name);
@@ -316,6 +277,7 @@ namespace SynoAI.Controllers
                     _logger.LogInformation($"{camera}: Failed to save image to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
                 }
             }
+            
             stopwatch.Stop();
             return filePath;
         }
