@@ -34,7 +34,7 @@ namespace SynoAI.AIs.DeepStack
 
                 client.BaseAddress = new Uri(Config.AIUrl);
 
-                logger.LogInformation("${camera.Name}: DeepStackAI: Posting snapshot to vision detection.");
+                logger.LogDebug($"{camera.Name}: DeepStackAI: Sending image.");
 
                 HttpResponseMessage response = await client.PostAsync(URL_VISION_DETECTION, multipartContent);
                 if (response.IsSuccessStatusCode)

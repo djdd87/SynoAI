@@ -24,9 +24,22 @@ namespace SynoAI.Services
         /// </summary>
         protected static Dictionary<string, int> Cameras { get; private set; }
 
-        private const string URI_LOGIN = "webapi/auth.cgi?api=SYNO.API.Auth&method=Login&version=3&account={0}&passwd={1}&session=SurveillanceStation";
-        private const string URI_CAMERA_INFO = "webapi/entry.cgi?api=SYNO.SurveillanceStation.Camera&method=List&version=3";
-        private const string URI_CAMERA_SNAPSHOT = "webapi/entry.cgi?camStm=1&version=3&cameraId={0}&api=\"SYNO.SurveillanceStation.Camera\"&method=GetSnapshot";
+        private const string API_LOGIN = "SYNO.API.Auth";
+        private const string API_CAMERA = "SYNO.SurveillanceStation.Camera";
+
+        private const string URI_INFO = "webapi/query.cgi?api=SYNO.API.Info&version=1&method=query";
+        private const string URI_LOGIN = "webapi/{0}?api=SYNO.API.Auth&method=Login&version=3&account={1}&passwd={2}&session=SurveillanceStation";
+        private const string URI_CAMERA_INFO = "webapi/{0}?api=SYNO.SurveillanceStation.Camera&method=List&version=3";
+        private const string URI_CAMERA_SNAPSHOT = "webapi/{0}?camStm=1&version=3&cameraId={1}&api=\"SYNO.SurveillanceStation.Camera\"&method=GetSnapshot";
+
+        /// <summary>
+        /// Holds the entry point to the SYNO.API.Auth API entry point.
+        /// </summary>
+        private static string URI_ENTRY_LOGIN { get; set; }
+        /// <summary>
+        /// Holds the entry point to the SYNO.SurveillanceStation.Camera API entry point.
+        /// </summary>
+        private static string URI_ENTRY_CAMERA { get; set; }
 
         private IHostApplicationLifetime _applicationLifetime;
         private ILogger<SynologyService> _logger;
@@ -37,6 +50,58 @@ namespace SynoAI.Services
             _logger = logger;
         }
 
+        /// <summary>
+        /// Fetches all the end points, because they're dynamic between DSM versions.
+        /// </summary>
+        public async Task GetEndPointsAsync()
+        {
+            _logger.LogInformation("API: Querying end points");
+            
+            using (HttpClient httpClient = new HttpClient())
+            {
+                httpClient.BaseAddress = new Uri(Config.Url);
+
+                HttpResponseMessage result = await httpClient.GetAsync(URI_INFO);
+                if (result.IsSuccessStatusCode)
+                {
+                    SynologyResponse<SynologyApiInfoResponse> response = await GetResponse<SynologyApiInfoResponse>(result);
+                    if (response.Success)
+                    {
+                        // Find the Authentication entry point
+                        if (response.Data.TryGetValue(API_LOGIN, out SynologyApiInfo loginPath))
+                        {
+                            _logger.LogDebug($"API: Found path '{loginPath.Path}' for {API_LOGIN}");
+                        }
+                        else
+                        {
+                            _logger.LogError($"API: Failed to find {API_LOGIN}.");
+                            _applicationLifetime.StopApplication();
+                        }
+
+                        // Find the Camera entry point
+                        if (response.Data.TryGetValue(API_CAMERA, out SynologyApiInfo cameraPath))
+                        {
+                            _logger.LogDebug($"API: Found path '{cameraPath.Path}' for {API_CAMERA}");
+                        }
+                        else
+                        {
+                            _logger.LogError($"API: Failed to find {API_CAMERA}.");
+                            _applicationLifetime.StopApplication();
+                        }
+
+                        URI_ENTRY_LOGIN = loginPath.Path;
+                        URI_ENTRY_CAMERA = cameraPath.Path;
+
+                        _logger.LogInformation("API: Successfully mapped all end points");
+                    }
+                    else
+                    {
+                        _logger.LogError($"API: Failed due to error code '{response.Error.Code}'");
+                    }
+                }
+                _logger.LogError($"API: Failed due to HTTP status code '{result.StatusCode}'");
+            }
+        }
 
         /// <summary>
         /// Generates a login cookie for the username and password in the config.
@@ -44,7 +109,7 @@ namespace SynoAI.Services
         /// <returns>A cookie, or null on failure.</returns>
         public async Task<Cookie> LoginAsync()
         {
-            _logger.LogInformation("Login: Creating client");
+            _logger.LogInformation("Login: Authenticating");
 
             CookieContainer cookieContainer = new CookieContainer();
             using (HttpClientHandler httpClientHandler = new HttpClientHandler
@@ -52,7 +117,7 @@ namespace SynoAI.Services
                 CookieContainer = cookieContainer
             })
             {
-                string loginUri = string.Format(URI_LOGIN, Config.Username, Config.Password);
+                string loginUri = string.Format(URI_LOGIN, URI_ENTRY_LOGIN, Config.Username, Config.Password);
 
                 using (HttpClient httpClient = new HttpClient(httpClientHandler))
                 {
@@ -77,7 +142,7 @@ namespace SynoAI.Services
                         }
                         else
                         {
-                            _logger.LogError($"Login: Failed due to error code '{response.Error.Code}'");
+                            _logger.LogError($"Login: Failed due to error '{response.Error.Code}'");
                         }
                     }
                     else
@@ -106,10 +171,11 @@ namespace SynoAI.Services
             {
                 cookieContainer.Add(baseAddress, new Cookie("id", Cookie.Value));
                 
-                HttpResponseMessage result = await client.GetAsync(URI_CAMERA_INFO);
+                string cameraInfoUri = string.Format(URI_CAMERA_INFO, URI_ENTRY_CAMERA);
+                HttpResponseMessage result = await client.GetAsync(cameraInfoUri);
 
                 SynologyResponse<SynologyCameras> response = await GetResponse<SynologyCameras>(result);
-                if (response.Success)
+                if (response.Success) 
                 {
                     _logger.LogInformation($"GetCameras: Successful. Found {response.Data.Total} cameras.");
                     return response.Data.Cameras;
@@ -139,8 +205,8 @@ namespace SynoAI.Services
 
                 if (Cameras.TryGetValue(cameraName, out int id))
                 {                    
-                    _logger.LogInformation($"{cameraName}: Found with Synology ID '{id}'.");
-                    string resource = string.Format(URI_CAMERA_SNAPSHOT + $"&profileType={Config.Quality}", id);
+                    _logger.LogDebug($"{cameraName}: Found with Synology ID '{id}'.");
+                    string resource = string.Format(URI_CAMERA_SNAPSHOT + $"&profileType={Config.Quality}", URI_ENTRY_CAMERA, id);
 
                     _logger.LogInformation($"{cameraName}: Taking snapshot");
                     HttpResponseMessage response = await client.GetAsync(resource);
@@ -149,7 +215,7 @@ namespace SynoAI.Services
                     if (response.Content.Headers.ContentType.MediaType == "image/jpeg")
                     {
                         // Only return the bytes when we have a valid image back
-                        _logger.LogInformation($"{cameraName}: Reading snapshot");
+                        _logger.LogDebug($"{cameraName}: Reading snapshot");
                         return await response.Content.ReadAsByteArrayAsync();
                     }
                     else
@@ -202,6 +268,9 @@ namespace SynoAI.Services
         public async Task InitialiseAsync()
         {
             _logger.LogInformation("Initialising");
+
+            // Get the actual end points, because they're not guaranteed to be the same on all installations and DSM versions
+            await GetEndPointsAsync();
 
             // Perform a login first as all actions need a valid cookie
             Cookie = await LoginAsync();
