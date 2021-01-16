@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SkiaSharp;
 using SynoAI.AIs;
 using SynoAI.Models;
 using SynoAI.Notifiers;
@@ -79,7 +80,7 @@ namespace SynoAI.Controllers
             if (predictions.Count() > 0)
             {
                 // Process the image
-                using (Image image = ProcessImage(camera, imageBytes, predictions))
+                using (SKBitmap image = ProcessImage(camera, imageBytes, predictions))
                 {
                     if (image == null)
                     {
@@ -126,7 +127,7 @@ namespace SynoAI.Controllers
         /// <param name="camera">The camera the image came from.</param>
         /// <param name="imageBytes">The image data.</param>
         /// <param name="predictions">The list of predictions to add to the image.</param>
-        private Image ProcessImage(Camera camera, byte[] imageBytes, IEnumerable<AIPrediction> predictions)
+        private SKBitmap ProcessImage(Camera camera, byte[] imageBytes, IEnumerable<AIPrediction> predictions)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -149,7 +150,7 @@ namespace SynoAI.Controllers
             // "You must keep the stream open for the lifetime of the Image." If we don't do this, then we'll end up with a generic GDI+
             // exception when saving the image. We'll just dispose the image in the caller.
             Stopwatch w0 = Stopwatch.StartNew();
-            Image image = Image.FromStream(new MemoryStream(imageBytes));
+            SKBitmap image = SKBitmap.Decode(new MemoryStream(imageBytes));
             w0.Stop();
             if (Config.DrawMode == DrawMode.Off)
             {
@@ -163,13 +164,10 @@ namespace SynoAI.Controllers
             Stopwatch w3 = new Stopwatch();
             Stopwatch w4 = new Stopwatch();
             Stopwatch w5 = new Stopwatch();
-            using (Graphics g = Graphics.FromImage(image))
+
+            using (SKCanvas canvas = new SKCanvas(image))
             {
                 w2.Stop();
-
-                Font font = new Font(Config.Font, Config.FontSize, FontStyle.Regular);
-                Brush brush = new SolidBrush(Color.Yellow);
-                Pen border = new Pen(brush);
 
                 w3 = Stopwatch.StartNew();
                 foreach (AIPrediction prediction in (Config.DrawMode == DrawMode.All ? predictions : validPredictions))
@@ -181,13 +179,30 @@ namespace SynoAI.Controllers
                         string label = $"{prediction.Label} ({confidence}%)";
 
                         w4.Start();
-                        g.DrawRectangle(border, new Rectangle(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY));
+                        
+                        SKRect rectangle = SKRect.Create(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY);
+                        SKPaint paint = new SKPaint 
+                        {
+                            Style = SKPaintStyle.Stroke,
+                            Color = SKColors.Red
+                        };
+
+                        // draw fill
+                        canvas.DrawRect(rectangle, paint);
+
                         w4.Stop();
                         
                         w5.Start();
-                        g.DrawString(label, font, brush,
-                            prediction.MinX + Config.TextOffsetX,
-                            prediction.MinY + Config.TextOffsetY);
+                        SKFont font = new SKFont(SKTypeface.FromFamilyName(Config.Font), Config.FontSize);
+                        
+                        SKPoint point = new SKPoint(
+                            prediction.MinX + Config.FontSize + Config.TextOffsetX, 
+                            prediction.MinY + Config.FontSize + Config.TextOffsetY);
+
+                        canvas.DrawText(label, point, paint);
+                        //g.DrawString(label, font, brush,
+                        //    prediction.MinX + Config.TextOffsetX,
+                        //    prediction.MinY + Config.TextOffsetY);
                         w5.Stop();
                     }
                 }
@@ -264,7 +279,7 @@ namespace SynoAI.Controllers
         /// </summary>
         /// <param name="camera">The camera to save the image for.</param>
         /// <param name="image">The image to save.</param>
-        private string SaveImage(Camera camera, Image image)
+        private string SaveImage(Camera camera, SKBitmap image)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -289,10 +304,19 @@ namespace SynoAI.Controllers
             string filePath = Path.Combine(directory, fileName);
             _logger.LogInformation($"{camera}: Saving image to '{filePath}'.");
 
-            image.Save(filePath, ImageFormat.Jpeg);
-
+            using (FileStream saveStream = new FileStream(filePath, FileMode.CreateNew))
+            {
+                bool saved = image.Encode(saveStream, SKEncodedImageFormat.Jpeg, 100);
+                if (saved)
+                {    
+                    _logger.LogInformation($"{camera}: Imaged saved to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
+                }
+                else
+                {
+                    _logger.LogInformation($"{camera}: Failed to save image to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
+                }
+            }
             stopwatch.Stop();
-            _logger.LogInformation($"{camera}: Imaged saved to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
             return filePath;
         }
 
