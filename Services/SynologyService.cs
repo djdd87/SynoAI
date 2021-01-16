@@ -121,6 +121,7 @@ namespace SynoAI.Services
             })
             {
                 string loginUri = string.Format(URI_LOGIN, URI_ENTRY_LOGIN, Config.Username, Config.Password);
+                _logger.LogDebug($"Login: Logging in ({loginUri})");
 
                 using (HttpClient httpClient = new HttpClient(httpClientHandler))
                 {
