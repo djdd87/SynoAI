@@ -193,7 +193,7 @@ namespace SynoAI.Services
                 SynologyResponse<SynologyCameras> response = await GetResponse<SynologyCameras>(result);
                 if (response.Success) 
                 {
-                    _logger.LogInformation($"GetCameras: Successful. Found {response.Data.Total} cameras.");
+                    _logger.LogInformation($"GetCameras: Successful. Found {response.Data.Cameras.Count()} cameras.");
                     return response.Data.Cameras;
                 }
                 else
