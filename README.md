@@ -15,7 +15,7 @@ I made this application mostly for myself in order to improve upon Christopher A
 
 * [Features](#features)
 * [Config](#config)
-* [Development Config](#development-config)
+* [Development Configs](#development-configs)
 * [Support AIs](#supported-ais)  
   * [Deepstack](#deepstack)
 * [Notifications](#notifications)
