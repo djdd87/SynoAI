@@ -165,21 +165,23 @@ namespace SynoAI.Controllers
                         decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
                         string label = $"{prediction.Label} ({confidence}%)";
 
+                        // Draw the box
                         SKRect rectangle = SKRect.Create(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY);
-                        SKPaint paint = new SKPaint 
+                        canvas.DrawRect(rectangle, new SKPaint 
                         {
                             Style = SKPaintStyle.Stroke,
-                            Color = SKColors.Red
-                        };
-
-                        // draw fill
-                        canvas.DrawRect(rectangle, paint);
+                            Color = GetColour(Config.BoxColor)
+                        });
                         
                         int x = prediction.MinX + Config.TextOffsetX;
                         int y = prediction.MinY + Config.FontSize + Config.TextOffsetY;
 
+                        // Draw the text
                         SKFont font = new SKFont(SKTypeface.FromFamilyName(Config.Font), Config.FontSize);
-                        canvas.DrawText(label, x, y, font, paint);
+                        canvas.DrawText(label, x, y, font, new SKPaint 
+                        {
+                            Color = GetColour(Config.FontColor)
+                        });
                     }
                 }
             }
@@ -188,6 +190,19 @@ namespace SynoAI.Controllers
             _logger.LogInformation($"{camera.Name}: Finished processing image boundaries ({stopwatch.ElapsedMilliseconds}ms).");
 
             return image;
+        }
+
+        /// <summary>
+        /// Parses the provided colour name into an SKColor.
+        /// </summary>
+        /// <param name="colour">The string to parse.</param>
+        private SKColor GetColour(string hex)
+        {
+            if (!SKColor.TryParse(hex, out SKColor colour))
+            {
+                return SKColors.Red;
+            }
+            return colour;  
         }
 
         /// <summary>

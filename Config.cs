@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using SkiaSharp;
 using SynoAI.AIs;
 using SynoAI.Models;
 using SynoAI.Notifiers;
@@ -53,6 +54,11 @@ namespace SynoAI
         public static int Delay { get; private set; }
 
         /// <summary>
+        /// The hex code of the colour to use for the boxing around image matches.
+        /// </summary>
+        public static string BoxColor { get; private set; }
+
+        /// <summary>
         /// The font to use on the image labels.
         /// </summary>
         public static string Font { get; private set; }
@@ -60,6 +66,10 @@ namespace SynoAI
         /// The font size to use on the image labels.
         /// </summary>
         public static int FontSize { get; private set; }
+        /// <summary>
+        /// The hex code of the colour to use on the image labels.
+        /// </summary>
+        public static string FontColor { get; private set; }
         /// <summary>
         /// The offset from the left of the image boundary box.
         /// </summary>
@@ -114,9 +124,13 @@ namespace SynoAI
             Delay = configuration.GetValue<int>("Delay", 5000);
             DrawMode = configuration.GetValue<DrawMode>("DrawMode", DrawMode.Matches);
 
+            BoxColor = configuration.GetValue<string>("BoxColor", SKColors.Red.ToString());
+
             Font = configuration.GetValue<string>("Font", "Tahoma");
+            FontColor = configuration.GetValue<string>("FontColor", SKColors.Red.ToString());
             FontSize = configuration.GetValue<int>("FontSize", 12);
-            TextOffsetX = configuration.GetValue<int>("TextOffsetX", 2);
+            
+            TextOffsetX = configuration.GetValue<int>("TextOffsetX", 4);
             TextOffsetY = configuration.GetValue<int>("TextOffsetY", 2);
 
             IConfigurationSection aiSection = configuration.GetSection("AI");
