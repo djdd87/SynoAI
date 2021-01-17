@@ -62,8 +62,10 @@ An example appsettings.json configuration file can be found [here](#example-apps
   * Matches: Will draw boundary boxes over any object/person that matches the types defined on the cameras
   * All: Will draw boundary boxes over any object/person that the AI detected
   * Off: Will not draw boundary boxes (note - this will speed up time between detection and notification as SynoAI will not have to manipulate the image)
+* BoxColor [optiona] (Default: #FF0000): The colour of the border of the boundary box
 * Font [optiona] (Default: Tahoma): The font to use when labelling the boundary boxes on the output image
 * FontSize [optiona] (Default: 12): The size of the font to use (in pixels) when labelling the boundary boxes on the output image
+* FontColor [optiona] (Default: #FF0000): The colour of the text for the labels when labelling the boundary boxes on the output image
 * TextOffsetX [optional] (Default: 2) : The number of pixels to offset the label from the left of the inside of the boundary image on the output image
 * TextOffsetY [optional] (Default: 2) : The number of pixels to offset the label from the top of the inside of the boundary image on the output image.
 
