@@ -29,6 +29,15 @@ namespace SynoAI
         /// The password to login to the API with.
         /// </summary>
         public static string Password { get; private set; }
+
+        /// <summary>
+        /// The version of the SYNO.API.Auth API to use.
+        /// </summary>
+        public static int ApiVersionAuth {get;private set;}
+        /// <summary>
+        /// The version of the SYNO.SurveillanceStation.Camera API to use.
+        /// </summary>
+        public static int ApiVersionCamera {get;private set;}
         
         /// <summary>
         /// Sets the profile type, aka Quality, of the image taken by the camera. 
@@ -96,6 +105,9 @@ namespace SynoAI
             Url = configuration.GetValue<string>("Url");
             Username = configuration.GetValue<string>("User");
             Password = configuration.GetValue<string>("Password");
+
+            ApiVersionAuth = configuration.GetValue<int>("ApiVersionInfo", 6);      // DSM 6.0 beta2
+            ApiVersionCamera = configuration.GetValue<int>("ApiVersionCamera", 9);  // Surveillance Station 8.0
 
             Quality = configuration.GetValue<CameraQuality>("Quality", CameraQuality.Balanced);
 

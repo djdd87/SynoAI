@@ -28,18 +28,18 @@ namespace SynoAI.Services
         private const string API_CAMERA = "SYNO.SurveillanceStation.Camera";
 
         private const string URI_INFO = "webapi/query.cgi?api=SYNO.API.Info&version=1&method=query";
-        private const string URI_LOGIN = "webapi/{0}?api=SYNO.API.Auth&method=Login&version=3&account={1}&passwd={2}&session=SurveillanceStation";
-        private const string URI_CAMERA_INFO = "webapi/{0}?api=SYNO.SurveillanceStation.Camera&method=List&version=3";
-        private const string URI_CAMERA_SNAPSHOT = "webapi/{0}?camStm=1&version=3&cameraId={1}&api=\"SYNO.SurveillanceStation.Camera\"&method=GetSnapshot";
+        private const string URI_LOGIN = "webapi/{0}?api=SYNO.API.Auth&method=Login&version={1}&account={2}&passwd={3}&session=SurveillanceStation";
+        private const string URI_CAMERA_INFO = "webapi/{0}?api=SYNO.SurveillanceStation.Camera&method=List&version={1}";
+        private const string URI_CAMERA_SNAPSHOT = "webapi/{0}?version={1}&id={2}&api=\"SYNO.SurveillanceStation.Camera\"&method=GetSnapshot";
 
         /// <summary>
         /// Holds the entry point to the SYNO.API.Auth API entry point.
         /// </summary>
-        private static string URI_ENTRY_LOGIN { get; set; }
+        private static string _loginPath { get; set; }
         /// <summary>
         /// Holds the entry point to the SYNO.SurveillanceStation.Camera API entry point.
         /// </summary>
-        private static string URI_ENTRY_CAMERA { get; set; }
+        private static string _cameraPath { get; set; }
 
         private IHostApplicationLifetime _applicationLifetime;
         private ILogger<SynologyService> _logger;
@@ -68,9 +68,15 @@ namespace SynoAI.Services
                     if (response.Success)
                     {
                         // Find the Authentication entry point
-                        if (response.Data.TryGetValue(API_LOGIN, out SynologyApiInfo loginPath))
+                        if (response.Data.TryGetValue(API_LOGIN, out SynologyApiInfo loginInfo))
                         {
-                            _logger.LogDebug($"API: Found path '{loginPath.Path}' for {API_LOGIN}");
+                            _logger.LogDebug($"API: Found path '{loginInfo.Path}' for {API_LOGIN}");
+                            
+                            if (loginInfo.MaxVersion < Config.ApiVersionAuth)
+                            {
+                                _logger.LogError($"API: {API_CAMERA} only supports a max version of {loginInfo.MaxVersion}, but the system is set to use version {Config.ApiVersionAuth}.");
+                                _applicationLifetime.StopApplication();
+                            }
                         }
                         else
                         {
@@ -79,9 +85,15 @@ namespace SynoAI.Services
                         }
 
                         // Find the Camera entry point
-                        if (response.Data.TryGetValue(API_CAMERA, out SynologyApiInfo cameraPath))
+                        if (response.Data.TryGetValue(API_CAMERA, out SynologyApiInfo cameraInfo))
                         {
-                            _logger.LogDebug($"API: Found path '{cameraPath.Path}' for {API_CAMERA}");
+                            _logger.LogDebug($"API: Found path '{cameraInfo.Path}' for {API_CAMERA}");
+
+                            if (cameraInfo.MaxVersion < Config.ApiVersionCamera)
+                            {
+                                _logger.LogError($"API: {API_CAMERA} only supports a max version of {cameraInfo.MaxVersion}, but the system is set to use version {Config.ApiVersionCamera}.");
+                                _applicationLifetime.StopApplication();
+                            }
                         }
                         else
                         {
@@ -89,8 +101,8 @@ namespace SynoAI.Services
                             _applicationLifetime.StopApplication();
                         }
 
-                        URI_ENTRY_LOGIN = loginPath.Path;
-                        URI_ENTRY_CAMERA = cameraPath.Path;
+                        _loginPath = loginInfo.Path;
+                        _cameraPath = cameraInfo.Path;
 
                         _logger.LogInformation("API: Successfully mapped all end points");
                     }
@@ -120,7 +132,7 @@ namespace SynoAI.Services
                 CookieContainer = cookieContainer
             })
             {
-                string loginUri = string.Format(URI_LOGIN, URI_ENTRY_LOGIN, Config.Username, Config.Password);
+                string loginUri = string.Format(URI_LOGIN, _loginPath, Config.ApiVersionAuth, Config.Username, Config.Password);
                 _logger.LogDebug($"Login: Logging in ({loginUri})");
 
                 using (HttpClient httpClient = new HttpClient(httpClientHandler))
@@ -175,7 +187,7 @@ namespace SynoAI.Services
             {
                 cookieContainer.Add(baseAddress, new Cookie("id", Cookie.Value));
                 
-                string cameraInfoUri = string.Format(URI_CAMERA_INFO, URI_ENTRY_CAMERA);
+                string cameraInfoUri = string.Format(URI_CAMERA_INFO, _cameraPath, Config.ApiVersionCamera);
                 HttpResponseMessage result = await client.GetAsync(cameraInfoUri);
 
                 SynologyResponse<SynologyCameras> response = await GetResponse<SynologyCameras>(result);
@@ -210,7 +222,9 @@ namespace SynoAI.Services
                 if (Cameras.TryGetValue(cameraName, out int id))
                 {                    
                     _logger.LogDebug($"{cameraName}: Found with Synology ID '{id}'.");
-                    string resource = string.Format(URI_CAMERA_SNAPSHOT + $"&profileType={Config.Quality}", URI_ENTRY_CAMERA, id);
+                    
+                    string resource = string.Format(URI_CAMERA_SNAPSHOT + $"&profileType={(int)Config.Quality}", _cameraPath, Config.ApiVersionCamera, id);
+                    _logger.LogDebug($"{cameraName}: Taking snapshot from '{resource}'.");
 
                     _logger.LogInformation($"{cameraName}: Taking snapshot");
                     HttpResponseMessage response = await client.GetAsync(resource);
@@ -298,7 +312,7 @@ namespace SynoAI.Services
                 Cameras = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
                 foreach (Camera camera in Config.Cameras)
                 {
-                    SynologyCamera match = synologyCameras.FirstOrDefault(x => x.Name.Equals(camera.Name, StringComparison.OrdinalIgnoreCase));
+                    SynologyCamera match = synologyCameras.FirstOrDefault(x => x.GetName().Equals(camera.Name, StringComparison.OrdinalIgnoreCase));
                     if (match == null)
                     {
                         _logger.LogWarning($"GetCameras: The camera with the name '{camera.Name}' was not found in the Surveillance Station camera list.");
