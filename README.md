@@ -15,6 +15,7 @@ I made this application mostly for myself in order to improve upon Christopher A
 
 * [Features](#features)
 * [Config](#config)
+* [Development Configs](#development-configs)
 * [Support AIs](#supported-ais)  
   * [Deepstack](#deepstack)
 * [Notifications](#notifications)
@@ -65,6 +66,11 @@ An example appsettings.json configuration file can be found [here](#example-apps
 * FontSize [optiona] (Default: 12): The size of the font to use (in pixels) when labelling the boundary boxes on the output image
 * TextOffsetX [optional] (Default: 2) : The number of pixels to offset the label from the left of the inside of the boundary image on the output image
 * TextOffsetY [optional] (Default: 2) : The number of pixels to offset the label from the top of the inside of the boundary image on the output image.
+
+## Development Configs
+Configs which should be changed for debugging (change at own risk):
+* ApiVersionInfo [optiona] (Default: 6): The API version to use for the SYNO.API.Info API. According to the function spec for DSM, 6 is the correct version for DSM 6+
+* ApiVersionCamera [optional] (Default: 9): The API version to use for SYNO.SurveillanceStation.Camera. According to the functional spec for DSM, 9 is the correct version for SSS 8+.
 
 ## Supported AIs
 * [Deepstack](https://deepstack.cc/)
