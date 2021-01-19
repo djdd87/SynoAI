@@ -136,7 +136,26 @@ The webhook notification will POST an image to the specified URL with a specifie
 * Field [optional] (Default: ```image```): The field name of the image in the POST data.
 
 ### HomeAssistant
-Integration with HomeAssistant can be achieved using the [Push](https://www.home-assistant.io/integrations/push/) integration by following the instructions on that page by calling the HomeAssistant webhook using the SynoAI Webhook notification. 
+Integration with HomeAssistant can be achieved using the [Push](https://www.home-assistant.io/integrations/push/) integration and by calling the HomeAssistant webhook with the SynoAI Webhook notification.
+
+Example Configuration.yaml:
+``` yaml
+camera:
+  - platform: push
+    name: Motion Driveway
+    webhook_id: motion_driveway
+    timeout: 1
+    buffer: 1
+```
+
+HomeAssistant requires the POSTed image field to be called "image", so from the SynoAI side the integration is simply a case of creating a Webhook and pointing it at your HomeAssistant's IP and Webhook ID:
+
+``` json
+{
+  "Type": "Webhook",
+  "Url": "http://nas-ip:8123/api/webhook/motion_driveway"
+}	
+```
 
 ## Caveats
 * SynoAI still relies on Surveillance Station triggering the motion alerts
