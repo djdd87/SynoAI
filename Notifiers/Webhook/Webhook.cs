@@ -46,8 +46,7 @@ namespace SynoAI.Notifiers.Webhook
                     {
                         MultipartFormDataContent data = new MultipartFormDataContent
                         {
-                            { new StreamContent(fileStream), "file", Path.GetFileName(filePath) },
-                            { new StringContent($"Detected Types: { string.Join(", ", foundTypes) }") }
+                            { new StreamContent(fileStream), Field, Path.GetFileName(filePath) }
                         };
 
                         HttpResponseMessage message;

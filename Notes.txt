@@ -6,10 +6,11 @@ docker build -t synoai:0.1 .
 -- docker run -it --rm -v /run/desktop/mnt/host/c/Projects/GitHub/SynoAI/appsettings.Development.json:/app/appsettings.json -p 8080:80 synoai:0.1
 
 # General docker notes
- - Added "RUN apt-get update && apt-get install -y libgdiplus" to Docketfile, because libgdiplus doesn't exist by default
+ - Added "RUN apt-get update && apt-get install -y libgdiplus" to Dockerfile, because libgdiplus doesn't exist by default
 
+# Synology API
+https://global.download.synology.com/download/Document/Software/DeveloperGuide/Package/SurveillanceStation/All/enu/Surveillance_Station_Web_API.pdf
 
-# Synology API Versions
 SYNO.SurveillanceStation.Camera 
     1 -> Surveillance Station 6.0-2337
     2 -> Surveillance Station 6.1

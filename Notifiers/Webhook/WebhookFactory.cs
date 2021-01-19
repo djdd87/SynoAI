@@ -15,7 +15,7 @@ namespace SynoAI.Notifiers.Webhook
 
                 string url = section.GetValue<string>("Url");
                 string field = section.GetValue<string>("Field", "image");
-                string method = section.GetValue<string>("Method", "GET");
+                string method = section.GetValue<string>("Method", "POST");
 
                 Webhook webhook = new Webhook()
                 {
