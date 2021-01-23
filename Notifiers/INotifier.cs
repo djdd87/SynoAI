@@ -10,6 +10,13 @@ namespace SynoAI.Notifiers
 {
     public interface INotifier
     {
+        /// <summary>
+        /// The list of camera names that the notifier is for.
+        /// </summary>
+        IEnumerable<string> Cameras { get; set; }
+        /// <summary>
+        /// Handles the send of the notification.
+        /// </summary>
         Task Send(Camera camera, string filePath, IEnumerable<string> foundTypes, ILogger logger);
     }
 }
