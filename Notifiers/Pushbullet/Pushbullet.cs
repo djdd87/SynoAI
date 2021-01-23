@@ -14,7 +14,7 @@ namespace SynoAI.Notifiers.Pushbullet
     /// Configuration for sending a Pushbullet notification.
     /// https://docs.pushbullet.com/
     /// </summary>
-    public class Pushbullet : INotifier
+    public class Pushbullet : NotifierBase
     {
         //private const int MAX_FILE_SIZE = 26214400;
 
@@ -33,7 +33,7 @@ namespace SynoAI.Notifiers.Pushbullet
         /// <param name="image">The processed image.</param>
         /// <param name="foundTypes">The list of types that were found.</param>
         /// <param name="logger">A logger.</param>
-        public async Task Send(Camera camera, string filePath, IEnumerable<string> foundTypes, ILogger logger)
+        public override async Task Send(Camera camera, string filePath, IEnumerable<string> foundTypes, ILogger logger)
         {
             // Pushbullet file uploads are a two part process. First we need to request to upload a file
             using (HttpClient client = new HttpClient())

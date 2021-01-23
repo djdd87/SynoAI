@@ -31,7 +31,10 @@ namespace SynoAI.Notifiers
                     throw new NotImplementedException(type.ToString());
             }
 
-            return factory.Create(logger, section);
+            INotifier notifier = factory.Create(logger, section);
+            notifier.Cameras = section.GetSection("Cameras").Get<List<string>>();
+
+            return notifier;
         }
     }
 }

@@ -103,7 +103,19 @@ The Deepstack API is a free to use AI that can identify objects, faces and more.
 
 ## Notifications
 
-Multiple notifications can be triggered when an object is detected. Each notification will have a defined "Type" and the sections below explain how each notification should be defined.
+Multiple notifications can be triggered when an object is detected. Each notification will have a defined "Type" and the sections below explain how each notification should be defined. An optional feature allows notifications to be triggered only by specified cameras.
+
+```json
+"Notifiers": [
+  {
+    "Type": "{Type}",
+    "Cameras": [ "Driveway", "Garden"]
+  }
+]
+```
+
+* Type [required]: One of the supported notification types (see each type for additional required and optional configs below)
+* Cameras [optional]: A list of camera names that the notification will be triggered for. Allows certain notifications to only trigger for specific cameras; not specifying the value, or setting cameras to an empty array, will result in the notification being sent for all cameras.  
 
 Supported notifications:
 

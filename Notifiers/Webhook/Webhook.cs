@@ -13,7 +13,7 @@ namespace SynoAI.Notifiers.Webhook
     /// <summary>
     /// Calls a third party API.
     /// </summary>
-    public class Webhook : INotifier
+    public class Webhook : NotifierBase
     {
         /// <summary>
         /// The URL to send the request to.
@@ -35,7 +35,7 @@ namespace SynoAI.Notifiers.Webhook
         /// <param name="image">The processed image.</param>
         /// <param name="foundTypes">The list of types that were found.</param>
         /// <param name="logger">A logger.</param>
-        public async Task Send(Camera camera, string filePath, IEnumerable<string> foundTypes, ILogger logger)
+        public override async Task Send(Camera camera, string filePath, IEnumerable<string> foundTypes, ILogger logger)
         {
             using (logger.BeginScope($"Webhook '{Url}'"))
             {
@@ -46,7 +46,7 @@ namespace SynoAI.Notifiers.Webhook
                     {
                         MultipartFormDataContent data = new MultipartFormDataContent
                         {
-                            { new StreamContent(fileStream), Field, Path.GetFileName(filePath) }
+                            { new StreamContent(fileStream), "file", Path.GetFileName(filePath) }
                         };
 
                         HttpResponseMessage message;

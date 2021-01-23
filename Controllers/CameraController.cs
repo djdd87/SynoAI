@@ -110,8 +110,11 @@ namespace SynoAI.Controllers
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
+            IEnumerable<INotifier> notifiers = Config.Notifiers.Where(x=> x.Cameras == null || x.Cameras.Count() == 0 ||
+                x.Cameras.Any(c=> c.Equals(camera.Name, StringComparison.OrdinalIgnoreCase))).ToList();
+
             List<Task> tasks = new List<Task>();
-            foreach (INotifier notifier in Config.Notifiers)
+            foreach (INotifier notifier in notifiers)
             {
                 tasks.Add(notifier.Send(camera, filePath, labels, _logger));
             }
