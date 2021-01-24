@@ -30,14 +30,16 @@ namespace SynoAI.Controllers
         private readonly IAIService _aiService;
         private readonly ISynologyService _synologyService;
         private readonly ILogger<CameraController> _logger;
+        private readonly ILogger<ISnapshotManager>  _snapshotManagerLogger;
 
         private static ConcurrentDictionary<string, DateTime> _lastCameraChecks = new ConcurrentDictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
 
-        public CameraController(IAIService aiService, ISynologyService synologyService, ILogger<CameraController> logger)
+        public CameraController(IAIService aiService, ISynologyService synologyService, ILogger<CameraController> logger, ILogger<ISnapshotManager> snapshotManagerLogger)
         {
             _aiService = aiService;
             _synologyService = synologyService;
             _logger = logger;
+            _snapshotManagerLogger = snapshotManagerLogger;
         }
 
         /// <summary>
@@ -73,40 +75,39 @@ namespace SynoAI.Controllers
             // Take the snapshot from Surveillance Station
             byte[] imageBytes = await GetSnapshot(id);
 
-            // Use the AI to get the valid predictions
+            // Use the AI to get the valid predictions and then get all the valid predictions, which are all the AI predictions where the result from the AI is 
+            // in the list of types and where the size of the object is bigger than the defined value.
             IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, imageBytes);
+            IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
+                camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase) &&     // Is a type we care about
+                x.SizeX >= Config.AIMinSizeX && x.SizeY >= Config.AIMinSizeY)           // Is bigger than the minimum size
+                .ToList();
 
-            // Remove any predictions that aren't in the list of types our camera should be reporting
-            if (predictions.Count() > 0)
+            if (validPredictions.Count() > 0)
             {
-                // Process the image
-                using (SKBitmap image = ProcessImage(camera, imageBytes, predictions))
-                {
-                    if (image == null)
-                    {
-                        // If we get a null image back, then we didn't find anything
-                        _logger.LogInformation($"{id}: Nothing detected by the AI exceeding the defined confidence level");
-                    }
-                    else
-                    {
-                        // Save the image and send the notifications
-                        string filePath = SaveImage(camera, image);
-                        
-                        // Limit the predictions to just those defined by the camera
-                        predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
-                        await SendNotifications(camera, filePath, predictions.Select(x=> x.Label).Distinct().ToList());
-                    }
-                }
+                // Because we don't want to process the image if it isn't even required, then we pass the snapshot manager to the notifiers. It will then perform 
+                // the necessary actions when it's GetImage method is called.
+                SnapshotManager snapshotManager = new SnapshotManager(imageBytes, predictions, validPredictions, _snapshotManagerLogger);
+                
+                // Limit the predictions to just those defined by the camera
+                predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
+                await SendNotifications(camera, snapshotManager, predictions.Select(x=> x.Label).Distinct().ToList());
+            }
+            else if (predictions.Count() > 0)
+            {
+                // We got predictions back from the AI, but nothing that should trigger an alert
+                _logger.LogInformation($"{id}: Nothing detected by the AI exceeding the defined confidence level");
             }
             else
             {
+                // We didn't get any predictions whatsoever from the AI
                 _logger.LogInformation($"{id}: Nothing detected by the AI");
             }
 
             _logger.LogInformation($"{id}: Finished ({overallStopwatch.ElapsedMilliseconds}ms).");
         }
 
-        private async Task SendNotifications(Camera camera, string filePath, IEnumerable<string> labels)
+        private async Task SendNotifications(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> labels)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -116,98 +117,14 @@ namespace SynoAI.Controllers
             List<Task> tasks = new List<Task>();
             foreach (INotifier notifier in notifiers)
             {
-                tasks.Add(notifier.Send(camera, filePath, labels, _logger));
+                tasks.Add(notifier.Send(camera, snapshotManager, labels, _logger));
             }
 
             await Task.WhenAll(tasks);
 
             _logger.LogInformation($"{camera.Name}: Notifications sent ({stopwatch.ElapsedMilliseconds}ms).");
         }
-
-        /// <summary>
-        /// Processes the source image by adding the boundary boxes and saves the file locally.
-        /// </summary>
-        /// <param name="camera">The camera the image came from.</param>
-        /// <param name="imageBytes">The image data.</param>
-        /// <param name="predictions">The list of predictions to add to the image.</param>
-        private SKBitmap ProcessImage(Camera camera, byte[] imageBytes, IEnumerable<AIPrediction> predictions)
-        {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
-            // Get all the valid predictions, which are all the AI predictions where the result from the AI is 
-            //  in the list of types and where the size of the object is bigger than the defined value.
-            IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
-                camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase) &&     // Is a type we care about
-                x.SizeX >= Config.AIMinSizeX && x.SizeY >= Config.AIMinSizeY)           // Is bigger than the minimum size
-                .ToList();
-
-            if (validPredictions.Count() == 0)
-            {
-                // There's nothing to process
-                return null;
-            }
-
-            _logger.LogInformation($"{camera.Name}: Processing image boundaries.");
-
-            // Load the bitmap
-            SKBitmap image = SKBitmap.Decode(new MemoryStream(imageBytes));
-            if (Config.DrawMode == DrawMode.Off)
-            {
-                _logger.LogInformation($"{camera.Name}: Draw mode is Off. Skipping image boundaries.");
-                return image;
-            }
-
-            // Draw the predictions
-            using (SKCanvas canvas = new SKCanvas(image))
-            {
-                foreach (AIPrediction prediction in (Config.DrawMode == DrawMode.All ? predictions : validPredictions))
-                {
-                    // Write out anything detected that was above the minimum size
-                    if (prediction.SizeX >= Config.AIMinSizeX && prediction.SizeY >= Config.AIMinSizeY)
-                    {
-                        decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
-                        string label = $"{prediction.Label} ({confidence}%)";
-
-                        // Draw the box
-                        SKRect rectangle = SKRect.Create(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY);
-                        canvas.DrawRect(rectangle, new SKPaint 
-                        {
-                            Style = SKPaintStyle.Stroke,
-                            Color = GetColour(Config.BoxColor)
-                        });
-                        
-                        int x = prediction.MinX + Config.TextOffsetX;
-                        int y = prediction.MinY + Config.FontSize + Config.TextOffsetY;
-
-                        // Draw the text
-                        SKFont font = new SKFont(SKTypeface.FromFamilyName(Config.Font), Config.FontSize);
-                        canvas.DrawText(label, x, y, font, new SKPaint 
-                        {
-                            Color = GetColour(Config.FontColor)
-                        });
-                    }
-                }
-            }
-
-            stopwatch.Stop();
-            _logger.LogInformation($"{camera.Name}: Finished processing image boundaries ({stopwatch.ElapsedMilliseconds}ms).");
-
-            return image;
-        }
-
-        /// <summary>
-        /// Parses the provided colour name into an SKColor.
-        /// </summary>
-        /// <param name="colour">The string to parse.</param>
-        private SKColor GetColour(string hex)
-        {
-            if (!SKColor.TryParse(hex, out SKColor colour))
-            {
-                return SKColors.Red;
-            }
-            return colour;  
-        }
-
+        
         /// <summary>
         /// Gets an image snapshot (in memory) from Surveillation Station.
         /// </summary>
@@ -259,45 +176,6 @@ namespace SynoAI.Controllers
             }
 
             return predictions;
-        }
-
-        /// <summary>
-        /// Saves the image to the camera's capture directory.
-        /// </summary>
-        /// <param name="camera">The camera to save the image for.</param>
-        /// <param name="image">The image to save.</param>
-        private string SaveImage(Camera camera, SKBitmap image)
-        {
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
-            string directory = $"Captures";
-            directory = Path.Combine(directory, camera.Name);
-
-            if (!Directory.Exists(directory))
-            {
-                _logger.LogInformation($"{camera}: Creating directory '{directory}'.");
-                Directory.CreateDirectory(directory);
-            }
-
-            string fileName = $"{camera.Name}_{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_FFF}.jpeg";
-            string filePath = Path.Combine(directory, fileName);
-            _logger.LogInformation($"{camera}: Saving image to '{filePath}'.");
-
-            using (FileStream saveStream = new FileStream(filePath, FileMode.CreateNew))
-            {
-                bool saved = image.Encode(saveStream, SKEncodedImageFormat.Jpeg, 100);
-                if (saved)
-                {    
-                    _logger.LogInformation($"{camera}: Imaged saved to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
-                }
-                else
-                {
-                    _logger.LogInformation($"{camera}: Failed to save image to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
-                }
-            }
-            
-            stopwatch.Stop();
-            return filePath;
         }
 
         /// <summary>

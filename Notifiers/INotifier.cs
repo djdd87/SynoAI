@@ -1,9 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using SynoAI.Models;
-using System;
+using SynoAI.Services;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace SynoAI.Notifiers
@@ -17,6 +15,6 @@ namespace SynoAI.Notifiers
         /// <summary>
         /// Handles the send of the notification.
         /// </summary>
-        Task Send(Camera camera, string filePath, IEnumerable<string> foundTypes, ILogger logger);
+        Task Send(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> foundTypes, ILogger logger);
     }
 }

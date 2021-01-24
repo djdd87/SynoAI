@@ -140,17 +140,21 @@ The webhook notification will POST an image to the specified URL with a specifie
 {
   "Url": "http://servername/resource",
   "Method": "POST",
-  "Field": "image"
+  "Field": "image",
+  "SendImage": true,
+  "SendTypes": false
 }
 ```
 * Url [required]: The URL to send the image to
 * Method [optional] (Default: ```POST```): The HTTP method to use, e.g. POST, PUT
-* Field [optional] (Default: ```image```): The field name of the image in the POST data.
+* Field [optional] (Default: ```image```): The field name of the image in the POST data
+* SendImage [optional] (Default: true): The image will be sent to the webhook when the method is POST, PATCH or PUT
+* SendTypes [optional] (Default: false): The list of found types will be sent to the webhook in the body of the request as a JSON string array.
 
 ### HomeAssistant
 Integration with HomeAssistant can be achieved using the [Push](https://www.home-assistant.io/integrations/push/) integration and by calling the HomeAssistant webhook with the SynoAI Webhook notification.
 
-Example Configuration.yaml:
+Example HomeAssistant Configuration.yaml:
 ``` yaml
 camera:
   - platform: push
@@ -160,7 +164,7 @@ camera:
     buffer: 1
 ```
 
-HomeAssistant requires the POSTed image field to be called "image", so from the SynoAI side the integration is simply a case of creating a Webhook and pointing it at your HomeAssistant's IP and Webhook ID:
+HomeAssistant requires the POSTed image field to be called "image" (which is the default for SynoAI), so from the SynoAI side the integration is simply a case of creating a Webhook and pointing it at your HomeAssistant's IP and Webhook ID:
 
 ``` json
 {
@@ -168,6 +172,10 @@ HomeAssistant requires the POSTed image field to be called "image", so from the 
   "Url": "http://nas-ip:8123/api/webhook/motion_driveway"
 }	
 ```
+
+Automations can be created using this webhook by checking for changes for the camera entity state. When the Push camera is not receiving any data, it will be in the state of "Idle". When the state switches to "Recording", it means that the webhook has started receiving data. For the fastest automation responses, perform your actions immediately on that state change.
+
+Multiple webhooks can be set up, each pointed at a different HomeAssistant Push camera. Additionally, you can create an automation that is triggered on a Webhook call. Then just use the SynoAI webhook notification to call that webhook. Note that it's wasteful to send an image when triggering the non-Push webhooks on HomeAssistant, so ensure that SendImage is set to false.
 
 ## Caveats
 * SynoAI still relies on Surveillance Station triggering the motion alerts

@@ -1,11 +1,13 @@
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SynoAI.Models;
+using SynoAI.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace SynoAI.Notifiers.Webhook
@@ -22,70 +24,90 @@ namespace SynoAI.Notifiers.Webhook
         /// <summary>
         /// The HTTP method (POST/PUT/etc).
         /// </summary>
-        public string Method { get; set; } = "POST";
+        public string Method { get; set; }
         /// <summary>
         /// The field name when posting the image.
         /// </summary>
-        public string Field { get; set; } = "image";
+        public string Field { get; set; }
+        /// <summary>
+        /// Whether the image should be sent in POST/PUT/PATCH requests.
+        /// </summary>
+        public bool SendImage { get; set; }
+        /// <summary>
+        /// Whether the message should be sent in POST/PUT/PATCH requests.
+        /// </summary>
+        public bool SendTypes { get; set; }
 
         /// <summary>
         /// Sends a notification to the Webhook.
         /// </summary>
         /// <param name="camera">The camera that triggered the notification.</param>
-        /// <param name="image">The processed image.</param>
+        /// <param name="snapshotManager">A thread safe object for fetching a readonly file stream.</param>
         /// <param name="foundTypes">The list of types that were found.</param>
         /// <param name="logger">A logger.</param>
-        public override async Task Send(Camera camera, string filePath, IEnumerable<string> foundTypes, ILogger logger)
+        public override async Task Send(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> foundTypes, ILogger logger)
         {
-            using (logger.BeginScope($"Webhook '{Url}'"))
+            logger.LogInformation($"{camera.Name}: Webhook: Processing");
+            using (HttpClient client = new HttpClient())
             {
-                logger.LogInformation("Calling Webhook");
-                using (HttpClient client = new HttpClient())
+                MultipartFormDataContent data = new MultipartFormDataContent();
+                if (SendTypes)
                 {
-                    using (FileStream fileStream = File.OpenRead(filePath))
-                    {
-                        MultipartFormDataContent data = new MultipartFormDataContent
-                        {
-                            { new StreamContent(fileStream), "file", Path.GetFileName(filePath) }
-                        };
+                    data.Add(JsonContent.Create(foundTypes));
+                } 
 
-                        HttpResponseMessage message;
-                        switch (Method)
+                FileStream fileStream = null;
+                switch (Method)
+                {
+                    case "PATCH":
+                    case "POST":
+                    case "PUT":
+                        if (SendImage)
                         {
-                            case "DELETE":
-                                logger.LogInformation("Calling DELETE.");
-                                message = await client.DeleteAsync(Url);
-                                break;
-                            case "GET":
-                                logger.LogInformation("Calling GET.");
-                                message = await client.GetAsync(Url);
-                                break;
-                            case "PATCH":
-                                logger.LogInformation("PATCHINGing file.");
-                                message = await client.PatchAsync(Url, data);
-                                break;
-                            case "POST":
-                                logger.LogInformation("POSTing file.");
-                                message = await client.PostAsync(Url, data);
-                                break;
-                            case "PUT":
-                                logger.LogInformation("PUTing file.");
-                                message = await client.PutAsync(Url, data);
-                                break;
-                            default:
-                                logger.LogError($"The Webhook method type '{Method}' is not supported.");
-                                return;
+                            ProcessedImage processedImage = snapshotManager.GetImage(camera);
+                            fileStream = processedImage.GetReadonlyStream();
+                            data.Add(new StreamContent(fileStream), Field, processedImage.FileName);
                         }
+                        break;                            
+                }
 
-                        if (message.IsSuccessStatusCode)
-                        {
-                            logger.LogInformation($"Success.");
-                        }
-                        else
-                        {
-                            logger.LogWarning($"The Webhook response with HTTP status code '{message.StatusCode}'.");
-                        }
-                    }
+                logger.LogInformation($"{camera.Name}: Webhook: Calling {Method}.");
+
+                HttpResponseMessage message;
+                switch (Method)
+                {
+                    case "DELETE":
+                        message = await client.DeleteAsync(Url);
+                        break;
+                    case "GET":
+                        message = await client.GetAsync(Url);
+                        break;
+                    case "PATCH":
+                        message = await client.PatchAsync(Url, data);
+                        break;
+                    case "POST":
+                        message = await client.PostAsync(Url, data);
+                        break;
+                    case "PUT":
+                        message = await client.PutAsync(Url, data);
+                        break;
+                    default:
+                        logger.LogError($"{camera.Name}: Webhook: The method type '{Method}' is not supported.");
+                        return;
+                }
+
+                if (message.IsSuccessStatusCode)
+                {
+                    logger.LogInformation($"{camera.Name}: Webhook: Success.");
+                }
+                else
+                {
+                    logger.LogWarning($"{camera.Name}: Webhook: The end point responded with HTTP status code '{message.StatusCode}'.");
+                }
+
+                if (fileStream != null)
+                {
+                    fileStream.Dispose();
                 }
             }
         }

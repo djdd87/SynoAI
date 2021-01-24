@@ -16,10 +16,14 @@ namespace SynoAI.Notifiers.Webhook
                 string url = section.GetValue<string>("Url");
                 string field = section.GetValue<string>("Field", "image");
                 string method = section.GetValue<string>("Method", "POST");
+                bool sendImage = section.GetValue<bool>("SendImage", true);
+                bool sendTypes = section.GetValue<bool>("SendTypes", false);
 
                 Webhook webhook = new Webhook()
                 {
-                    Url = url
+                    Url = url,
+                    SendImage = sendImage,
+                    SendTypes = sendTypes
                 };
 
                 if (!string.IsNullOrWhiteSpace(field))

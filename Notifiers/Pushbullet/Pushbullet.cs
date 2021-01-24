@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SynoAI.Models;
+using SynoAI.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -30,10 +31,10 @@ namespace SynoAI.Notifiers.Pushbullet
         /// Sends a message and an image using the Pushbullet API.
         /// </summary>
         /// <param name="camera">The camera that triggered the notification.</param>
-        /// <param name="image">The processed image.</param>
+        /// <param name="snapshotManager">A thread safe object for fetching the processed image.</param>
         /// <param name="foundTypes">The list of types that were found.</param>
         /// <param name="logger">A logger.</param>
-        public override async Task Send(Camera camera, string filePath, IEnumerable<string> foundTypes, ILogger logger)
+        public override async Task Send(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> foundTypes, ILogger logger)
         {
             // Pushbullet file uploads are a two part process. First we need to request to upload a file
             using (HttpClient client = new HttpClient())
@@ -41,7 +42,9 @@ namespace SynoAI.Notifiers.Pushbullet
                 client.DefaultRequestHeaders.Add("Access-Token", ApiKey);
 
                 // POST the request to upload a file so we know where we're supposed to send it
-                string fileName = Path.GetFileName(filePath);
+                ProcessedImage processedImage = snapshotManager.GetImage(camera); 
+
+                string fileName = processedImage.FileName;
                 string requestJson = JsonConvert.SerializeObject(new PushbulletUploadRequest()
                 {
                     FileName = fileName,
@@ -55,43 +58,43 @@ namespace SynoAI.Notifiers.Pushbullet
                     PushbulletUploadRequestResponse uploadRequestResult = await GetResponse<PushbulletUploadRequestResponse>(requestResponse);
 
                     // POST the file to the requested URL
-                    HttpResponseMessage uploadFileResponse;
-                    using (FileStream fileStream = File.OpenRead(filePath))
+                    using (FileStream fileStream = processedImage.GetReadonlyStream())
                     {
+                        HttpResponseMessage uploadFileResponse;
                         uploadFileResponse = await client.PostAsync(uploadRequestResult.UploadUrl, new MultipartFormDataContent
                         {
                             { new StreamContent(fileStream), "file", fileName }
                         });
-                    }
 
-                    if (uploadFileResponse.IsSuccessStatusCode)
-                    {
-                        // The file was uploaded successfully, so we can now send the message
-                        string pushJson = JsonConvert.SerializeObject(new PushbulletPush()
+                        if (uploadFileResponse.IsSuccessStatusCode)
                         {
-                            Type = "file",
-                            Title = "Movement Detected",
-                            Body = "Detected: " + string.Join(", ", foundTypes),
-                            FileName = uploadRequestResult.FileName,
-                            FileUrl = uploadRequestResult.FileUrl,
-                            FileType = uploadRequestResult.FileType
-                        });
+                            // The file was uploaded successfully, so we can now send the message
+                            string pushJson = JsonConvert.SerializeObject(new PushbulletPush()
+                            {
+                                Type = "file",
+                                Title = $"{camera.Name}: Movement Detected",
+                                Body = "Detected: " + string.Join(", ", foundTypes),
+                                FileName = uploadRequestResult.FileName,
+                                FileUrl = uploadRequestResult.FileUrl,
+                                FileType = uploadRequestResult.FileType
+                            });
 
-                        HttpResponseMessage pushResponse = await client.PostAsync(URI_PUSHES, new StringContent(pushJson, null, "application/json"));
-                        if (pushResponse.IsSuccessStatusCode)
-                        {
-                            logger.LogInformation($"{camera.Name}: Pushbullet notification sent successfully");
+                            HttpResponseMessage pushResponse = await client.PostAsync(URI_PUSHES, new StringContent(pushJson, null, "application/json"));
+                            if (pushResponse.IsSuccessStatusCode)
+                            {
+                                logger.LogInformation($"{camera.Name}: Pushbullet notification sent successfully");
+                            }
+                            else
+                            {
+                                PushbulletErrorResponse error = await GetResponse<PushbulletErrorResponse>(pushResponse);
+                                logger.LogError($"{camera.Name}: Pushbullet error sending push ({error.Error})");
+                            }
                         }
                         else
                         {
-                            PushbulletErrorResponse error = await GetResponse<PushbulletErrorResponse>(pushResponse);
-                            logger.LogError($"{camera.Name}: Pushbullet error sending push ({error.Error})");
+                            PushbulletErrorResponse error = await GetResponse<PushbulletErrorResponse>(uploadFileResponse);
+                            logger.LogError($"{camera.Name}: Pushbullet error uploading file ({error.Error})");
                         }
-                    }
-                    else
-                    {
-                        PushbulletErrorResponse error = await GetResponse<PushbulletErrorResponse>(uploadFileResponse);
-                        logger.LogError($"{camera.Name}: Pushbullet error uploading file ({error.Error})");
                     }
                 }
                 else
