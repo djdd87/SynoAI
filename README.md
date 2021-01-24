@@ -146,7 +146,12 @@ The webhook notification will POST an image to the specified URL with a specifie
 }
 ```
 * Url [required]: The URL to send the image to
-* Method [optional] (Default: ```POST```): The HTTP method to use, e.g. POST, PUT
+* Method [optional] (Default: ```POST```): The HTTP method to use:
+  * GET
+  * POST
+  * PATCH
+  * PUT
+  * DELETE
 * Field [optional] (Default: ```image```): The field name of the image in the POST data
 * SendImage [optional] (Default: true): The image will be sent to the webhook when the method is POST, PATCH or PUT
 * SendTypes [optional] (Default: false): The list of found types will be sent to the webhook in the body of the request as a JSON string array.
