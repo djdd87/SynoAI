@@ -280,6 +280,12 @@ If you have followed the above instructions to setup the container using the DSM
 ## Docker
 SynoAI can be installed as a docker image, which is [available from DockerHub](https://hub.docker.com/r/djdd87/synoai).
 
+### Images
+The following is a list of the available images and their meaning:
+ 
+* Latest: The latest version
+* Stable: A known stable version, which will only periodically receive updates (ensure the readme on the stable branch is followed as the latest branch's readme may contain changes that are not relevant to the stable image).
+
 ### Docker Configuration
 The image can be pulled using the Docker cli by calling:
 ```
