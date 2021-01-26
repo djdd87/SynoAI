@@ -14,6 +14,10 @@ namespace SynoAI.Notifiers.Webhook
                 logger.LogInformation("Processing Webhook Config");
 
                 string url = section.GetValue<string>("Url");
+                AuthorizationMethod authentication = section.GetValue<AuthorizationMethod>("Authorization", AuthorizationMethod.None);
+                string username = section.GetValue<string>("Username", null);
+                string password = section.GetValue<string>("Password", null);
+                string token = section.GetValue<string>("Token", null);
                 string field = section.GetValue<string>("Field", "image");
                 string method = section.GetValue<string>("Method", "POST");
                 bool sendImage = section.GetValue<bool>("SendImage", true);
@@ -22,6 +26,10 @@ namespace SynoAI.Notifiers.Webhook
                 Webhook webhook = new Webhook()
                 {
                     Url = url,
+                    Authentication = authentication,
+                    Username = username,
+                    Password = password,
+                    Token = token,
                     SendImage = sendImage,
                     SendTypes = sendTypes
                 };

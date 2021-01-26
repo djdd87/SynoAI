@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace SynoAI.Notifiers.Webhook
@@ -25,6 +27,24 @@ namespace SynoAI.Notifiers.Webhook
         /// The HTTP method (POST/PUT/etc).
         /// </summary>
         public string Method { get; set; }
+
+        /// <summary>
+        /// The type of authentication.
+        /// </summary>
+        public AuthorizationMethod Authentication { get; set; }
+        /// <summary>
+        /// The username when using Basic authentication.
+        /// </summary>
+        public string Username {get;set;}
+        /// <summary>
+        /// The password to use when using Basic authentication.
+        /// </summary>
+        public string Password {get;set;}
+        /// <summary>
+        /// The token to use when using Bearer authentication.
+        /// </summary>
+        public string Token {get;set;}
+        
         /// <summary>
         /// The field name when posting the image.
         /// </summary>
@@ -50,6 +70,8 @@ namespace SynoAI.Notifiers.Webhook
             logger.LogInformation($"{camera.Name}: Webhook: Processing");
             using (HttpClient client = new HttpClient())
             {
+                client.DefaultRequestHeaders.Authorization = GetAuthenticationHeader();
+
                 MultipartFormDataContent data = new MultipartFormDataContent();
                 if (SendTypes)
                 {
@@ -110,6 +132,29 @@ namespace SynoAI.Notifiers.Webhook
                     fileStream.Dispose();
                 }
             }
+        }
+
+        /// <summary>
+        /// Generates an authentication header for the client.
+        /// </summary>
+        /// <returns>An authentication header.</returns>
+        private AuthenticationHeaderValue GetAuthenticationHeader()
+        {
+            string parameter;
+            switch (Authentication)
+            {
+                case AuthorizationMethod.Basic:
+                    byte[] bytes = Encoding.ASCII.GetBytes($"{Username}:{Password}");
+                    parameter = Convert.ToBase64String(bytes);
+                    break;
+                case AuthorizationMethod.Bearer:
+                    parameter = Token;
+                    break;
+                default:
+                    return null;
+            }
+
+            return new AuthenticationHeaderValue(Authentication.ToString(), parameter);
         }
 
         /// <summary>
