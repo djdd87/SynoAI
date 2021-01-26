@@ -21,6 +21,7 @@
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
-README.md
-appsettings.Development.json
-docker-compose.debug.yml
+**/README.md
+**/appsettings.Development.json
+**/docker-compose.debug.yml
+**/*.Tests
