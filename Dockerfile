@@ -4,7 +4,9 @@ WORKDIR /app
 EXPOSE 80
 EXPOSE 443
 
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+#FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
+#Temporary fix for NuGet certificate bug
+FROM mcr.microsoft.com/dotnet/sdk:5.0-focal 
 WORKDIR /src
 COPY ["SynoAI/SynoAI.csproj", "./"]
 RUN dotnet restore "SynoAI.csproj"
