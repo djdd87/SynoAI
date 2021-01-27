@@ -6,16 +6,16 @@ EXPOSE 443
 
 #FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 #Temporary fix for NuGet certificate bug
-FROM mcr.microsoft.com/dotnet/sdk:5.0-focal 
+FROM mcr.microsoft.com/dotnet/sdk:5.0-focal
 WORKDIR /src
-COPY ["SynoAI/SynoAI.csproj", "./"]
+COPY ["SynoAI.csproj", "./"]
 RUN dotnet restore "SynoAI.csproj"
 COPY . .
 WORKDIR "/src/."
-RUN dotnet build "SynoAI/SynoAI.csproj" -c Release -o /app/build
+RUN dotnet build "SynoAI.csproj" -c Release -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "SynoAI/SynoAI.csproj" -c Release -o /app/publish
+RUN dotnet publish "SynoAI.csproj" -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
