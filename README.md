@@ -57,22 +57,22 @@ An example appsettings.json configuration file can be found [here](#example-apps
   * Types: [required]: An array of types that will trigger a notification when detected by the AI, e.g. ["Person", "Car"]
   * Threshold [required]: An integer denoting the required confidence of the AI to trigger the notification, e.g. 40 means that the AI must be 40% sure that the object detected was a person before SynoAI sends a notification.
 * Notifiers [required]: See [notifications](#notifications)
-* Delay [optiona] (Default: 5000): The period of time in milliseconds (ms) that must occur between the last motion detection of camera and the next time it'll be processed. i.e. if your delay is set to 5000 and your camera reports motion 4 seconds after it had already reported motion to SynoAI, then the check will be ignored. However, if the report from Surveillance Station is more than 5000ms, then the cameras image will be processed.
-* DrawMode [optional] (Default: Matches): Whether to draw all predictions from the AI on the capture image:
+* Delay [optiona] (Default: ```5000```): The period of time in milliseconds (ms) that must occur between the last motion detection of camera and the next time it'll be processed. i.e. if your delay is set to 5000 and your camera reports motion 4 seconds after it had already reported motion to SynoAI, then the check will be ignored. However, if the report from Surveillance Station is more than 5000ms, then the cameras image will be processed.
+* DrawMode [optional] (Default: ```Matches```): Whether to draw all predictions from the AI on the capture image:
   * Matches: Will draw boundary boxes over any object/person that matches the types defined on the cameras
   * All: Will draw boundary boxes over any object/person that the AI detected
   * Off: Will not draw boundary boxes (note - this will speed up time between detection and notification as SynoAI will not have to manipulate the image)
-* BoxColor [optiona] (Default: #FF0000): The colour of the border of the boundary box
-* Font [optiona] (Default: Tahoma): The font to use when labelling the boundary boxes on the output image
-* FontSize [optiona] (Default: 12): The size of the font to use (in pixels) when labelling the boundary boxes on the output image
-* FontColor [optiona] (Default: #FF0000): The colour of the text for the labels when labelling the boundary boxes on the output image
-* TextOffsetX [optional] (Default: 2) : The number of pixels to offset the label from the left of the inside of the boundary image on the output image
-* TextOffsetY [optional] (Default: 2) : The number of pixels to offset the label from the top of the inside of the boundary image on the output image.
+* BoxColor [optiona] (Default: ```#FF0000```): The colour of the border of the boundary box
+* Font [optiona] (Default: ```Tahoma```): The font to use when labelling the boundary boxes on the output image
+* FontSize [optiona] (Default: ```12```): The size of the font to use (in pixels) when labelling the boundary boxes on the output image
+* FontColor [optiona] (Default: ```#FF0000```): The colour of the text for the labels when labelling the boundary boxes on the output image
+* TextOffsetX [optional] (Default: ```2```) : The number of pixels to offset the label from the left of the inside of the boundary image on the output image
+* TextOffsetY [optional] (Default: ```2```) : The number of pixels to offset the label from the top of the inside of the boundary image on the output image.
 
 ## Development Configs
 Configs which should be changed for debugging (change at own risk):
-* ApiVersionInfo [optiona] (Default: 6): The API version to use for the SYNO.API.Info API. According to the function spec for DSM, 6 is the correct version for DSM 6+
-* ApiVersionCamera [optional] (Default: 9): The API version to use for SYNO.SurveillanceStation.Camera. According to the functional spec for DSM, 9 is the correct version for SSS 8+.
+* ApiVersionInfo [optiona] (Default: ```6```): The API version to use for the SYNO.API.Info API. According to the function spec for DSM, 6 is the correct version for DSM 6+
+* ApiVersionCamera [optional] (Default: ```9```): The API version to use for SYNO.SurveillanceStation.Camera. According to the functional spec for DSM, 9 is the correct version for SSS 8+.
 
 ## Supported AIs
 * [Deepstack](https://deepstack.cc/)
@@ -98,8 +98,8 @@ The Deepstack API is a free to use AI that can identify objects, faces and more.
 }
 ```
 * Url [required]: The URL of the AI to POST the image to
-* MinSizeX [optional] (Default: 50): The minimum size in pixels that the object must be to trigger a change
-* MinSizeY [optional] (Default: 50): The minimum size in pixels that the object must be to trigger a change.
+* MinSizeX [optional] (Default: ```50```): The minimum size in pixels that the object must be to trigger a change
+* MinSizeY [optional] (Default: ```50```): The minimum size in pixels that the object must be to trigger a change.
 
 ## Notifications
 
@@ -152,9 +152,15 @@ The webhook notification will POST an image to the specified URL with a specifie
   * PATCH
   * PUT
   * DELETE
+* Authorization [optional] (Default: ```None```): The type of Authorization to use if any
+  * Basic
+    * Username [optional]: The username to use when using Basic Authorization
+    * Password [optional]: The password to use when using Basic Authorization
+  * Bearer
+    * Token [optional]: The token to use when using Basic Authorization
 * Field [optional] (Default: ```image```): The field name of the image in the POST data
-* SendImage [optional] (Default: true): The image will be sent to the webhook when the method is POST, PATCH or PUT
-* SendTypes [optional] (Default: false): The list of found types will be sent to the webhook in the body of the request as a JSON string array.
+* SendImage [optional] (Default: ```true```): The image will be sent to the webhook when the method is POST, PATCH or PUT
+* SendTypes [optional] (Default: ```false```): The list of found types will be sent to the webhook in the body of the request as a JSON string array.
 
 ### HomeAssistant
 Integration with HomeAssistant can be achieved using the [Push](https://www.home-assistant.io/integrations/push/) integration and by calling the HomeAssistant webhook with the SynoAI Webhook notification.
