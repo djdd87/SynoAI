@@ -9,6 +9,6 @@ namespace SynoAI.Notifiers
     public abstract class NotifierBase : INotifier
     {
         public IEnumerable<string> Cameras { get; set;} 
-        public abstract Task Send(Camera camera, ISnapshotManager fileAccessor, IEnumerable<string> foundTypes, ILogger logger);
+        public abstract Task SendAsync(Camera camera, ISnapshotManager fileAccessor, IEnumerable<string> foundTypes, ILogger logger);
     }
 }
