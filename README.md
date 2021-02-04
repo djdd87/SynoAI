@@ -201,7 +201,7 @@ The top level steps are:
 * Add Action Rules to Synology Surveillance Station's motion alerts in order to trigger the SynoAI API.
 
 ### 1) Configure Deepstack
-The following instructions explain how to set up the Deepstack image using the Docker app built into DSM. Before continuing, you'll need to obtain a *free* API key from [Deepstack](https://www.deepstack.cc/install/docker). 
+The following instructions explain how to set up the Deepstack image using the Docker app built into DSM. Before continuing, you'll need to obtain a *free* API key from [Deepstack](https://www.deepstack.cc/install/docker). *UPDATE 2020-02-04 - It looks like DeepStack is now "free forever" and doesn't even need a free API key. I haven't investigated this yet, but it's seems as though you might just be able to get the docker image now without activating.*
 
 * Download the deepquestai/deepstack image by either;
   * Searching the registry for deepquestai/deepstack
