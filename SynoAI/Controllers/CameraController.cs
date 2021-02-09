@@ -117,7 +117,7 @@ namespace SynoAI.Controllers
             List<Task> tasks = new List<Task>();
             foreach (INotifier notifier in notifiers)
             {
-                tasks.Add(notifier.Send(camera, snapshotManager, labels, _logger));
+                tasks.Add(notifier.SendAsync(camera, snapshotManager, labels, _logger));
             }
 
             await Task.WhenAll(tasks);
