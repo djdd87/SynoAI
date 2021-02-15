@@ -24,7 +24,7 @@ namespace SynoAI.Notifiers.Email
         /// <summary>
         /// The email address to send the notification to.
         /// </summary>
-        public string ToEmail { get; set; }
+        public string Destination { get; set; }
         /// <summary>
         /// The username to autheticate on the smtp server.
         /// </summary>
@@ -55,7 +55,7 @@ namespace SynoAI.Notifiers.Email
         /// <param name="logger">A logger.</param>
         public override async Task SendAsync(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> foundTypes, ILogger logger)
         {
-            using (logger.BeginScope($"Email '{ToEmail}'"))
+            using (logger.BeginScope($"Email '{Destination}'"))
             {
                 // Assign camera name to variable for logger placeholder
                 string cameraName = camera.Name;
@@ -67,9 +67,9 @@ namespace SynoAI.Notifiers.Email
                 {
                     // Create the email message
                     MimeMessage email = new MimeMessage();
-                    email.From.Add(new MailboxAddress("SynoAi", ToEmail));
-                    email.To.Add(MailboxAddress.Parse(ToEmail));
-                    email.Subject = "SynoAi: Movement Detected";
+                    email.From.Add(new MailboxAddress("SynoAI", Destination));
+                    email.To.Add(MailboxAddress.Parse(Destination));
+                    email.Subject = $"SynoAI: Movement Detected ({camera.Name})";
 
                     BodyBuilder builder = new BodyBuilder();
                     builder.HtmlBody = $"<h2>Movement detected on camera: {camera.Name}</h2>";
@@ -83,11 +83,11 @@ namespace SynoAI.Notifiers.Email
                     await smtp.SendAsync(email);
                     smtp.Disconnect(true);
 
-                    logger.LogInformation("{cameraName}: Email notification sent successfully", cameraName);
+                    logger.LogInformation($"{cameraName}: Email notification sent successfully", cameraName);
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError("{cameraName}: Error occurred sending email", cameraName);
+                    logger.LogError($"{cameraName}: Error occurred sending email", cameraName);
                     logger.LogError(ex, "An exception occurred");
                 }
             }

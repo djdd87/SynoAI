@@ -21,6 +21,7 @@ I made this application mostly for myself in order to improve upon Christopher A
 * [Notifications](#notifications)
   * [Pushbullet](#pushbullet)
   * [Webhook](#webhook)
+  * [Email](#email)
   * [HomeAssistant](#homeassistant)
 * [Caveats](#caveats)
 * [Configuration](#configuration)
@@ -161,6 +162,32 @@ The webhook notification will POST an image to the specified URL with a specifie
 * Field [optional] (Default: ```image```): The field name of the image in the POST data
 * SendImage [optional] (Default: ```true```): The image will be sent to the webhook when the method is POST, PATCH or PUT
 * SendTypes [optional] (Default: ```false```): The list of found types will be sent to the webhook in the body of the request as a JSON string array.
+
+### Email 
+The email notification will send and email with the attached image to the specified recipient.
+
+```json
+{
+  "Type": "Email",
+  "Destination": "youremail@example.com",
+  "Host": "smtp.server.com",
+  "Port": 465,
+  "Username": "username",
+  "Password": "password",
+  "Encryption": "Auto"
+}
+```
+* Destination [required]: The email recipient for SynoAi notifications
+* Host [required]: The hostname of the SMTP server e.g. "smtp.gmail.com"
+* Port [optional] (Default: 25): The port used by the SMTP server e.g 25, 465, 587
+* Username [optional] (Default: ``````):  The email used to authenticate with the smtp server
+* Password [optional] (Default: ``````) : The password used to authenticate with the smtp server
+* Encryption [optional] (Default: ```None```):  The encryption method used by the host:
+  * None: No SSL or TLS encryption should be used
+  * Auto: Allow SynoAI to decide which SSL or TLS options to use. If the server does not support SSL or TLS, then the connection will continue without any encryption
+  * SSL: The connection should use SSL or TLS encryption immediately
+  * STARTTLS: Elevates the connection to use TLS encryption immediately after reading the greeting and capabilities of the server. If the server does not support the STARTTLS extension, then the connection will fail and a NotSupportedException will be thrown
+  * STARTTLSWHENAVAILABLE: Elevates the connection to use TLS encryption immediately after reading the greeting and capabilities of the server, but only if the server supports the STARTTLS extension.
 
 ### HomeAssistant
 Integration with HomeAssistant can be achieved using the [Push](https://www.home-assistant.io/integrations/push/) integration and by calling the HomeAssistant webhook with the SynoAI Webhook notification.
