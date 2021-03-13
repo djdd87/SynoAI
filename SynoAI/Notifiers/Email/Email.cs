@@ -77,18 +77,23 @@ namespace SynoAI.Notifiers.Email
                     email.Body = builder.ToMessageBody();
 
                     // Send email
-                    using var smtp = new SmtpClient();
-                    smtp.Connect(Host, Port, SocketOptions);
-                    if(!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
-                        smtp.Authenticate(Username, Password);
-                    await smtp.SendAsync(email);
-                    smtp.Disconnect(true);
+                    using (SmtpClient smtp = new SmtpClient())
+                    {
+                        smtp.Connect(Host, Port, SocketOptions);
+                        if(!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+                        {
+                            smtp.Authenticate(Username, Password);
+                        }
+                        
+                        await smtp.SendAsync(email);
+                        smtp.Disconnect(true);
+                    }
 
-                    logger.LogInformation($"{cameraName}: Email notification sent successfully", cameraName);
+                    logger.LogInformation("{cameraName}: Email notification sent successfully", cameraName);
                 }
                 catch (Exception ex)
                 {
-                    logger.LogError($"{cameraName}: Error occurred sending email", cameraName);
+                    logger.LogError("{cameraName}: Error occurred sending email", cameraName);
                     logger.LogError(ex, "An exception occurred");
                 }
             }

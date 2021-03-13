@@ -166,9 +166,8 @@ The webhook notification will POST an image to the specified URL with a specifie
 
 ### Telegram
 The telegram bot will send notifications and images when motion has been detected.
-Currently all the options below are required for the bot to work except the `PhotoBaseURL`. I have simply exposed the Captures folder through `Web Station` and set that URL into the `PhotoBaseURL` option.
 
-For setting up the telegram bot there are plenty of [guides](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-channel-connect-telegram?view=azure-bot-service-4.0)
+For setting up the telegram bot there are [plenty](https://core.telegram.org/bots#6-botfather) of [guides](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-channel-connect-telegram?view=azure-bot-service-4.0) available.
 
 ```json
 {
@@ -179,7 +178,9 @@ For setting up the telegram bot there are plenty of [guides](https://docs.micros
 }
 ```
 
-
+* Chat ID [required]: The ID of the chat with your bot. There are a number of ways of retrieving your ID, including [this one](https://sean-bradley.medium.com/get-telegram-chat-id-80b575520659).
+* Token [required]: The API token provided to you by Telegram's BotFather when creating your bot
+* PhotoBaseURL [optional]: Should only be filled in if you're using the Synology Web Station and can self host your images. If left blank, the file will be uploaded to Telegram for you. However, if you exposed your Captures directory on Web Station, this would be the URL to your captures folder.
 
 ### Email 
 The email notification will send and email with the attached image to the specified recipient.

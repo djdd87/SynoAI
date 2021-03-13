@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using MimeKit;
 using MimeKit.Text;
 using Newtonsoft.Json;
-using SynoAI.Extensions;
 using SynoAI.Models;
 using SynoAI.Services;
 using System;
@@ -37,7 +36,7 @@ namespace SynoAI.Notifiers.Telegram
         public string PhotoBaseURL { get; set; }
 
         /// <summary>
-        /// Sends a message and an image using the Pushbullet API.
+        /// Sends a message and an image using the Telegram API.
         /// </summary>
         /// <param name="camera">The camera that triggered the notification.</param>
         /// <param name="snapshotManager">A thread safe object for fetching the processed image.</param>
@@ -52,26 +51,30 @@ namespace SynoAI.Notifiers.Telegram
 
                 try
                 {
-                    var bot = new TelegramBotClient(Token);
-
+                    TelegramBotClient bot = new TelegramBotClient(Token);
                     ProcessedImage processedImage = snapshotManager.GetImage(camera);
-                    var photoUrl = $"{PhotoBaseURL}/{camera.Name}/{processedImage.FileName}";
 
-                    var message = $"Motion detected on {camera.Name}\n\nDetected {foundTypes.Count()} objects:\n{String.Join("/n", foundTypes.Select(x => x.FirstCharToUpper()).ToArray())}";
-
-
-                    if(!string.IsNullOrEmpty(PhotoBaseURL)) {
+                    string message = GetMessage(camera, foundTypes);
+                    if (string.IsNullOrWhiteSpace(PhotoBaseURL))
+                    {
+                        // The photo base URL hasn't been specified, which means we need to send the file ourselves
+                        using (FileStream fileStream = processedImage.GetReadonlyStream())
+                        {
+                            await bot.SendPhotoAsync(ChatID, fileStream, message);
+                        }
+                        // TODO - Add a config to disable the sending of the image?
+                    } 
+                    else 
+                    {
+                        string photoUrl = $"{PhotoBaseURL}/{camera.Name}/{processedImage.FileName}";
                         await bot.SendPhotoAsync(ChatID, photoUrl, message);
-                    } else {
-                        await bot.SendTextMessageAsync(ChatID, message);
                     }
 
-
-                    logger.LogInformation($"{cameraName}: Telegram notification sent successfully", cameraName);
+                    logger.LogInformation("{cameraName}: Telegram notification sent successfully", cameraName);
                 } 
                 catch (Exception ex)
                 {
-                    logger.LogError($"{cameraName}: Error occurred sending telegram", cameraName);
+                    logger.LogError("{cameraName}: Error occurred sending telegram", cameraName);
                     logger.LogError(ex, "An exception occurred");
                 }
             }
