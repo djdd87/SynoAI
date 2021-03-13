@@ -21,6 +21,10 @@ namespace SynoAI.Notifiers
         /// <summary>
         /// Sends a notification email with the image attached.
         /// </summary>
-        Email
+        Email,
+        /// <summary>
+        /// Sends a notification to Telegram with the image attached.
+        /// </summary>
+        Telegram
     }
 }
