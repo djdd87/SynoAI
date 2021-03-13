@@ -165,9 +165,7 @@ The webhook notification will POST an image to the specified URL with a specifie
 * SendTypes [optional] (Default: ```false```): The list of found types will be sent to the webhook in the body of the request as a JSON string array.
 
 ### Telegram
-The telegram bot will send notifications and images when motion has been detected.
-
-For setting up the telegram bot there are [plenty](https://core.telegram.org/bots#6-botfather) of [guides](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-channel-connect-telegram?view=azure-bot-service-4.0) available.
+The telegram bot will send notifications and images when motion has been detected. To use this notification, you will need to set up your own Telegram bot using [one](https://core.telegram.org/bots#6-botfather) of the many [guides](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-channel-connect-telegram?view=azure-bot-service-4.0) available.
 
 ```json
 {
