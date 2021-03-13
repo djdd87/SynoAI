@@ -21,7 +21,7 @@ I made this application mostly for myself in order to improve upon Christopher A
 * [Notifications](#notifications)
   * [Pushbullet](#pushbullet)
   * [Webhook](#webhook)
-  * [Email](#email)
+  * [Email](#email) 
   * [HomeAssistant](#homeassistant)
 * [Caveats](#caveats)
 * [Configuration](#configuration)
@@ -196,6 +196,7 @@ The email notification will send and email with the attached image to the specif
   "Encryption": "Auto"
 }
 ```
+
 * Destination [required]: The email recipient for SynoAi notifications
 * Host [required]: The hostname of the SMTP server e.g. "smtp.gmail.com"
 * Port [optional] (Default: 25): The port used by the SMTP server e.g 25, 465, 587
@@ -207,6 +208,19 @@ The email notification will send and email with the attached image to the specif
   * SSL: The connection should use SSL or TLS encryption immediately
   * STARTTLS: Elevates the connection to use TLS encryption immediately after reading the greeting and capabilities of the server. If the server does not support the STARTTLS extension, then the connection will fail and a NotSupportedException will be thrown
   * STARTTLSWHENAVAILABLE: Elevates the connection to use TLS encryption immediately after reading the greeting and capabilities of the server, but only if the server supports the STARTTLS extension.
+
+#### Gmail
+```json
+{
+  "Type": "Email",
+  "Destination": "youremail@gmail.com",
+  "Host": "smtp.gmail.com",
+  "Port": 587,
+  "Encryption": "StartTLS",
+  "Username": "youremail@gmail.com",
+  "Password": "yourpassword"
+},
+```
 
 ### HomeAssistant
 Integration with HomeAssistant can be achieved using the [Push](https://www.home-assistant.io/integrations/push/) integration and by calling the HomeAssistant webhook with the SynoAI Webhook notification.
