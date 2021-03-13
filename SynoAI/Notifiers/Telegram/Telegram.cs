@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using MimeKit;
 using MimeKit.Text;
 using Newtonsoft.Json;
+using SynoAI.Extensions;
 using SynoAI.Models;
 using SynoAI.Services;
 using System;
@@ -51,12 +52,19 @@ namespace SynoAI.Notifiers.Telegram
 
                 try
                 {
+                    var bot = new TelegramBotClient(Token);
+
                     ProcessedImage processedImage = snapshotManager.GetImage(camera);
                     var photoUrl = $"{PhotoBaseURL}/{camera.Name}/{processedImage.FileName}";
 
-                    var bot = new TelegramBotClient(Token);
-                    await bot.SendTextMessageAsync(ChatID, $"Motion detected on {camera.Name}\n\nDetected {foundTypes.Count()} objects:\n {String.Join("\n", foundTypes)}");
-                    await bot.SendPhotoAsync(ChatID, photoUrl);
+                    var message = $"Motion detected on {camera.Name}\n\nDetected {foundTypes.Count()} objects:\n{String.Join("/n", foundTypes.Select(x => x.FirstCharToUpper()).ToArray())}";
+
+
+                    if(!string.IsNullOrEmpty(PhotoBaseURL)) {
+                        await bot.SendPhotoAsync(ChatID, photoUrl, message);
+                    } else {
+                        await bot.SendTextMessageAsync(ChatID, message);
+                    }
 
 
                     logger.LogInformation($"{cameraName}: Telegram notification sent successfully", cameraName);

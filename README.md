@@ -122,6 +122,7 @@ Supported notifications:
 
 * Pushbullet
 * Webhook
+* Telegram
 
 ### Pushbullet
 The [Pushbullet](https://www.pushbullet.com/) notification will send an image and a message containing a list of detected object types. An API key will need to be obtained from your Pushbullet account. Currently the notification will be sent to all devices that the API key belongs to.
@@ -162,6 +163,23 @@ The webhook notification will POST an image to the specified URL with a specifie
 * Field [optional] (Default: ```image```): The field name of the image in the POST data
 * SendImage [optional] (Default: ```true```): The image will be sent to the webhook when the method is POST, PATCH or PUT
 * SendTypes [optional] (Default: ```false```): The list of found types will be sent to the webhook in the body of the request as a JSON string array.
+
+### Telegram
+The telegram bot will send notifications and images when motion has been detected.
+Currently all the options below are required for the bot to work except the `PhotoBaseURL`. I have simply exposed the Captures folder through `Web Station` and set that URL into the `PhotoBaseURL` option.
+
+For setting up the telegram bot there are plenty of [guides](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-channel-connect-telegram?view=azure-bot-service-4.0)
+
+```json
+{
+  "Type": "Telegram",
+  "ChatID": "000000000",
+  "Token": "",
+  "PhotoBaseURL": ""
+}
+```
+
+
 
 ### Email 
 The email notification will send and email with the attached image to the specified recipient.
