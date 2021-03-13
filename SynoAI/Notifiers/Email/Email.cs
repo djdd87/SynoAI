@@ -79,7 +79,8 @@ namespace SynoAI.Notifiers.Email
                     // Send email
                     using var smtp = new SmtpClient();
                     smtp.Connect(Host, Port, SocketOptions);
-                    smtp.Authenticate(Username, Password);
+                    if(!string.IsNullOrEmpty(Username) && !string.IsNullOrEmpty(Password))
+                        smtp.Authenticate(Username, Password);
                     await smtp.SendAsync(email);
                     smtp.Disconnect(true);
 
