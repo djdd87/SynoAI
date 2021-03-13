@@ -91,7 +91,7 @@ namespace SynoAI.Controllers
                 
                 // Limit the predictions to just those defined by the camera
                 predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
-                await SendNotifications(camera, snapshotManager, predictions.Select(x=> x.Label).Distinct().ToList());
+                await SendNotifications(camera, snapshotManager, predictions.Select(x=> x.Label).ToList());
             }
             else if (predictions.Count() > 0)
             {

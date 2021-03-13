@@ -122,6 +122,7 @@ Supported notifications:
 
 * Pushbullet
 * Webhook
+* Telegram
 
 ### Pushbullet
 The [Pushbullet](https://www.pushbullet.com/) notification will send an image and a message containing a list of detected object types. An API key will need to be obtained from your Pushbullet account. Currently the notification will be sent to all devices that the API key belongs to.
@@ -162,6 +163,24 @@ The webhook notification will POST an image to the specified URL with a specifie
 * Field [optional] (Default: ```image```): The field name of the image in the POST data
 * SendImage [optional] (Default: ```true```): The image will be sent to the webhook when the method is POST, PATCH or PUT
 * SendTypes [optional] (Default: ```false```): The list of found types will be sent to the webhook in the body of the request as a JSON string array.
+
+### Telegram
+The telegram bot will send notifications and images when motion has been detected.
+
+For setting up the telegram bot there are [plenty](https://core.telegram.org/bots#6-botfather) of [guides](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-channel-connect-telegram?view=azure-bot-service-4.0) available.
+
+```json
+{
+  "Type": "Telegram",
+  "ChatID": "000000000",
+  "Token": "",
+  "PhotoBaseURL": ""
+}
+```
+
+* Chat ID [required]: The ID of the chat with your bot. There are a number of ways of retrieving your ID, including [this one](https://sean-bradley.medium.com/get-telegram-chat-id-80b575520659).
+* Token [required]: The API token provided to you by Telegram's BotFather when creating your bot
+* PhotoBaseURL [optional]: Should only be filled in if you're using the Synology Web Station and can self host your images. If left blank, the file will be uploaded to Telegram for you. However, if you exposed your Captures directory on Web Station, this would be the URL to your captures folder.
 
 ### Email 
 The email notification will send and email with the attached image to the specified recipient.

@@ -73,7 +73,7 @@ namespace SynoAI.Notifiers.Pushbullet
                             {
                                 Type = "file",
                                 Title = $"{camera.Name}: Movement Detected",
-                                Body = "Detected: " + string.Join(", ", foundTypes),
+                                Body = GetMessage(camera, foundTypes),
                                 FileName = uploadRequestResult.FileName,
                                 FileUrl = uploadRequestResult.FileUrl,
                                 FileType = uploadRequestResult.FileType
