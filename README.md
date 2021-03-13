@@ -21,6 +21,7 @@ I made this application mostly for myself in order to improve upon Christopher A
 * [Notifications](#notifications)
   * [Pushbullet](#pushbullet)
   * [Webhook](#webhook)
+  * [Telegram](#telegram)
   * [Email](#email) 
   * [HomeAssistant](#homeassistant)
 * [Caveats](#caveats)
