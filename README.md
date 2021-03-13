@@ -118,12 +118,6 @@ Multiple notifications can be triggered when an object is detected. Each notific
 * Type [required]: One of the supported notification types (see each type for additional required and optional configs below)
 * Cameras [optional]: A list of camera names that the notification will be triggered for. Allows certain notifications to only trigger for specific cameras; not specifying the value, or setting cameras to an empty array, will result in the notification being sent for all cameras.  
 
-Supported notifications:
-
-* Pushbullet
-* Webhook
-* Telegram
-
 ### Pushbullet
 The [Pushbullet](https://www.pushbullet.com/) notification will send an image and a message containing a list of detected object types. An API key will need to be obtained from your Pushbullet account. Currently the notification will be sent to all devices that the API key belongs to.
 
