@@ -55,7 +55,7 @@ namespace SynoAI.Notifiers.Telegram
                     var photoUrl = $"{PhotoBaseURL}/{camera.Name}/{processedImage.FileName}";
 
                     var bot = new TelegramBotClient(Token);
-                    await bot.SendTextMessageAsync(ChatID, $"Motion detected on {camera.Name}\n\nDetected {foundTypes.Count()} objects:\n {foundTypes.Select(x => x+"\n")}");
+                    await bot.SendTextMessageAsync(ChatID, $"Motion detected on {camera.Name}\n\nDetected {foundTypes.Count()} objects:\n {String.Join("\n", foundTypes)}");
                     await bot.SendPhotoAsync(ChatID, photoUrl);
 
 
