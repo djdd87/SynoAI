@@ -144,7 +144,7 @@ namespace SynoAI.Services
                 Directory.CreateDirectory(directory);
             }
 
-            string fileName = $"{camera.Name}_{DateTime.UtcNow:yyyy_MM_dd_HH_mm_ss_FFF}.jpeg";
+            string fileName = $"{camera.Name}_{DateTime.Now:yyyy_MM_dd_HH_mm_ss_FFF}.jpeg";
             string filePath = Path.Combine(directory, fileName);
             _logger.LogInformation($"{camera}: Saving image to '{filePath}'.");
 
