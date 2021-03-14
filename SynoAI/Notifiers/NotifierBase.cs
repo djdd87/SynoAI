@@ -16,7 +16,7 @@ namespace SynoAI.Notifiers
 
         protected string GetMessage(Camera camera, IEnumerable<string> foundTypes)
         {
-            return $"Motion detected on {camera.Name}\n\nDetected {foundTypes.Count()} objects:\n{String.Join("/n", foundTypes.Select(x => x.FirstCharToUpper()).ToArray())}";
+            return $"Motion detected on {camera.Name}\n\nDetected {foundTypes.Count()} objects:\n{String.Join("\n", foundTypes.Select(x => x.FirstCharToUpper()).ToArray())}";
         }
     }
 }
