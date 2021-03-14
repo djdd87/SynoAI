@@ -21,7 +21,8 @@ I made this application mostly for myself in order to improve upon Christopher A
 * [Notifications](#notifications)
   * [Pushbullet](#pushbullet)
   * [Webhook](#webhook)
-  * [Email](#email)
+  * [Telegram](#telegram)
+  * [Email](#email) 
   * [HomeAssistant](#homeassistant)
 * [Caveats](#caveats)
 * [Configuration](#configuration)
@@ -118,12 +119,6 @@ Multiple notifications can be triggered when an object is detected. Each notific
 * Type [required]: One of the supported notification types (see each type for additional required and optional configs below)
 * Cameras [optional]: A list of camera names that the notification will be triggered for. Allows certain notifications to only trigger for specific cameras; not specifying the value, or setting cameras to an empty array, will result in the notification being sent for all cameras.  
 
-Supported notifications:
-
-* Pushbullet
-* Webhook
-* Telegram
-
 ### Pushbullet
 The [Pushbullet](https://www.pushbullet.com/) notification will send an image and a message containing a list of detected object types. An API key will need to be obtained from your Pushbullet account. Currently the notification will be sent to all devices that the API key belongs to.
 
@@ -165,9 +160,7 @@ The webhook notification will POST an image to the specified URL with a specifie
 * SendTypes [optional] (Default: ```false```): The list of found types will be sent to the webhook in the body of the request as a JSON string array.
 
 ### Telegram
-The telegram bot will send notifications and images when motion has been detected.
-
-For setting up the telegram bot there are [plenty](https://core.telegram.org/bots#6-botfather) of [guides](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-channel-connect-telegram?view=azure-bot-service-4.0) available.
+The telegram bot will send notifications and images when motion has been detected. To use this notification, you will need to set up your own Telegram bot using [one](https://core.telegram.org/bots#6-botfather) of the many [guides](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-channel-connect-telegram?view=azure-bot-service-4.0) available.
 
 ```json
 {
@@ -196,6 +189,7 @@ The email notification will send and email with the attached image to the specif
   "Encryption": "Auto"
 }
 ```
+
 * Destination [required]: The email recipient for SynoAi notifications
 * Host [required]: The hostname of the SMTP server e.g. "smtp.gmail.com"
 * Port [optional] (Default: 25): The port used by the SMTP server e.g 25, 465, 587
@@ -207,6 +201,19 @@ The email notification will send and email with the attached image to the specif
   * SSL: The connection should use SSL or TLS encryption immediately
   * STARTTLS: Elevates the connection to use TLS encryption immediately after reading the greeting and capabilities of the server. If the server does not support the STARTTLS extension, then the connection will fail and a NotSupportedException will be thrown
   * STARTTLSWHENAVAILABLE: Elevates the connection to use TLS encryption immediately after reading the greeting and capabilities of the server, but only if the server supports the STARTTLS extension.
+
+#### Gmail
+```json
+{
+  "Type": "Email",
+  "Destination": "youremail@gmail.com",
+  "Host": "smtp.gmail.com",
+  "Port": 587,
+  "Encryption": "StartTLS",
+  "Username": "youremail@gmail.com",
+  "Password": "yourpassword"
+},
+```
 
 ### HomeAssistant
 Integration with HomeAssistant can be achieved using the [Push](https://www.home-assistant.io/integrations/push/) integration and by calling the HomeAssistant webhook with the SynoAI Webhook notification.
