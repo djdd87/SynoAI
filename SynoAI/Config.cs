@@ -117,7 +117,7 @@ namespace SynoAI
         {
             logger.LogInformation("Processing config.");
             Url = configuration.GetValue<string>("Url");
-            Username = configuration.GetValue<string>("User");
+            Username = configuration.GetValue<string>("Username");
             Password = configuration.GetValue<string>("Password");
             AllowInsecureUrl = configuration.GetValue<bool>("AllowInsecureUrl");
 
