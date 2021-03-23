@@ -73,11 +73,18 @@ namespace SynoAI.Controllers
             Stopwatch overallStopwatch = Stopwatch.StartNew();
 
             // Take the snapshot from Surveillance Station
-            byte[] imageBytes = await GetSnapshot(id);
+            byte[] snapshot = await GetSnapshot(id);
+
+            // Save the original unprocessed image if required
+            if (Config.SaveOriginalSnapshot)
+            {
+                _logger.LogInformation($"{id}: Saving original image before processing");
+                SnapshotManager.SaveOriginalImage(_logger, camera, snapshot);
+            }
 
             // Use the AI to get the valid predictions and then get all the valid predictions, which are all the AI predictions where the result from the AI is 
             // in the list of types and where the size of the object is bigger than the defined value.
-            IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, imageBytes);
+            IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, snapshot);
             IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
                 camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase) &&     // Is a type we care about
                 x.SizeX >= Config.AIMinSizeX && x.SizeY >= Config.AIMinSizeY)           // Is bigger than the minimum size
@@ -87,7 +94,7 @@ namespace SynoAI.Controllers
             {
                 // Because we don't want to process the image if it isn't even required, then we pass the snapshot manager to the notifiers. It will then perform 
                 // the necessary actions when it's GetImage method is called.
-                SnapshotManager snapshotManager = new SnapshotManager(imageBytes, predictions, validPredictions, _snapshotManagerLogger);
+                SnapshotManager snapshotManager = new SnapshotManager(snapshot, predictions, validPredictions, _snapshotManagerLogger);
                 
                 // Limit the predictions to just those defined by the camera
                 predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();

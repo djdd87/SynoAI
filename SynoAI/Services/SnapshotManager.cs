@@ -57,7 +57,7 @@ namespace SynoAI.Services
                         string filePath;
                         using (SKBitmap image = ProcessImage(camera))
                         {
-                            filePath = SaveImage(camera, image);
+                            filePath = SaveImage(_logger, camera, image);
                         }
 
                         // Create the helper object
@@ -80,8 +80,10 @@ namespace SynoAI.Services
 
             _logger.LogInformation($"{camera.Name}: Processing image boundaries.");
 
-            // Load the bitmap
+            // Load the bitmap 
             SKBitmap image = SKBitmap.Decode(new MemoryStream(_snapshot));
+
+            // Don't process the drawing if the drawing mode is off
             if (Config.DrawMode == DrawMode.Off)
             {
                 _logger.LogInformation($"{camera.Name}: Draw mode is Off. Skipping image boundaries.");
@@ -127,11 +129,22 @@ namespace SynoAI.Services
         }
 
         /// <summary>
+        /// Saves the original unprocessed image from the provided byte array to the camera's capture directory.
+        /// </summary>
+        /// <param name="camera">The camera to save the image for.</param>
+        /// <param name="image">The image to save.</param>
+        public static string SaveOriginalImage(ILogger logger, Camera camera, byte[] snapshot)
+        {
+            SKBitmap image = SKBitmap.Decode(new MemoryStream(snapshot));
+            return SaveImage(logger, camera, image, "Original");
+        }
+
+        /// <summary>
         /// Saves the image to the camera's capture directory.
         /// </summary>
         /// <param name="camera">The camera to save the image for.</param>
         /// <param name="image">The image to save.</param>
-        private string SaveImage(Camera camera, SKBitmap image)
+        private static string SaveImage(ILogger logger, Camera camera, SKBitmap image, string suffix = null)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -140,13 +153,19 @@ namespace SynoAI.Services
 
             if (!Directory.Exists(directory))
             {
-                _logger.LogInformation($"{camera}: Creating directory '{directory}'.");
+                logger.LogInformation($"{camera}: Creating directory '{directory}'.");
                 Directory.CreateDirectory(directory);
             }
 
-            string fileName = $"{camera.Name}_{DateTime.Now:yyyy_MM_dd_HH_mm_ss_FFF}.jpeg";
+            string fileName = $"{camera.Name}_{DateTime.Now:yyyy_MM_dd_HH_mm_ss_FFF}";
+            if (!string.IsNullOrWhiteSpace(suffix))
+            {
+                fileName += "_" + suffix;
+            }
+            fileName+= ".jpeg";
+
             string filePath = Path.Combine(directory, fileName);
-            _logger.LogInformation($"{camera}: Saving image to '{filePath}'.");
+            logger.LogInformation($"{camera}: Saving image to '{filePath}'.");
 
             using (FileStream saveStream = new FileStream(filePath, FileMode.CreateNew))
             {
@@ -155,11 +174,11 @@ namespace SynoAI.Services
 
                 if (saved)
                 {    
-                    _logger.LogInformation($"{camera}: Imaged saved to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
+                    logger.LogInformation($"{camera}: Imaged saved to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
                 }
                 else
                 {
-                    _logger.LogInformation($"{camera}: Failed to save image to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
+                    logger.LogInformation($"{camera}: Failed to save image to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
                 }
             }
             

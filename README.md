@@ -70,7 +70,8 @@ An example appsettings.json configuration file can be found [here](#example-apps
 * FontSize [optiona] (Default: ```12```): The size of the font to use (in pixels) when labelling the boundary boxes on the output image
 * FontColor [optiona] (Default: ```#FF0000```): The colour of the text for the labels when labelling the boundary boxes on the output image
 * TextOffsetX [optional] (Default: ```2```) : The number of pixels to offset the label from the left of the inside of the boundary image on the output image
-* TextOffsetY [optional] (Default: ```2```) : The number of pixels to offset the label from the top of the inside of the boundary image on the output image.
+* TextOffsetY [optional] (Default: ```2```) : The number of pixels to offset the label from the top of the inside of the boundary image on the output image
+* SaveOriginalSnapshot [optional] (Default: ```false```): Whether to save the source snapshot that was captured from the API before it was sent to and processed by the AI.
 
 ## Development Configs
 Configs which should be changed for debugging (change at own risk):
@@ -204,6 +205,8 @@ The email notification will send and email with the attached image to the specif
   * STARTTLSWHENAVAILABLE: Elevates the connection to use TLS encryption immediately after reading the greeting and capabilities of the server, but only if the server supports the STARTTLS extension.
 
 #### Gmail
+Note that to send email using GMail you may need to log into your Google Account (or Admin Console) and allow "[Less secure app access](https://support.google.com/accounts/answer/6010255)".
+
 ```json
 {
   "Type": "Email",

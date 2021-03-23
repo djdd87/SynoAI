@@ -82,6 +82,10 @@ namespace SynoAI
         /// The offset from the top of the image boundary box.
         /// </summary>
         public static int TextOffsetY { get; private set; }
+        /// <summary>
+        /// Whether this original snapshot generated from the API should be saved to the file system.
+        /// </summary>
+        public static bool SaveOriginalSnapshot { get; private set; }
 
         /// <summary>
         /// The artificial intelligence system to process the images with.
@@ -116,8 +120,10 @@ namespace SynoAI
         public static void Generate(ILogger logger, IConfiguration configuration)
         {
             logger.LogInformation("Processing config.");
+
             Url = configuration.GetValue<string>("Url");
-            Username = configuration.GetValue<string>("User");
+            
+            Username = configuration.GetValue<string>("User");  // "Username" returns the local system account when debugging, which isn't ideal. Need to resolve this.
             Password = configuration.GetValue<string>("Password");
             AllowInsecureUrl = configuration.GetValue<bool>("AllowInsecureUrl", false);
 
@@ -137,6 +143,8 @@ namespace SynoAI
             
             TextOffsetX = configuration.GetValue<int>("TextOffsetX", 4);
             TextOffsetY = configuration.GetValue<int>("TextOffsetY", 2);
+
+            SaveOriginalSnapshot = configuration.GetValue<bool>("SaveOriginalSnapshot", false);
 
             IConfigurationSection aiSection = configuration.GetSection("AI");
             AI = aiSection.GetValue<AIType>("Type", AIType.DeepStack);
