@@ -366,3 +366,4 @@ appsettings.Development.json
 PrivateNotes.txt
 Captures
 docker-compose.debug.yml
+.DS_STORE

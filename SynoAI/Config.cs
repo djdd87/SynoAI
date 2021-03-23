@@ -30,6 +30,10 @@ namespace SynoAI
         /// The password to login to the API with.
         /// </summary>
         public static string Password { get; private set; }
+        /// <summary>
+        /// Allow insecure URL Access to the Synology API
+        /// </summary>
+        public static bool AllowInsecureUrl {get;private set;}
 
         /// <summary>
         /// The version of the SYNO.API.Auth API to use.
@@ -113,8 +117,9 @@ namespace SynoAI
         {
             logger.LogInformation("Processing config.");
             Url = configuration.GetValue<string>("Url");
-            Username = configuration.GetValue<string>("User");
+            Username = configuration.GetValue<string>("Username");
             Password = configuration.GetValue<string>("Password");
+            AllowInsecureUrl = configuration.GetValue<bool>("AllowInsecureUrl");
 
             ApiVersionAuth = configuration.GetValue<int>("ApiVersionInfo", 6);      // DSM 6.0 beta2
             ApiVersionCamera = configuration.GetValue<int>("ApiVersionCamera", 9);  // Surveillance Station 8.0

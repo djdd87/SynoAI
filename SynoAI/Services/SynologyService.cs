@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Security;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -50,14 +51,18 @@ namespace SynoAI.Services
             _logger = logger;
         }
 
+
         /// <summary>
         /// Fetches all the end points, because they're dynamic between DSM versions.
         /// </summary>
         public async Task GetEndPointsAsync()
         {
             _logger.LogInformation("API: Querying end points");
-            
-            using (HttpClient httpClient = new HttpClient())
+            using var httpClientHandler = new HttpClientHandler();
+            if (Config.AllowInsecureUrl)
+                httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true;
+
+            using (HttpClient httpClient = new HttpClient(httpClientHandler))
             {
                 httpClient.BaseAddress = new Uri(Config.Url);
 
@@ -71,7 +76,7 @@ namespace SynoAI.Services
                         if (response.Data.TryGetValue(API_LOGIN, out SynologyApiInfo loginInfo))
                         {
                             _logger.LogDebug($"API: Found path '{loginInfo.Path}' for {API_LOGIN}");
-                            
+
                             if (loginInfo.MaxVersion < Config.ApiVersionAuth)
                             {
                                 _logger.LogError($"API: {API_CAMERA} only supports a max version of {loginInfo.MaxVersion}, but the system is set to use version {Config.ApiVersionAuth}.");
@@ -127,47 +132,45 @@ namespace SynoAI.Services
             _logger.LogInformation("Login: Authenticating");
 
             CookieContainer cookieContainer = new CookieContainer();
-            using (HttpClientHandler httpClientHandler = new HttpClientHandler
-            {
-                CookieContainer = cookieContainer
-            })
-            {
-                string loginUri = string.Format(URI_LOGIN, _loginPath, Config.ApiVersionAuth, Config.Username, Config.Password);
-                _logger.LogDebug($"Login: Logging in ({loginUri})");
+            using var httpClientHandler = new HttpClientHandler();
+            httpClientHandler.CookieContainer = cookieContainer;
+            if (Config.AllowInsecureUrl)
+                httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true;
 
-                using (HttpClient httpClient = new HttpClient(httpClientHandler))
+            string loginUri = string.Format(URI_LOGIN, _loginPath, Config.ApiVersionAuth, Config.Username, Config.Password);
+            _logger.LogDebug($"Login: Logging in ({loginUri})");
+
+            using (HttpClient httpClient = new HttpClient(httpClientHandler))
+            {
+                httpClient.BaseAddress = new Uri(Config.Url);
+
+                HttpResponseMessage result = await httpClient.GetAsync(loginUri);
+                if (result.IsSuccessStatusCode)
                 {
-                    httpClient.BaseAddress = new Uri(Config.Url);
-
-                    HttpResponseMessage result = await httpClient.GetAsync(loginUri);
-                    if (result.IsSuccessStatusCode)
+                    SynologyResponse<SynologyLogin> response = await GetResponse<SynologyLogin>(result);
+                    if (response.Success)
                     {
-                        SynologyResponse<SynologyLogin> response = await GetResponse<SynologyLogin>(result);
-                        if (response.Success)
-                        {
-                            _logger.LogInformation("Login: Successful");
+                        _logger.LogInformation("Login: Successful");
 
-                            IEnumerable<Cookie> cookies = cookieContainer.GetCookies(httpClient.BaseAddress).Cast<Cookie>().ToList();
-                            Cookie cookie = cookies.FirstOrDefault(x => x.Name == "id");
-                            if (cookie == null)
-                            {
-                                _applicationLifetime.StopApplication();                            
-                            }
-
-                            return cookie;
-                        }
-                        else
+                        IEnumerable<Cookie> cookies = cookieContainer.GetCookies(httpClient.BaseAddress).Cast<Cookie>().ToList();
+                        Cookie cookie = cookies.FirstOrDefault(x => x.Name == "id");
+                        if (cookie == null)
                         {
-                            _logger.LogError($"Login: Failed due to error '{response.Error.Code}'");
+                            _applicationLifetime.StopApplication();
                         }
+
+                        return cookie;
                     }
                     else
                     {
-                        _logger.LogError($"Login: Failed due to HTTP status code '{result.StatusCode}'");
+                        _logger.LogError($"Login: Failed due to error '{response.Error.Code}'");
                     }
                 }
+                else
+                {
+                    _logger.LogError($"Login: Failed due to HTTP status code '{result.StatusCode}'");
+                }
             }
-
             return null;
         }
 
@@ -182,16 +185,20 @@ namespace SynoAI.Services
             Uri baseAddress = new Uri(Config.Url);
 
             CookieContainer cookieContainer = new CookieContainer();
-            using (HttpClientHandler handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (HttpClient client = new HttpClient(handler) { BaseAddress = baseAddress })
+            using var httpClientHandler = new HttpClientHandler();
+            httpClientHandler.CookieContainer = cookieContainer;
+            if (Config.AllowInsecureUrl)
+                httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true;
+
+            using (HttpClient client = new HttpClient(httpClientHandler) { BaseAddress = baseAddress })
             {
                 cookieContainer.Add(baseAddress, new Cookie("id", Cookie.Value));
-                
+
                 string cameraInfoUri = string.Format(URI_CAMERA_INFO, _cameraPath, Config.ApiVersionCamera);
                 HttpResponseMessage result = await client.GetAsync(cameraInfoUri);
 
                 SynologyResponse<SynologyCameras> response = await GetResponse<SynologyCameras>(result);
-                if (response.Success) 
+                if (response.Success)
                 {
                     _logger.LogInformation($"GetCameras: Successful. Found {response.Data.Cameras.Count()} cameras.");
                     return response.Data.Cameras;
@@ -214,15 +221,19 @@ namespace SynoAI.Services
             Uri baseAddress = new Uri(Config.Url);
 
             CookieContainer cookieContainer = new CookieContainer();
-            using (HttpClientHandler handler = new HttpClientHandler() { CookieContainer = cookieContainer })
-            using (HttpClient client = new HttpClient(handler) { BaseAddress = baseAddress })
+            using var httpClientHandler = new HttpClientHandler();
+            httpClientHandler.CookieContainer = cookieContainer;
+            if (Config.AllowInsecureUrl)
+                httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true;
+
+            using (HttpClient client = new HttpClient(httpClientHandler) { BaseAddress = baseAddress })
             {
                 cookieContainer.Add(baseAddress, new Cookie("id", Cookie.Value));
 
                 if (Cameras.TryGetValue(cameraName, out int id))
-                {                    
+                {
                     _logger.LogDebug($"{cameraName}: Found with Synology ID '{id}'.");
-                    
+
                     string resource = string.Format(URI_CAMERA_SNAPSHOT + $"&profileType={(int)Config.Quality}", _cameraPath, Config.ApiVersionCamera, id);
                     _logger.LogDebug($"{cameraName}: Taking snapshot from '{resource}'.");
 
