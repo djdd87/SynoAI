@@ -58,14 +58,9 @@ namespace SynoAI.Services
         public async Task GetEndPointsAsync()
         {
             _logger.LogInformation("API: Querying end points");
-            using var httpClientHandler = new HttpClientHandler();
-            if (Config.AllowInsecureUrl)
-                httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true;
 
-            using (HttpClient httpClient = new HttpClient(httpClientHandler))
+            using (HttpClient httpClient = GetHttpClient(Config.Url))
             {
-                httpClient.BaseAddress = new Uri(Config.Url);
-
                 HttpResponseMessage result = await httpClient.GetAsync(URI_INFO);
                 if (result.IsSuccessStatusCode)
                 {
@@ -131,19 +126,12 @@ namespace SynoAI.Services
         {
             _logger.LogInformation("Login: Authenticating");
 
-            CookieContainer cookieContainer = new CookieContainer();
-            using var httpClientHandler = new HttpClientHandler();
-            httpClientHandler.CookieContainer = cookieContainer;
-            if (Config.AllowInsecureUrl)
-                httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true;
-
             string loginUri = string.Format(URI_LOGIN, _loginPath, Config.ApiVersionAuth, Config.Username, Config.Password);
             _logger.LogDebug($"Login: Logging in ({loginUri})");
 
-            using (HttpClient httpClient = new HttpClient(httpClientHandler))
+            CookieContainer cookieContainer = new CookieContainer();
+            using (HttpClient httpClient = GetHttpClient(Config.Url, cookieContainer))
             {
-                httpClient.BaseAddress = new Uri(Config.Url);
-
                 HttpResponseMessage result = await httpClient.GetAsync(loginUri);
                 if (result.IsSuccessStatusCode)
                 {
@@ -182,17 +170,10 @@ namespace SynoAI.Services
         {
             _logger.LogInformation("GetCameras: Fetching Cameras");
 
-            Uri baseAddress = new Uri(Config.Url);
-
             CookieContainer cookieContainer = new CookieContainer();
-            using var httpClientHandler = new HttpClientHandler();
-            httpClientHandler.CookieContainer = cookieContainer;
-            if (Config.AllowInsecureUrl)
-                httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true;
-
-            using (HttpClient client = new HttpClient(httpClientHandler) { BaseAddress = baseAddress })
+            using (HttpClient client = GetHttpClient(Config.Url, cookieContainer))
             {
-                cookieContainer.Add(baseAddress, new Cookie("id", Cookie.Value));
+                cookieContainer.Add(client.BaseAddress, new Cookie("id", Cookie.Value));
 
                 string cameraInfoUri = string.Format(URI_CAMERA_INFO, _cameraPath, Config.ApiVersionCamera);
                 HttpResponseMessage result = await client.GetAsync(cameraInfoUri);
@@ -218,17 +199,10 @@ namespace SynoAI.Services
         /// <returns>A string to the file path.</returns>
         public async Task<byte[]> TakeSnapshotAsync(string cameraName)
         {
-            Uri baseAddress = new Uri(Config.Url);
-
             CookieContainer cookieContainer = new CookieContainer();
-            using var httpClientHandler = new HttpClientHandler();
-            httpClientHandler.CookieContainer = cookieContainer;
-            if (Config.AllowInsecureUrl)
-                httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true;
-
-            using (HttpClient client = new HttpClient(httpClientHandler) { BaseAddress = baseAddress })
+            using (HttpClient client = GetHttpClient(Config.Url, cookieContainer))
             {
-                cookieContainer.Add(baseAddress, new Cookie("id", Cookie.Value));
+                cookieContainer.Add(client.BaseAddress, new Cookie("id", Cookie.Value));
 
                 if (Cameras.TryGetValue(cameraName, out int id))
                 {
@@ -336,6 +310,43 @@ namespace SynoAI.Services
             }
 
             _logger.LogInformation("Initialisation successful.");
+        }
+
+        /// <summary>
+        /// Generates an HttpClient object.
+        /// </summary>
+        /// <param name="baseAddress">The base URI.</param>
+        /// <param name="cookieContainer">The container for the cookies.</param>
+        /// <returns>An HttpClient.</returns>
+        private HttpClient GetHttpClient(string baseAddress, CookieContainer cookieContainer = null)
+        {           
+            Uri uri = new Uri(baseAddress);
+            return GetHttpClient(uri, cookieContainer);
+        }
+
+        /// <summary>
+        /// Generates an HttpClient object.
+        /// </summary>
+        /// <param name="baseUri">The base URI.</param>
+        /// <param name="cookieContainer">The container for the cookies.</param>
+        /// <returns>An HttpClient.</returns>
+        private HttpClient GetHttpClient(Uri baseUri, CookieContainer cookieContainer = null)
+        {           
+            HttpClientHandler httpClientHandler = new HttpClientHandler();
+            if (cookieContainer != null)
+            {
+                httpClientHandler.CookieContainer = cookieContainer;
+            }
+
+            if (Config.AllowInsecureUrl)
+            {
+                httpClientHandler.ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true;
+            }
+            
+            return new HttpClient(httpClientHandler)
+            {
+                BaseAddress = baseUri
+            };
         }
     }
 }

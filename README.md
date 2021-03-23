@@ -54,6 +54,7 @@ An example appsettings.json configuration file can be found [here](#example-apps
 * Url [required]: The URL and port of your NAS, e.g. http://{IP}:{Port}
 * User [required]: The user that will be used to request API snapshots
 * Password [required]: The password of the user above
+* AllowInsecureUrl [optional] (Default ```false```): Whether to allow an insecure HTTPS connection to the Synology API
 * Cameras [required]: An array of camera objects
   * Name: [required]: The name of the camera on Surveillance Station
   * Types: [required]: An array of types that will trigger a notification when detected by the AI, e.g. ["Person", "Car"]
