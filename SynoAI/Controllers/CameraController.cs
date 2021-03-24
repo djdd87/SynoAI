@@ -178,7 +178,7 @@ namespace SynoAI.Controllers
             {
                 foreach (AIPrediction prediction in predictions)
                 {
-                    _logger.LogInformation($"{camera}: {prediction.Label} ({prediction.Confidence}%)");
+                    _logger.LogInformation($"{camera}: {prediction.Label} ({prediction.Confidence}%) [Size: {prediction.SizeX}x{prediction.SizeY}] [Start: {prediction.MinX},{prediction.MinY} | End: {prediction.MaxX},{prediction.MaxY}]");
                 }
             }
 
