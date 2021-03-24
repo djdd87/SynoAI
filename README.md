@@ -60,6 +60,10 @@ An example appsettings.json configuration file can be found [here](#example-apps
   * Types: [required]: An array of types that will trigger a notification when detected by the AI, e.g. ["Person", "Car"]
   * Threshold [required]: An integer denoting the required confidence of the AI to trigger the notification, e.g. 40 means that the AI must be 40% sure that the object detected was a person before SynoAI sends a notification.
 * Notifiers [required]: See [notifications](#notifications)
+* Quality [optional] (Default: ```Balanced```): The quality, aka "profile type" to use when taking a snapshot. This will be based upon the settings of the streams you have configured in Surveillance Station. i.e. if your low, balanced and high streams have the same settings in Surveillance Station, then this setting will make no difference. But if you have a high quality 4k stream, a balance 1080p stream and a low 720p stream, then setting to high will return and process a 4k image. Note that the higher quality the snapshot, the longer the notification will take. Additionally, the larger the image, the smaller your detected objects may be, so ensure you set the MinSizeX/MinSizeY values respectively.
+  * High: Takes the snapshot using the profile type "High quality"
+  * Balanced: Takes the snapshot using the project type "Balanced"
+  * Low: Takes the snapshot using the profile type "Low bandwidth" 
 * Delay [optiona] (Default: ```5000```): The period of time in milliseconds (ms) that must occur between the last motion detection of camera and the next time it'll be processed. i.e. if your delay is set to 5000 and your camera reports motion 4 seconds after it had already reported motion to SynoAI, then the check will be ignored. However, if the report from Surveillance Station is more than 5000ms, then the cameras image will be processed.
 * DrawMode [optional] (Default: ```Matches```): Whether to draw all predictions from the AI on the capture image:
   * Matches: Will draw boundary boxes over any object/person that matches the types defined on the cameras
