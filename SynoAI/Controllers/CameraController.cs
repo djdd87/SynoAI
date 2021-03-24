@@ -103,7 +103,7 @@ namespace SynoAI.Controllers
             else if (predictions.Count() > 0)
             {
                 // We got predictions back from the AI, but nothing that should trigger an alert
-                _logger.LogInformation($"{id}: Nothing detected by the AI exceeding the defined confidence level");
+                _logger.LogInformation($"{id}: Nothing detected by the AI exceeding the defined confidence level and/or minimum size");
             }
             else
             {
