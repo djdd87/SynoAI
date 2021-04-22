@@ -262,11 +262,9 @@ The top level steps are:
 * Add Action Rules to Synology Surveillance Station's motion alerts in order to trigger the SynoAI API.
 
 ### 1) Configure Deepstack
-The following instructions explain how to set up the Deepstack image using the Docker app built into DSM. Before continuing, you'll need to obtain a *free* API key from [Deepstack](https://www.deepstack.cc/install/docker). *UPDATE 2020-02-04 - It looks like DeepStack is now "free forever" and doesn't even need a free API key. I haven't investigated this yet, but it's seems as though you might just be able to get the docker image now without activating.*
+The following instructions explain how to set up the Deepstack image using the Docker app built into DSM. 
 
-* Download the deepquestai/deepstack image by either;
-  * Searching the registry for deepquestai/deepstack
-  * Choose the tag cpu-x6-beta, or noavx; this is dependent on the capabilities of your NAS.
+* Download the deepquestai/deepstack:latest image
 * Run the image
 * Enter a name for the image, e.g. deepstack
 * Edit the advanced settings
@@ -276,9 +274,9 @@ The following instructions explain how to set up the Deepstack image using the D
 * On the Environment tab;
   * Set MODE: Low
   * Set VISION-DETECTION: True
-* Accept the advnaced settings and then run the image
-* Open a webbrowser and go to the Deepstack page by navigating to http://{YourIP}:{YourDeepstackPort}
-* If you've set everything up successfully then you will be able to enter your API key in here and move onto the next step.
+* Accept the advanced settings and then run the image
+* Open a web browser and go to the Deepstack page by navigating to http://{YourIP}:{YourDeepstackPort}
+* If you've set everything up successfully and you're using the latest version of DeepStack, then you'll see a message saying "DeepStack Activated"
    
 ### 2) Configure SynoAI
 The following instructions explain how to set up the SynoAI image using the Docker app built into DSM. For docker-compose, see the example file in the src, or in the documentation below.
