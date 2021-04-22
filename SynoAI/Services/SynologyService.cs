@@ -151,7 +151,7 @@ namespace SynoAI.Services
                     }
                     else
                     {
-                        _logger.LogError($"Login: Failed due to error '{response.Error.Code}'");
+                        _logger.LogError($"Login: Failed due to Synology API error code '{response.Error.Code}'");
                     }
                 }
                 else

@@ -37,7 +37,7 @@ I made this application mostly for myself in order to improve upon Christopher A
 * [Example appsettings.json](#example-appsettingsjson)
 * [Problems/Debugging](#problemsdebugging)
   * [Logging](#logging)
-  * [Common Synology Error Codes](#common-synology-error-codes)
+  * [Trouble Shooting](#trouble-shooting)
 
 ## Features
 * Triggered via an Action Rule from Synology Surveillance Station
@@ -450,7 +450,25 @@ If issues are encountered, to get more verbose information in the logs, change t
 ```
 This will output the full information log and help identify where things are going wrong, as well as displaying the confidence percentages from Deepstack.
 
-### Common Synology Error Codes
+### Trouble Shooting
+
+#### "Failed due to Synology API error code X"
+* 400 Invalid password.
+  * If your password is definitely correct and you are still getting a 400 error code, then there's potentially an issue with the Synology DSM user configuration. However, if you cannot see any issues with the permissions, try creating a new user from SurveillanceStation directly.
+* 401 Guest or disabled account.
+* 402 Permission denied.
+* 403 One time password not specified.
+  * You have Two-Factor Authentication enabled and this is not currently support. Please create a dedicated user account without 2FA limited to just SurveillanceStation.
+* 404 One time password authenticate failed.
+* 405 App portal incorrect.
+* 406 OTP code enforced.
+* 407 Max Tries (if auto blocking is set to true).
+* 408 Password Expired Can not Change.
+* 409 Password Expired.
+* 410 Password must change (when first time use or after reset password by admin).
+* 411 Account Locked (when account max try exceed).
+
+#### Common Synology Error Codes
 * 100: Unknown error
 * 101: Invalid parameters
 * 102: API does not exist
@@ -458,6 +476,7 @@ This will output the full information log and help identify where things are goi
 * 104: This API version is not supported
 * 105: Insufficient user privilege
   * If this occurs, check your username and password, or;
-  * Try creating a specific user for Synology Surveillance Station
+  * Try creating a specific user for Synology Surveillance Station, or;
+  * Ensure your user has permission to the Surveillance Station application
 * 106: Connection time out
 * 107: Multiple login detected
