@@ -82,12 +82,16 @@ namespace SynoAI.Controllers
                 SnapshotManager.SaveOriginalImage(_logger, camera, snapshot);
             }
 
+            // Get the min X and Y values
+            int minX = camera.GetMinSizeX();
+            int minY = camera.GetMinSizeY();
+
             // Use the AI to get the valid predictions and then get all the valid predictions, which are all the AI predictions where the result from the AI is 
             // in the list of types and where the size of the object is bigger than the defined value.
             IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, snapshot);
             IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
                 camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase) &&     // Is a type we care about
-                x.SizeX >= Config.AIMinSizeX && x.SizeY >= Config.AIMinSizeY)           // Is bigger than the minimum size
+                x.SizeX >= minX && x.SizeY >= minY)                                     // Is bigger than the minimum size
                 .ToList();
 
             if (validPredictions.Count() > 0)

@@ -96,7 +96,9 @@ namespace SynoAI.Services
                 foreach (AIPrediction prediction in Config.DrawMode == DrawMode.All ? _predictions : _validPredictions)
                 {
                     // Write out anything detected that was above the minimum size
-                    if (prediction.SizeX >= Config.AIMinSizeX && prediction.SizeY >= Config.AIMinSizeY)
+                    int minSizeX = camera.GetMinSizeX();
+                    int minSizeY = camera.GetMinSizeY();
+                    if (prediction.SizeX >= minSizeX && prediction.SizeY >= minSizeY)
                     {
                         decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
                         string label = $"{prediction.Label} ({confidence}%)";

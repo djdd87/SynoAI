@@ -92,8 +92,8 @@ namespace SynoAI
         /// </summary>
         public static AIType AI { get; private set; }
         public static string AIUrl { get; private set; }
-        public static int AIMinSizeX { get; private set; }
-        public static int AIMinSizeY { get; private set; }
+        public static int MinSizeX { get; private set; }
+        public static int MinSizeY { get; private set; }
 
         /// <summary>
         /// The list of cameras.
@@ -149,8 +149,8 @@ namespace SynoAI
             IConfigurationSection aiSection = configuration.GetSection("AI");
             AI = aiSection.GetValue<AIType>("Type", AIType.DeepStack);
             AIUrl = aiSection.GetValue<string>("Url");
-            AIMinSizeX = aiSection.GetValue<int>("MinSizeX", 50);
-            AIMinSizeY = aiSection.GetValue<int>("MinSizeY", 50);
+            MinSizeX = aiSection.GetValue<int>("MinSizeX", 50);
+            MinSizeY = aiSection.GetValue<int>("MinSizeY", 50);
 
             Cameras = GenerateCameras(logger, configuration);
             Notifiers = GenerateNotifiers(logger, configuration);

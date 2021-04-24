@@ -58,7 +58,9 @@ An example appsettings.json configuration file can be found [here](#example-apps
 * Cameras [required]: An array of camera objects
   * Name: [required]: The name of the camera on Surveillance Station
   * Types: [required]: An array of types that will trigger a notification when detected by the AI, e.g. ["Person", "Car"]
-  * Threshold [required]: An integer denoting the required confidence of the AI to trigger the notification, e.g. 40 means that the AI must be 40% sure that the object detected was a person before SynoAI sends a notification.
+  * Threshold [required]: An integer denoting the required confidence of the AI to trigger the notification, e.g. 40 means that the AI must be 40% sure that the object detected was a person before SynoAI sends a notification
+  * MinSizeX [optional] (Default: ```NULL```): The minimum pixels that the object must be horizontally to trigger a change (will override the default set on the AI's MinSizeX)
+  * MinSizeY [optional] (Default: ```NULL```): The minimum pixels that the object must be vertically to trigger a change (will override the default set on the AI's MinSizeY).
 * Notifiers [required]: See [notifications](#notifications)
 * Quality [optional] (Default: ```Balanced```): The quality, aka "profile type" to use when taking a snapshot. This will be based upon the settings of the streams you have configured in Surveillance Station. i.e. if your low, balanced and high streams have the same settings in Surveillance Station, then this setting will make no difference. But if you have a high quality 4k stream, a balance 1080p stream and a low 720p stream, then setting to high will return and process a 4k image. Note that the higher quality the snapshot, the longer the notification will take. Additionally, the larger the image, the smaller your detected objects may be, so ensure you set the MinSizeX/MinSizeY values respectively.
   * High: Takes the snapshot using the profile type "High quality"
@@ -106,8 +108,8 @@ The Deepstack API is a free to use AI that can identify objects, faces and more.
 }
 ```
 * Url [required]: The URL of the AI to POST the image to
-* MinSizeX [optional] (Default: ```50```): The minimum size in pixels that the object must be to trigger a change
-* MinSizeY [optional] (Default: ```50```): The minimum size in pixels that the object must be to trigger a change.
+* MinSizeX [optional] (Default: ```50```): The minimum size in pixels that the object must be to trigger a change (will be ignored if specified on the Camera)
+* MinSizeY [optional] (Default: ```50```): The minimum size in pixels that the object must be to trigger a change (will be ignored if specified on the Camera).
 
 ## Notifications
 
@@ -421,7 +423,9 @@ services:
     {
       "Name": "Driveway",
       "Types": [ "Person", "Car" ],
-      "Threshold": 45
+      "Threshold": 45,
+      "MinSizeX": 250,
+      "MinSizeY": 500
     },
     {
       "Name": "BackDoor",
