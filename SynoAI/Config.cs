@@ -144,13 +144,14 @@ namespace SynoAI
             TextOffsetX = configuration.GetValue<int>("TextOffsetX", 4);
             TextOffsetY = configuration.GetValue<int>("TextOffsetY", 2);
 
+            MinSizeX = configuration.GetValue<int>("MinSizeX", 50);
+            MinSizeY = configuration.GetValue<int>("MinSizeY", 50);
+
             SaveOriginalSnapshot = configuration.GetValue<bool>("SaveOriginalSnapshot", false);
 
             IConfigurationSection aiSection = configuration.GetSection("AI");
             AI = aiSection.GetValue<AIType>("Type", AIType.DeepStack);
             AIUrl = aiSection.GetValue<string>("Url");
-            MinSizeX = aiSection.GetValue<int>("MinSizeX", 50);
-            MinSizeY = aiSection.GetValue<int>("MinSizeY", 50);
 
             Cameras = GenerateCameras(logger, configuration);
             Notifiers = GenerateNotifiers(logger, configuration);
