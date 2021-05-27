@@ -89,33 +89,36 @@ namespace SynoAI.Controllers
             // Use the AI to get the valid predictions and then get all the valid predictions, which are all the AI predictions where the result from the AI is 
             // in the list of types and where the size of the object is bigger than the defined value.
             IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, snapshot);
-            IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
-                camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase) &&     // Is a type we care about
-                x.SizeX >= minX && x.SizeY >= minY)                                     // Is bigger than the minimum size
-                .ToList();
+            if (predictions != null)
+            {
+                IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
+                    camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase) &&     // Is a type we care about
+                    x.SizeX >= minX && x.SizeY >= minY)                                     // Is bigger than the minimum size
+                    .ToList();
 
-            if (validPredictions.Count() > 0)
-            {
-                // Because we don't want to process the image if it isn't even required, then we pass the snapshot manager to the notifiers. It will then perform 
-                // the necessary actions when it's GetImage method is called.
-                SnapshotManager snapshotManager = new SnapshotManager(snapshot, predictions, validPredictions, _snapshotManagerLogger);
-                
-                // Limit the predictions to just those defined by the camera
-                predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
-                await SendNotifications(camera, snapshotManager, predictions.Select(x=> x.Label).ToList());
-            }
-            else if (predictions.Count() > 0)
-            {
-                // We got predictions back from the AI, but nothing that should trigger an alert
-                _logger.LogInformation($"{id}: Nothing detected by the AI exceeding the defined confidence level and/or minimum size");
-            }
-            else
-            {
-                // We didn't get any predictions whatsoever from the AI
-                _logger.LogInformation($"{id}: Nothing detected by the AI");
-            }
+                if (validPredictions.Count() > 0)
+                {
+                    // Because we don't want to process the image if it isn't even required, then we pass the snapshot manager to the notifiers. It will then perform 
+                    // the necessary actions when it's GetImage method is called.
+                    SnapshotManager snapshotManager = new SnapshotManager(snapshot, predictions, validPredictions, _snapshotManagerLogger);
+                    
+                    // Limit the predictions to just those defined by the camera
+                    predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
+                    await SendNotifications(camera, snapshotManager, predictions.Select(x=> x.Label).ToList());
+                }
+                else if (predictions.Count() > 0)
+                {
+                    // We got predictions back from the AI, but nothing that should trigger an alert
+                    _logger.LogInformation($"{id}: Nothing detected by the AI exceeding the defined confidence level and/or minimum size");
+                }
+                else
+                {
+                    // We didn't get any predictions whatsoever from the AI
+                    _logger.LogInformation($"{id}: Nothing detected by the AI");
+                }
 
-            _logger.LogInformation($"{id}: Finished ({overallStopwatch.ElapsedMilliseconds}ms).");
+                _logger.LogInformation($"{id}: Finished ({overallStopwatch.ElapsedMilliseconds}ms).");
+            }
         }
 
         private async Task SendNotifications(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> labels)
