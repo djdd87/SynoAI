@@ -55,7 +55,7 @@ namespace SynoAI.Services
         /// <summary>
         /// Fetches all the end points, because they're dynamic between DSM versions.
         /// </summary>
-        public async Task GetEndPointsAsync()
+        public async Task<bool> GetEndPointsAsync()
         {
             _logger.LogInformation("API: Querying end points");
 
@@ -75,13 +75,11 @@ namespace SynoAI.Services
                             if (loginInfo.MaxVersion < Config.ApiVersionAuth)
                             {
                                 _logger.LogError($"API: {API_CAMERA} only supports a max version of {loginInfo.MaxVersion}, but the system is set to use version {Config.ApiVersionAuth}.");
-                                _applicationLifetime.StopApplication();
                             }
                         }
                         else
                         {
                             _logger.LogError($"API: Failed to find {API_LOGIN}.");
-                            _applicationLifetime.StopApplication();
                         }
 
                         // Find the Camera entry point
@@ -92,19 +90,18 @@ namespace SynoAI.Services
                             if (cameraInfo.MaxVersion < Config.ApiVersionCamera)
                             {
                                 _logger.LogError($"API: {API_CAMERA} only supports a max version of {cameraInfo.MaxVersion}, but the system is set to use version {Config.ApiVersionCamera}.");
-                                _applicationLifetime.StopApplication();
                             }
                         }
                         else
                         {
                             _logger.LogError($"API: Failed to find {API_CAMERA}.");
-                            _applicationLifetime.StopApplication();
                         }
 
                         _loginPath = loginInfo.Path;
                         _cameraPath = cameraInfo.Path;
 
                         _logger.LogInformation("API: Successfully mapped all end points");
+                        return true;
                     }
                     else
                     {
@@ -116,6 +113,7 @@ namespace SynoAI.Services
                     _logger.LogError($"API: Failed due to HTTP status code '{result.StatusCode}'");
                 }
             }
+            return false;
         }
 
         /// <summary>
@@ -273,43 +271,55 @@ namespace SynoAI.Services
             _logger.LogInformation("Initialising");
 
             // Get the actual end points, because they're not guaranteed to be the same on all installations and DSM versions
-            await GetEndPointsAsync();
-
-            // Perform a login first as all actions need a valid cookie
-            Cookie = await LoginAsync();
-            if (Cookie == null)
+            try
             {
-                // The login failed, so kill the application
-                _applicationLifetime.StopApplication();
-                return;
-            }
-
-            // Fetch all the cameras and store a Name to ID dictionary for quick lookup
-            IEnumerable<SynologyCamera> synologyCameras = await GetCamerasAsync();
-            if (synologyCameras == null)
-            {
-                // We failed to fetch the cameras, so kill the application
-                _applicationLifetime.StopApplication();
-                return;
-            }
-            else
-            {
-                Cameras = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
-                foreach (Camera camera in Config.Cameras)
+                bool retrievedEndPoints = await GetEndPointsAsync();
+                if (!retrievedEndPoints) 
                 {
-                    SynologyCamera match = synologyCameras.FirstOrDefault(x => x.GetName().Equals(camera.Name, StringComparison.OrdinalIgnoreCase));
-                    if (match == null)
+                    _applicationLifetime.StopApplication();
+                }
+
+                // Perform a login first as all actions need a valid cookie
+                Cookie = await LoginAsync();
+                if (Cookie == null)
+                {
+                    // The login failed, so kill the application
+                    _applicationLifetime.StopApplication();
+                    return;
+                }
+
+                // Fetch all the cameras and store a Name to ID dictionary for quick lookup
+                IEnumerable<SynologyCamera> synologyCameras = await GetCamerasAsync();
+                if (synologyCameras == null)
+                {
+                    // We failed to fetch the cameras, so kill the application
+                    _applicationLifetime.StopApplication();
+                    return;
+                }
+                else
+                {
+                    Cameras = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
+                    foreach (Camera camera in Config.Cameras)
                     {
-                        _logger.LogWarning($"GetCameras: The camera with the name '{camera.Name}' was not found in the Surveillance Station camera list.");
-                    }
-                    else
-                    {
-                        Cameras.Add(camera.Name, match.Id);
+                        SynologyCamera match = synologyCameras.FirstOrDefault(x => x.GetName().Equals(camera.Name, StringComparison.OrdinalIgnoreCase));
+                        if (match == null)
+                        {
+                            _logger.LogWarning($"GetCameras: The camera with the name '{camera.Name}' was not found in the Surveillance Station camera list.");
+                        }
+                        else
+                        {
+                            Cameras.Add(camera.Name, match.Id);
+                        }
                     }
                 }
-            }
 
-            _logger.LogInformation("Initialisation successful.");
+                _logger.LogInformation("Initialisation successful.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An unhandled exception occurred initialisation SynoAI. Exiting...");
+                _applicationLifetime.StopApplication();
+            }
         }
 
         /// <summary>
