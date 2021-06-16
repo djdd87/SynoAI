@@ -46,5 +46,10 @@ namespace SynoAI.Models
         {
             return MinSizeY ?? Config.MinSizeY;
         }
+
+        public override string ToString()
+        {
+            return Name;
+        }
     }
 }
