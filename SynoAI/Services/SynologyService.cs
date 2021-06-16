@@ -317,7 +317,7 @@ namespace SynoAI.Services
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An unhandled exception occurred initialisation SynoAI. Exiting...");
+                _logger.LogError(ex, "An unhandled exception occurred initialising SynoAI. Exiting...");
                 _applicationLifetime.StopApplication();
             }
         }
