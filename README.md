@@ -481,3 +481,8 @@ This will output the full information log and help identify where things are goi
   * Ensure your user has permission to the Surveillance Station application
 * 106: Connection time out
 * 107: Multiple login detected
+
+#### DeepStack
+
+* DeepStackAI: Failed to call API with HTTP status code 'Forbidden'
+  * Ensure that you have enabled VISION-DETECTION and correctly spelled it
