@@ -74,6 +74,7 @@ namespace SynoAI.Controllers
 
             // Take the snapshot from Surveillance Station
             byte[] snapshot = await GetSnapshot(id);
+            snapshot = PreProcessSnapshot(camera, snapshot);
 
             // Save the original unprocessed image if required
             if (Config.SaveOriginalSnapshot)
@@ -119,6 +120,63 @@ namespace SynoAI.Controllers
 
                 _logger.LogInformation($"{id}: Finished ({overallStopwatch.ElapsedMilliseconds}ms).");
             }
+        }
+
+        /// <summary>
+        /// Handles any required preprocessing of the captured image.
+        /// </summary>
+        /// <param name="camera">The camera that the snapshot is from.</param>
+        /// <param name="snapshot">The image data.</param>
+        /// <returns>A byte array of the image.</returns>
+        private byte[] PreProcessSnapshot(Camera camera, byte[] snapshot)
+        {
+            if (camera.Rotate == 0)
+            {
+                return snapshot;
+            }
+
+            Stopwatch stopwatch = Stopwatch.StartNew();
+
+            // Load the bitmap & rotate the image
+            SKBitmap bitmap = SKBitmap.Decode(new MemoryStream(snapshot));
+            _logger.LogInformation($"{camera.Name}: Rotating image {camera.Rotate} degrees.");
+            bitmap = Rotate(bitmap, camera.Rotate);
+
+            using (SKPixmap pixmap = bitmap.PeekPixels())
+            using (SKData data = pixmap.Encode(SKEncodedImageFormat.Jpeg, 100)) 
+            { 
+                _logger.LogInformation($"{camera.Name}: Image preprocessing complete ({stopwatch.ElapsedMilliseconds}ms).");
+                return data.ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Rotates the image to the specified angle.
+        /// </summary>
+        /// <param name="bitmap">The bitmap to rotate.</param>
+        /// <param name="angle">The angle to rotate to.</param>
+        /// <returns>The rotated bitmap.</returns>
+        private SKBitmap Rotate(SKBitmap bitmap, double angle)
+        {
+            double radians = Math.PI * angle / 180;
+            float sine = (float)Math.Abs(Math.Sin(radians));
+            float cosine = (float)Math.Abs(Math.Cos(radians));
+            int originalWidth = bitmap.Width;
+            int originalHeight = bitmap.Height;
+            int rotatedWidth = (int)(cosine * originalWidth + sine * originalHeight);
+            int rotatedHeight = (int)(cosine * originalHeight + sine * originalWidth);
+
+            SKBitmap rotatedBitmap = new SKBitmap(rotatedWidth, rotatedHeight);
+            using (SKCanvas canvas = new SKCanvas(rotatedBitmap))
+            {
+                canvas.Clear();
+                canvas.Translate(rotatedWidth / 2, rotatedHeight / 2);
+                canvas.RotateDegrees((float)angle);
+                canvas.Translate(-originalWidth / 2, -originalHeight / 2);
+                canvas.DrawBitmap(bitmap, new SKPoint());
+            }
+            
+            return rotatedBitmap;
         }
 
         private async Task SendNotifications(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> labels)
