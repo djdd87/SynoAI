@@ -103,9 +103,28 @@ namespace SynoAI.Controllers
                     // the necessary actions when it's GetImage method is called.
                     SnapshotManager snapshotManager = new SnapshotManager(snapshot, predictions, validPredictions, _snapshotManagerLogger);
                     
-                    // Limit the predictions to just those defined by the camera
-                    predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
-                    await SendNotifications(camera, snapshotManager, predictions.Select(x=> x.Label).ToList());
+                    // Generate text for notifications
+                    
+                    IEnumerable<String> notifications = new string[]{};
+
+                    if (Config.AlternativeLabelling && Config.DrawMode == DrawMode.Matches)
+                    {
+                        int counter = 1;
+                        foreach (AIPrediction prediction in validPredictions) 
+                        {
+                            decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
+                            String label = $"{counter}. {prediction.Label} ({confidence}%)";
+                            notifications.Append(label);
+                            counter++;
+                        }
+                    }
+                    else
+                    {
+                        notifications = validPredictions.Select(x => x.Label).ToList();
+                    }
+
+                    //Send Notifications                  
+                    await SendNotifications(camera, snapshotManager, notifications);
                 }
                 else if (predictions.Count() > 0)
                 {
