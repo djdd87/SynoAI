@@ -83,6 +83,14 @@ namespace SynoAI
         /// </summary>
         public static int TextOffsetY { get; private set; }
         /// <summary>
+        /// True will only place a reference number on each label image, later detailing object type and confidence percentage on the notification text
+        /// </summary>
+        public static bool AlternativeLabelling { get; private set; } 
+        /// <summary>
+        /// True will place each image label below the boundary box.
+        /// </summary>
+        public static bool LabelBelowBox { get; private set; } 
+        /// <summary>
         /// Whether this original snapshot generated from the API should be saved to the file system.
         /// </summary>
         public static bool SaveOriginalSnapshot { get; private set; }
@@ -146,6 +154,9 @@ namespace SynoAI
 
             MinSizeX = configuration.GetValue<int>("MinSizeX", 50);
             MinSizeY = configuration.GetValue<int>("MinSizeY", 50);
+
+            LabelBelowBox = configuration.GetValue<bool>("LabelBelowBox", false);
+            AlternativeLabelling = configuration.GetValue<bool>("AlternativeLabelling", false);
 
             SaveOriginalSnapshot = configuration.GetValue<bool>("SaveOriginalSnapshot", false);
 
