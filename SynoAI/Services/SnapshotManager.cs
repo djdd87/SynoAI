@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using SkiaSharp;
 using SynoAI.Models;
+using SynoAI.Extensions;
 
 namespace SynoAI.Services
 {
@@ -111,18 +112,22 @@ namespace SynoAI.Services
                             StrokeWidth = Config.StrokeWidth
                         });
                         
-                        //Label creation, either classic label or alternative labelling
+                        //Label creation, either classic label or alternative labelling (and only if there is more than one object)
                         string label = String.Empty;
 
                         if (Config.AlternativeLabelling && Config.DrawMode == DrawMode.Matches) 
                         {
-                            label = counter.ToString();
-                            counter++;
+                            //On alternatie labelling, just place a reference number and only if there is more than one object
+                            if (_validPredictions.Count() > 1) 
+                            {
+                                label = counter.ToString();
+                                counter++;
+                            }
                         }
                         else
                         {
                             decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
-                            label = $"{prediction.Label} ({confidence}%)";
+                            label = $"{prediction.Label.FirstCharToUpper()} {confidence}%";
                         }
 
                         //Label positioning

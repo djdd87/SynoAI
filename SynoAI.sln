@@ -5,8 +5,8 @@ VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SynoAI", "SynoAI\SynoAI.csproj", "{D55517BF-4185-4B3D-956F-9CCE6425D88B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SynoAI.Tests", "SynoAI.Tests\SynoAI.Tests.csproj", "{C3A70D73-D1DD-46E4-882E-34CA833BE3EF}"
-EndProject
+#Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SynoAI.Tests", "SynoAI.Tests\SynoAI.Tests.csproj", "{C3A70D73-D1DD-46E4-882E-34CA833BE3EF}"
+#EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

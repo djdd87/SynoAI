@@ -57,7 +57,7 @@ namespace SynoAI.Notifiers.Email
         /// <param name="snapshotManager">A thread safe object for fetching the processed image.</param>
         /// <param name="foundTypes">The list of types that were found.</param>
         /// <param name="logger">A logger.</param>
-        public override async Task SendAsync(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> foundTypes, ILogger logger)
+        public override async Task SendAsync(Camera camera, ISnapshotManager snapshotManager, IList<string> foundTypes, ILogger logger)
         {
             using (logger.BeginScope($"Email '{Destination}'"))
             {

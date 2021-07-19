@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SkiaSharp;
-using SynoAI.AIs;
 using SynoAI.Models;
 using SynoAI.Notifiers;
 using SynoAI.Services;
@@ -10,12 +8,9 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
+using SynoAI.Extensions;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace SynoAI.Controllers
@@ -105,26 +100,35 @@ namespace SynoAI.Controllers
                     
                     // Generate text for notifications
                     
-                    IEnumerable<String> notifications = new string[]{};
+                    IList<String> labels = new List<String>();
 
                     if (Config.AlternativeLabelling && Config.DrawMode == DrawMode.Matches)
                     {
-                        int counter = 1;
-                        foreach (AIPrediction prediction in validPredictions) 
+                        if (validPredictions.Count() == 1) 
                         {
-                            decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
-                            String label = $"{counter}. {prediction.Label} ({confidence}%)";
-                            notifications.Append(label);
-                            counter++;
+                            decimal confidence = Math.Round(validPredictions.First().Confidence, 0, MidpointRounding.AwayFromZero);
+                            labels.Add($"{validPredictions.First().Label.FirstCharToUpper()} {confidence}%");
+                        }
+                        else 
+                        {
+                            //Since there is more than one object detected, include correlating number
+                            int counter = 1;
+                            foreach (AIPrediction prediction in validPredictions) 
+                            {
+                                decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
+                                String label = $"{counter}. {prediction.Label.FirstCharToUpper()} {confidence}%";
+                                labels.Add(label);
+                                counter++;
+                            }
                         }
                     }
                     else
                     {
-                        notifications = validPredictions.Select(x => x.Label).ToList();
+                        labels = validPredictions.Select(x => x.Label.FirstCharToUpper()).ToList();
                     }
 
                     //Send Notifications                  
-                    await SendNotifications(camera, snapshotManager, notifications);
+                    await SendNotifications(camera, snapshotManager, labels);
                 }
                 else if (predictions.Count() > 0)
                 {
@@ -199,7 +203,7 @@ namespace SynoAI.Controllers
             return rotatedBitmap;
         }
 
-        private async Task SendNotifications(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> labels)
+        private async Task SendNotifications(Camera camera, ISnapshotManager snapshotManager, IList<String> labels)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
