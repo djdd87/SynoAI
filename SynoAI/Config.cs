@@ -4,12 +4,8 @@ using SkiaSharp;
 using SynoAI.AIs;
 using SynoAI.Models;
 using SynoAI.Notifiers;
-using SynoAI.Notifiers.Pushbullet;
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SynoAI
 {
@@ -51,12 +47,6 @@ namespace SynoAI
         /// 2 = Low bandwidth
         /// </summary>
         public static CameraQuality Quality { get; private set; }
-
-        /// <summary>
-        /// The amount of time that needs to have passed between the last call to check the camera and the current call.
-        /// </summary>
-        public static int Delay { get; private set; }
-
         /// <summary>
         /// The hex code of the colour to use for the boxing around image matches.
         /// </summary>
@@ -91,6 +81,11 @@ namespace SynoAI
         /// </summary>
         public static bool LabelBelowBox { get; private set; } 
         /// <summary>
+        /// <summary>
+        /// Upon movement, the maximum number of snapshots sequentially retrieved from SSS until finding an object of interest (i.e. 4 snapshots)
+        /// </summary>
+        public static int MaxSnapshots { get; private set; } 
+        /// <summary>
         /// Whether this original snapshot generated from the API should be saved to the file system.
         /// </summary>
         public static bool SaveOriginalSnapshot { get; private set; }
@@ -100,6 +95,7 @@ namespace SynoAI
         /// </summary>
         public static AIType AI { get; private set; }
         public static string AIUrl { get; private set; }
+        public static string AIPath { get; private set; }
         public static int MinSizeX { get; private set; }
         public static int MinSizeY { get; private set; }
 
@@ -139,8 +135,7 @@ namespace SynoAI
             ApiVersionCamera = configuration.GetValue<int>("ApiVersionCamera", 9);  // Surveillance Station 8.0
 
             Quality = configuration.GetValue<CameraQuality>("Quality", CameraQuality.Balanced);
-
-            Delay = configuration.GetValue<int>("Delay", 5000);
+            
             DrawMode = configuration.GetValue<DrawMode>("DrawMode", DrawMode.Matches);
 
             BoxColor = configuration.GetValue<string>("BoxColor", SKColors.Red.ToString());
@@ -157,12 +152,18 @@ namespace SynoAI
 
             LabelBelowBox = configuration.GetValue<bool>("LabelBelowBox", false);
             AlternativeLabelling = configuration.GetValue<bool>("AlternativeLabelling", false);
+            MaxSnapshots = configuration.GetValue<int>("MaxSnapshots", 1);
+            if (MaxSnapshots > 254) {
+                MaxSnapshots = 254;
+                logger.LogWarning("ATTENTION: Config parameter MaxSnapshots is too big: Maximum accepted value is 254 ");
+            }
 
             SaveOriginalSnapshot = configuration.GetValue<bool>("SaveOriginalSnapshot", false);
 
             IConfigurationSection aiSection = configuration.GetSection("AI");
             AI = aiSection.GetValue<AIType>("Type", AIType.DeepStack);
             AIUrl = aiSection.GetValue<string>("Url");
+            AIPath = aiSection.GetValue<string>("Path","v1/vision/detection");
 
             Cameras = GenerateCameras(logger, configuration);
             Notifiers = GenerateNotifiers(logger, configuration);
