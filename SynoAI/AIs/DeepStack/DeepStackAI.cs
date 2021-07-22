@@ -39,7 +39,8 @@ namespace SynoAI.AIs.DeepStack
                     DeepStackResponse deepStackResponse = await GetResponse(response);
                     if (deepStackResponse.Success)
                     {
-                        IEnumerable<AIPrediction> predictions = deepStackResponse.Predictions.Where(x=> x.Confidence >= minConfidence).Select(x => new AIPrediction()
+
+                    IEnumerable<AIPrediction> predictions = deepStackResponse.Predictions.Where(x=> x.Confidence >= minConfidence).Select(x => new AIPrediction()  
                         {
                             Confidence = x.Confidence * 100,
                             Label = x.Label,
