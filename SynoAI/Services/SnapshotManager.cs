@@ -82,7 +82,7 @@ namespace SynoAI.Services
             _logger.LogInformation($"{camera.Name}: Processing image boundaries.");
 
             // Load the bitmap 
-            SKBitmap image = SKBitmap.Decode(new MemoryStream(_snapshot));
+            SKBitmap image = SKBitmap.Decode(_snapshot);
 
             // Don't process the drawing if the drawing mode is off
             if (Config.DrawMode == DrawMode.Off)

@@ -73,12 +73,16 @@ namespace SynoAI.Controllers
                 // Take the snapshot from Surveillance Station
                 byte[] snapshot = await GetSnapshot(id);
                 _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} received at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+
+                //See if the image needs to be rotated (or further processing in the future ?) previous to being analyzed by AI
                 snapshot = PreProcessSnapshot(camera, snapshot);
 
                 // Use the AI to get the valid predictions and then get all the valid predictions, which are all the AI predictions where the result from the AI is 
                 // in the list of types and where the size of the object is bigger than the defined value.
                 IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, snapshot);
+
                 _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} processed {predictions.Count()} objects at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                
                 if (predictions != null)
                 {
                     IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
@@ -88,6 +92,11 @@ namespace SynoAI.Controllers
 
                     if (validPredictions.Count() > 0)
                     {
+
+                        // Because we don't want to process the image if it isn't even required, then we pass the snapshot manager to the notifiers. It will then perform 
+                        // the necessary actions when it's GetImage method is called.
+                        SnapshotManager snapshotManager = new SnapshotManager(snapshot, predictions, validPredictions, _snapshotManagerLogger);
+
                         // Save the original unprocessed image if required
                         if (Config.SaveOriginalSnapshot)
                         {
@@ -95,10 +104,6 @@ namespace SynoAI.Controllers
                             SnapshotManager.SaveOriginalImage(_logger, camera, snapshot);
                         }
 
-                        // Because we don't want to process the image if it isn't even required, then we pass the snapshot manager to the notifiers. It will then perform 
-                        // the necessary actions when it's GetImage method is called.
-                        SnapshotManager snapshotManager = new SnapshotManager(snapshot, predictions, validPredictions, _snapshotManagerLogger);
-                        
                         // Generate text for notifications                  
                         IList<String> labels = new List<String>();
 
@@ -170,23 +175,27 @@ namespace SynoAI.Controllers
         /// <returns>A byte array of the image.</returns>
         private byte[] PreProcessSnapshot(Camera camera, byte[] snapshot)
         {
-            if (camera.Rotate == 0)
+            if (camera.Rotate != 0)
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                // Load the bitmap & rotate the image
+                //SKBitmap bitmap = SKBitmap.Decode(new MemoryStream(snapshot));
+                SKBitmap bitmap = SKBitmap.Decode(snapshot);
+
+                _logger.LogInformation($"{camera.Name}: Rotating image {camera.Rotate} degrees.");
+                bitmap = Rotate(bitmap, camera.Rotate);
+
+                using (SKPixmap pixmap = bitmap.PeekPixels())
+                using (SKData data = pixmap.Encode(SKEncodedImageFormat.Jpeg, 100)) 
+                { 
+                    _logger.LogInformation($"{camera.Name}: Image preprocessing complete ({stopwatch.ElapsedMilliseconds}ms).");
+                    return data.ToArray();
+                }
+            }
+            else 
             {
                 return snapshot;
-            }
-
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
-            // Load the bitmap & rotate the image
-            SKBitmap bitmap = SKBitmap.Decode(new MemoryStream(snapshot));
-            _logger.LogInformation($"{camera.Name}: Rotating image {camera.Rotate} degrees.");
-            bitmap = Rotate(bitmap, camera.Rotate);
-
-            using (SKPixmap pixmap = bitmap.PeekPixels())
-            using (SKData data = pixmap.Encode(SKEncodedImageFormat.Jpeg, 100)) 
-            { 
-                _logger.LogInformation($"{camera.Name}: Image preprocessing complete ({stopwatch.ElapsedMilliseconds}ms).");
-                return data.ToArray();
             }
         }
 
@@ -273,7 +282,6 @@ namespace SynoAI.Controllers
             if (predictions == null)
             {
                 _logger.LogError($"{camera}: Failed to get get predictions.");
-                return null;
             }
             else if (_logger.IsEnabled(LogLevel.Information))
             {
