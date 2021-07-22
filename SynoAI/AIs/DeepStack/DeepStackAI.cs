@@ -7,15 +7,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Json;
 using System.Threading.Tasks;
 
 namespace SynoAI.AIs.DeepStack
 {
     public class DeepStackAI : AI
     {
-        private const string URL_VISION_DETECTION = "v1/vision/detection";
-
         public async override Task<IEnumerable<AIPrediction>> Process(ILogger logger, Camera camera, byte[] image)
         {
             using (HttpClient client = new HttpClient())
@@ -36,7 +33,7 @@ namespace SynoAI.AIs.DeepStack
 
                 logger.LogDebug($"{camera.Name}: DeepStackAI: Sending image.");
 
-                HttpResponseMessage response = await client.PostAsync(URL_VISION_DETECTION, multipartContent);
+                HttpResponseMessage response = await client.PostAsync(Config.AIPath, multipartContent);
                 if (response.IsSuccessStatusCode)
                 {
                     DeepStackResponse deepStackResponse = await GetResponse(response);
