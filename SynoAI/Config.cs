@@ -99,9 +99,22 @@ namespace SynoAI
         /// The artificial intelligence system to process the images with.
         /// </summary>
         public static AIType AI { get; private set; }
+        /// <summary>
+        /// The URL to access the AI.
+        /// </summary>
         public static string AIUrl { get; private set; }
+        /// <summary>
+        /// Development use only. The internal path to call the AI. Potentially a better way to do this would be to support multiple AIs and have separate configs baked into each AI.
+        /// </summary>
         public static string AIPath { get; private set; }
+        
+        /// <summary>
+        /// The default minimum width that an object must be to be considered valid for reporting. Can be overridden on a camera by camera basis to account for different camera resolutions.
+        /// </summary>
         public static int MinSizeX { get; private set; }
+        /// <summary>
+        /// The default minimum height that an object must be to be considered valid for reporting. Can be overridden on a camera by camera basis to account for different camera resolutions.
+        /// </summary>
         public static int MinSizeY { get; private set; }
 
         /// <summary>

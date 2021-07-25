@@ -112,12 +112,11 @@ namespace SynoAI.Services
                             StrokeWidth = Config.StrokeWidth
                         });
                         
-                        //Label creation, either classic label or alternative labelling (and only if there is more than one object)
+                        // Label creation, either classic label or alternative labelling (and only if there is more than one object)
                         string label = String.Empty;
-
                         if (Config.AlternativeLabelling && Config.DrawMode == DrawMode.Matches) 
                         {
-                            //On alternatie labelling, just place a reference number and only if there is more than one object
+                            // On alternatie labelling, just place a reference number and only if there is more than one object
                             if (_validPredictions.Count() > 1) 
                             {
                                 label = counter.ToString();
@@ -130,11 +129,11 @@ namespace SynoAI.Services
                             label = $"{prediction.Label.FirstCharToUpper()} {confidence}%";
                         }
 
-                        //Label positioning
+                        // Label positioning
                         int x = prediction.MinX + Config.TextOffsetX;
                         int y = prediction.MinY + Config.FontSize + Config.TextOffsetY;
 
-                        //Consider below box placement
+                        // Consider below box placement
                         if (Config.LabelBelowBox) 
                         {
                             y += prediction.SizeY;
@@ -190,7 +189,7 @@ namespace SynoAI.Services
             {
                 fileName += "_" + suffix;
             }
-            fileName+= ".jpeg";
+            fileName += ".jpeg";
 
             string filePath = Path.Combine(directory, fileName);
             logger.LogInformation($"{camera}: Saving image to '{filePath}'.");

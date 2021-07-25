@@ -61,24 +61,24 @@ namespace SynoAI.Controllers
             // Get the min X and Y values for object; initialize snapshots counter.
             int minX = camera.GetMinSizeX();
             int minY = camera.GetMinSizeY();
-            int snapshotCount= 1;
+            int snapshotCount = 1;
 
             // Create the stopwatches for reporting timings
             Stopwatch overallStopwatch = Stopwatch.StartNew();
 
-            //Start bucle for asking snapshots until a valid prediction is found or MaxSnapshots is reached
-            while (snapshotCount > 0 && snapshotCount <= Config.MaxSnapshots) 
+            // Start loop for requesting snapshots until a valid prediction is found or MaxSnapshots is reached
+            while (snapshotCount <= Config.MaxSnapshots)
             {
-                _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} asked at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
                 // Take the snapshot from Surveillance Station
+                _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} asked at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
                 byte[] snapshot = await GetSnapshot(id);
                 _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} received at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
 
-                //See if the image needs to be rotated (or further processing in the future ?) previous to being analyzed by AI
+                // See if the image needs to be rotated (or further processing in the future ?) before being analyzed by the AI
                 snapshot = PreProcessSnapshot(camera, snapshot);
 
-                // Use the AI to get the valid predictions and then get all the valid predictions, which are all the AI predictions where the result from the AI is 
-                // in the list of types and where the size of the object is bigger than the defined value.
+                // Use the AI to get the valid predictions and then get all the valid predictions (which are all the AI predictions where the result from the AI is 
+                // in the list of types and where the size of the object is bigger than the defined value).
                 IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, snapshot);
 
                 _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} processed {predictions.Count()} objects at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
@@ -92,7 +92,6 @@ namespace SynoAI.Controllers
 
                     if (validPredictions.Count() > 0)
                     {
-
                         // Because we don't want to process the image if it isn't even required, then we pass the snapshot manager to the notifiers. It will then perform 
                         // the necessary actions when it's GetImage method is called.
                         SnapshotManager snapshotManager = new SnapshotManager(snapshot, predictions, validPredictions, _snapshotManagerLogger);
@@ -105,12 +104,13 @@ namespace SynoAI.Controllers
                         }
 
                         // Generate text for notifications                  
-                        IList<String> labels = new List<String>();
-
+                        List<String> labels = new List<String>();
                         if (Config.AlternativeLabelling && Config.DrawMode == DrawMode.Matches)
                         {
                             if (validPredictions.Count() == 1) 
                             {
+                                // If there is only a single object, then don't add a correlating number and instead just
+                                // write out the label.
                                 decimal confidence = Math.Round(validPredictions.First().Confidence, 0, MidpointRounding.AwayFromZero);
                                 labels.Add($"{validPredictions.First().Label.FirstCharToUpper()} {confidence}%");
                             }
@@ -131,12 +131,10 @@ namespace SynoAI.Controllers
                             labels = validPredictions.Select(x => x.Label.FirstCharToUpper()).ToList();
                         }
 
-                        //Send Notifications                  
+                        // Send Notifications                  
                         await SendNotifications(camera, snapshotManager, labels);
                         _logger.LogInformation($"{id}: Valid object found in snapshot {snapshotCount} of {Config.MaxSnapshots} at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
-
-                        //Stop snapshot bucle iteration:
-                        snapshotCount = -1;
+                        break;
                     }
                     else if (predictions.Count() > 0)
                     {
