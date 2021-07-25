@@ -6,6 +6,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using SkiaSharp;
 using SynoAI.Models;
+using SynoAI.Extensions;
 
 namespace SynoAI.Services
 {
@@ -81,7 +82,7 @@ namespace SynoAI.Services
             _logger.LogInformation($"{camera.Name}: Processing image boundaries.");
 
             // Load the bitmap 
-            SKBitmap image = SKBitmap.Decode(new MemoryStream(_snapshot));
+            SKBitmap image = SKBitmap.Decode(_snapshot);
 
             // Don't process the drawing if the drawing mode is off
             if (Config.DrawMode == DrawMode.Off)
@@ -93,6 +94,8 @@ namespace SynoAI.Services
             // Draw the predictions
             using (SKCanvas canvas = new SKCanvas(image))
             {
+                int counter = 1; //used for assigning a reference number on each prediction if AlternativeLabelling is true
+
                 foreach (AIPrediction prediction in Config.DrawMode == DrawMode.All ? _predictions : _validPredictions)
                 {
                     // Write out anything detected that was above the minimum size
@@ -100,9 +103,6 @@ namespace SynoAI.Services
                     int minSizeY = camera.GetMinSizeY();
                     if (prediction.SizeX >= minSizeX && prediction.SizeY >= minSizeY)
                     {
-                        decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
-                        string label = $"{prediction.Label} ({confidence}%)";
-
                         // Draw the box
                         SKRect rectangle = SKRect.Create(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY);
                         canvas.DrawRect(rectangle, new SKPaint 
@@ -111,9 +111,34 @@ namespace SynoAI.Services
                             Color = GetColour(Config.BoxColor)
                         });
                         
+                        //Label creation, either classic label or alternative labelling (and only if there is more than one object)
+                        string label = String.Empty;
+
+                        if (Config.AlternativeLabelling && Config.DrawMode == DrawMode.Matches) 
+                        {
+                            //On alternatie labelling, just place a reference number and only if there is more than one object
+                            if (_validPredictions.Count() > 1) 
+                            {
+                                label = counter.ToString();
+                                counter++;
+                            }
+                        }
+                        else
+                        {
+                            decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
+                            label = $"{prediction.Label.FirstCharToUpper()} {confidence}%";
+                        }
+
+                        //Label positioning
                         int x = prediction.MinX + Config.TextOffsetX;
                         int y = prediction.MinY + Config.FontSize + Config.TextOffsetY;
 
+                        //Consider below box placement
+                        if (Config.LabelBelowBox) 
+                        {
+                            y += prediction.SizeY;
+                        }
+      
                         // Draw the text
                         SKFont font = new SKFont(SKTypeface.FromFamilyName(Config.Font), Config.FontSize);
                         canvas.DrawText(label, x, y, font, new SKPaint 
