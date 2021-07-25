@@ -86,7 +86,6 @@ namespace SynoAI
         /// </summary>
         public static bool LabelBelowBox { get; private set; } 
         /// <summary>
-        /// <summary>
         /// Upon movement, the maximum number of snapshots sequentially retrieved from SSS until finding an object of interest (i.e. 4 snapshots)
         /// </summary>
         public static int MaxSnapshots { get; private set; } 
