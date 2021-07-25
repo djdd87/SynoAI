@@ -48,7 +48,7 @@ namespace SynoAI.Controllers
         /// <param name="id">The name of the camera.</param>
         [HttpGet]
         [Route("{id}")]
-        public async Task<string> Get(string id)
+        public async void Get(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
             {
@@ -59,15 +59,14 @@ namespace SynoAI.Controllers
             Camera camera = Config.Cameras.FirstOrDefault(x => x.Name.Equals(id, StringComparison.OrdinalIgnoreCase));
             if (camera == null)
             {
-                string error = $"The camera with the name '{id}' was not found.";
-                _logger.LogError(error);
-                return error;
+                _logger.LogError($"The camera with the name '{id}' was not found.");
+                return;
             }
 
             // Enforce a delay between checks
             if (!HasSufficientDelay(id))
             {
-                return "Insufficient time has passed since the last call";
+                return;
             }
 
             // Create the stopwatches for reporting timings
@@ -91,19 +90,13 @@ namespace SynoAI.Controllers
             // Use the AI to get the valid predictions and then get all the valid predictions, which are all the AI predictions where the result from the AI is 
             // in the list of types and where the size of the object is bigger than the defined value.
             IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, snapshot);
-
-            if (predictions == null)
-            {
-                return "Error: Failed to generate predictions";
-            }
-            else
+            if (predictions != null)
             {
                 IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
                     camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase) &&     // Is a type we care about
                     x.SizeX >= minX && x.SizeY >= minY)                                     // Is bigger than the minimum size
                     .ToList();
 
-                string response;
                 if (validPredictions.Count() > 0)
                 {
                     // Because we don't want to process the image if it isn't even required, then we pass the snapshot manager to the notifiers. It will then perform 
@@ -113,24 +106,19 @@ namespace SynoAI.Controllers
                     // Limit the predictions to just those defined by the camera
                     predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
                     await SendNotifications(camera, snapshotManager, predictions.Select(x=> x.Label).ToList());
-
-                    response = $"Found - {string.Join(",", validPredictions.Select(x=> x.Label))}";
                 }
                 else if (predictions.Count() > 0)
                 {
                     // We got predictions back from the AI, but nothing that should trigger an alert
-                    response = "Nothing detected by the AI exceeding the defined confidence level and/or minimum size";
-                    _logger.LogInformation($"{id}: {response}");
+                    _logger.LogInformation($"{id}: Nothing detected by the AI exceeding the defined confidence level and/or minimum size");
                 }
                 else
                 {
                     // We didn't get any predictions whatsoever from the AI
-                    response = "Nothing detected by the AI";
-                    _logger.LogInformation($"{id}: {response}");
+                    _logger.LogInformation($"{id}: Nothing detected by the AI");
                 }
 
                 _logger.LogInformation($"{id}: Finished ({overallStopwatch.ElapsedMilliseconds}ms).");
-                return $"Success: {response}";
             }
         }
 
