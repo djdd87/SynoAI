@@ -65,7 +65,7 @@ namespace SynoAI.Notifiers.Webhook
         /// <param name="snapshotManager">A thread safe object for fetching a readonly file stream.</param>
         /// <param name="foundTypes">The list of types that were found.</param>
         /// <param name="logger">A logger.</param>
-        public override async Task SendAsync(Camera camera, ISnapshotManager snapshotManager, IList<string> foundTypes, ILogger logger)
+        public override async Task SendAsync(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> foundTypes, ILogger logger)
         {
             logger.LogInformation($"{camera.Name}: Webhook: Processing");
             using (HttpClient client = new HttpClient())
