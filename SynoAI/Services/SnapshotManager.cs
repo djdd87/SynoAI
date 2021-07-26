@@ -95,12 +95,12 @@ namespace SynoAI.Services
             using (SKCanvas canvas = new SKCanvas(image))
             {
                 int counter = 1; //used for assigning a reference number on each prediction if AlternativeLabelling is true
+                int minSizeX = camera.GetMinSizeX();
+                int minSizeY = camera.GetMinSizeY();
 
                 foreach (AIPrediction prediction in Config.DrawMode == DrawMode.All ? _predictions : _validPredictions)
                 {
-                    // Write out anything detected that was above the minimum size
-                    int minSizeX = camera.GetMinSizeX();
-                    int minSizeY = camera.GetMinSizeY();
+                    // Only process objects bigger than the minimum size
                     if (prediction.SizeX >= minSizeX && prediction.SizeY >= minSizeY)
                     {
                         // Draw the box
