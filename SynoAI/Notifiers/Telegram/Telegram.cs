@@ -39,10 +39,10 @@ namespace SynoAI.Notifiers.Telegram
         /// Sends a message and an image using the Telegram API.
         /// </summary>
         /// <param name="camera">The camera that triggered the notification.</param>
-        /// <param name="snapshotManager">A thread safe object for fetching the processed image.</param>
+        /// <param name="processedImage">Object for fetching the processed image.</param>
         /// <param name="foundTypes">The list of types that were found.</param>
         /// <param name="logger">A logger.</param>
-        public override async Task SendAsync(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> foundTypes, ILogger logger)
+        public override async Task SendAsync(Camera camera, ProcessedImage processedImage, IEnumerable<string> foundTypes, ILogger logger)
         {
             using (logger.BeginScope($"Telegram '{ChatID}'"))
             {
@@ -52,7 +52,6 @@ namespace SynoAI.Notifiers.Telegram
                 try
                 {
                     TelegramBotClient bot = new TelegramBotClient(Token);
-                    ProcessedImage processedImage = snapshotManager.GetImage(camera);
 
                     string message = GetMessage(camera, foundTypes);
                     if (string.IsNullOrWhiteSpace(PhotoBaseURL))

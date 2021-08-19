@@ -5,14 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using SynoAI.Models;
 using SynoAI.Services;
-using SynoAI.Extensions;
 
 namespace SynoAI.Notifiers
 {
     public abstract class NotifierBase : INotifier
     {
         public IEnumerable<string> Cameras { get; set;} 
-        public abstract Task SendAsync(Camera camera, ISnapshotManager fileAccessor, IEnumerable<string> foundTypes, ILogger logger);
+        public abstract Task SendAsync(Camera camera, ProcessedImage processedImage, IEnumerable<string> foundTypes, ILogger logger);
 
         protected string GetMessage(Camera camera, IEnumerable<string> foundTypes)
         {

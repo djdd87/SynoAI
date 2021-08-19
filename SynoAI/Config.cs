@@ -165,10 +165,6 @@ namespace SynoAI
             LabelBelowBox = configuration.GetValue<bool>("LabelBelowBox", false);
             AlternativeLabelling = configuration.GetValue<bool>("AlternativeLabelling", false);
             MaxSnapshots = configuration.GetValue<int>("MaxSnapshots", 1);
-            if (MaxSnapshots > 254) {
-                MaxSnapshots = 254;
-                logger.LogWarning("ATTENTION: Config parameter MaxSnapshots is too big: Maximum accepted value is 254 ");
-            }
 
             SaveOriginalSnapshot = configuration.GetValue<bool>("SaveOriginalSnapshot", false);
 
