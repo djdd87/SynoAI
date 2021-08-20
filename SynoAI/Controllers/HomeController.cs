@@ -133,14 +133,24 @@ namespace SynoAI.Controllers
         /// <summary>
         /// Since Y axis shows <NumberOfSteps> reference values, if there are less than <NumberOfSteps> snapshots, we need to adjust way of displaying the y-axis ref
         /// </summary>
-        public static String yStepping(int MaxValue, int Step, int NumberOfSteps) {
-            if (MaxValue / NumberOfSteps >= 1 || Step == 1)
-            {
-                int yValue = (MaxValue / NumberOfSteps) * (Step -1);
+        public static String yStepping(int MaxValue, int Step, int NumberOfSteps) 
+        {
+            double yValue = MaxValue;
+            yValue = yValue / NumberOfSteps;
+            yValue = Math.Round(yValue); 
+
+            //Y axis label results being a minimal reasonable number, or it is just the first step (top number, max value) so use it!
+            if (yValue > 1 || Step == 1)
+            {        
+                yValue = yValue * (Step -1);
                 yValue = MaxValue - yValue;
                 return yValue.ToString();
             }
-            return " ";
+            else
+            {
+                //If Y axis label results being a small number, just fill this step with a space.
+                return " ";
+            }
         }
 
 
