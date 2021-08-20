@@ -1,17 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using System.IO;
-using Microsoft.Extensions.Logging;
-using SkiaSharp;
 using SynoAI.Models;
-using SynoAI.Notifiers;
-using SynoAI.Services;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
-using SynoAI.Extensions;
+
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace SynoAI.Controllers
 {
@@ -36,7 +29,9 @@ namespace SynoAI.Controllers
             return View();
         }
 
-
+        /// <summary>
+        /// Analyzes snapshots saved into a given camera folder
+        /// </summary>
         public static void GetGraphData(string cameraName) 
         {   
             graphData.Clear();
@@ -115,6 +110,9 @@ namespace SynoAI.Controllers
             }
         }
 
+        /// <summary>
+        /// Adds a value into the list of data to be graphed.
+        /// </summary>
         private static void AddGraphValue(int hour, int objects, int predictions) 
         {
             // Store past hour values
@@ -131,7 +129,10 @@ namespace SynoAI.Controllers
             } 
         }
 
-        //Since Y axis shows <NumberOfSteps> reference values, if there are less than <NumberOfSteps> snapshots, we need to adjust way of displaying the y-axis ref
+
+        /// <summary>
+        /// Since Y axis shows <NumberOfSteps> reference values, if there are less than <NumberOfSteps> snapshots, we need to adjust way of displaying the y-axis ref
+        /// </summary>
         public static String yStepping(int MaxValue, int Step, int NumberOfSteps) {
             if (MaxValue / NumberOfSteps >= 1 || Step == 1)
             {
@@ -143,6 +144,9 @@ namespace SynoAI.Controllers
         }
 
 
+        /// <summary>
+        /// Create a nice string showing the filesize formatted into Kb, Mb, Gb, etc. 
+        /// </summary>
         public static string NiceByteSize()
         {
             if (cameraStorage > 0) {
@@ -159,17 +163,23 @@ namespace SynoAI.Controllers
         }       
 
 
+        /// <summary>
+        /// Calculate graph bar length, given theavailable height and the actual value to graph
+        /// </summary>
         public static int GraphBar(int value, int height) 
         {
-            // double maxValue = yMax;
-            // double currentValue = value;
-            // double availHeight = height;
-            //double result = (availHeight / maxValue) * currentValue;
-            double result = (height / yMax) * value;
+            double maxValue = yMax;
+            double currentValue = value;
+            double availHeight = height;
+            double result = (availHeight / maxValue) * currentValue;
+            //double result = (height / yMax) * value;
             return Convert.ToInt16(result);
         }
 
 
+        /// <summary>
+        /// Returns string including all objects types configured for valid detection inside the given camera
+        /// </summary>
         public static string GetTypes(Camera camera) 
         {
             if (camera.Types.Count() == 0) 

@@ -87,12 +87,6 @@ namespace SynoAI.Controllers
 
                         if (validPredictions.Count() > 0)
                         {
-                            //Original comment: Because we don't want to process the image if it isn't even required, then we pass the snapshot manager to the notifiers. 
-                            //It will then perform the necessary actions when it's GetImage method is called.
-
-                            //euquiq: I think we need to process the image and save it locally, even if user did not choose a Notifier. 
-                            //Maybe user just wants to have a local repository of found objects in each camera, for custom processing / inspection
-
                             // Save the original unprocessed image if required
                             if (Config.SaveOriginalSnapshot)
                             {
@@ -215,6 +209,13 @@ namespace SynoAI.Controllers
             return rotatedBitmap;
         }
 
+
+        /// <summary>
+        /// Sends notifications, if there is any configured
+        /// </summary>
+        /// <param name="camera">The camera responsible for this snapshot.</param>
+        /// <param name="processedImage">The path information for the snapshot.</param>
+        /// <param name="labels">The text metadata for each existing valid object.</param>
         private async Task SendNotifications(Camera camera, ProcessedImage processedImage, IList<String> labels)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
