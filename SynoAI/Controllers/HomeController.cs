@@ -27,18 +27,12 @@ namespace SynoAI.Controllers
         static readonly string[] byteSizes = { "bytes", "Kb", "Mb", "Gb", "Tb" };
 
         [Route("")]
-        // [Route("Home")]
-        // [Route("Home/Index")]
-        // [Route("Home/Index/{id?}")]
-
-
 
         /// <summary>
         /// Called by the user from web browser
         /// </summary>
         public IActionResult Index()
         {
-            //ViewData["Message"] = $"Valid detections per hour for {date:yyyy_MM_dd}";
             return View();
         }
 
@@ -58,20 +52,19 @@ namespace SynoAI.Controllers
                 var dir = new DirectoryInfo(directory);
                 FileInfo[] files = dir.GetFiles().OrderByDescending(p => p.CreationTime).ToArray();
 
+                // Add total number of snapshots for this cámera into global counter
                 cameraFiles = files.Count();
 
                 int index = -1;
                 int objects = 0;
-
                 string name = string.Empty;
-
                 int objectsHour = 0;
                 int validPredictionsHour = 0;
                 int oldHour = -1;
                 
                 foreach (FileInfo item in files) 
                 {
-                    // Add file size to storage usage counter
+                    // Add file size to global storage usage counter
                     cameraStorage += item.Length;   
 
                     // Check if current image file corresponds to a New hour                
@@ -88,17 +81,19 @@ namespace SynoAI.Controllers
                             objectsHour = 0;
                         }
 
+                        //Move forward into next snapshot...
                         oldHour = item.CreationTime.Hour;
                         cameraHours++;
                     }
 
-                    // Inside first 24 hours, feed counters for hourly graph points
+                    // Inside first 24 hours, also feed counters for hourly graph points
                     if (cameraHours < 25)
                     {
                         name = Path.GetFileNameWithoutExtension(item.Name);
                         index = name.IndexOf("-");
                         if (index != -1) 
                         {
+                            //try to extract the number of valid objects predicted inside this snapshot
                             if (!int.TryParse(name.Substring(index +1), out objects))
                                 objects = 0;
                         }
@@ -112,7 +107,7 @@ namespace SynoAI.Controllers
                     }
                 }
 
-                //Consider "last" hour:
+                // Are there any remaining predictions, left inside the last "remaining" hour ?
                 if (validPredictionsHour > 0)
                 {
                   AddGraphValue(oldHour, objectsHour, validPredictionsHour);   
@@ -120,9 +115,11 @@ namespace SynoAI.Controllers
             }
         }
 
-        private static void AddGraphValue(int hour, int objects, int predictions) {
+        private static void AddGraphValue(int hour, int objects, int predictions) 
+        {
             // Store past hour values
             graphData.Add( new GraphData() { Hour = hour, Objects = objects, Predictions = predictions });
+
             //Adjust Max value for Y axis
             if ( objects  > yMax)
             {
@@ -134,10 +131,7 @@ namespace SynoAI.Controllers
             } 
         }
 
-        //Since Y axis shows 5 reference values, if there are less than 5 snapshots, we need to force at least "1" as integer
-        //If not, the webpage will freeze the NAS while creating the y-Axis labels, due to not being able to reach 0 by substracting 0 on current number of snapshots.
-        //  15,1,5  3,2,5 --- 3,5,5
-
+        //Since Y axis shows <NumberOfSteps> reference values, if there are less than <NumberOfSteps> snapshots, we need to adjust way of displaying the y-axis ref
         public static String yStepping(int MaxValue, int Step, int NumberOfSteps) {
             if (MaxValue / NumberOfSteps >= 1 || Step == 1)
             {
@@ -150,28 +144,28 @@ namespace SynoAI.Controllers
 
 
         public static string NiceByteSize()
-{
-    if (cameraStorage > 0) {
-        int i = 0;
-        decimal dValue = (decimal)cameraStorage;
-        while (Math.Round(dValue, 1) >= 1000)
         {
-            dValue /= 1024;
-            i++;
-        }
-        return string.Format("{0:n1} {1}", dValue, byteSizes[i]);
-    }
-    return "---";
-}       
+            if (cameraStorage > 0) {
+                int i = 0;
+                decimal dValue = (decimal)cameraStorage;
+                while (Math.Round(dValue, 1) >= 1000)
+                {
+                    dValue /= 1024;
+                    i++;
+                }
+                return string.Format("{0:n1} {1}", dValue, byteSizes[i]);
+            }
+            return "---";
+        }       
 
 
         public static int GraphBar(int value, int height) 
         {
-            double maxValue = yMax;
-            double currentValue = value;
-            double availHeight = height;
-            double result = (availHeight / maxValue) * currentValue;
-
+            // double maxValue = yMax;
+            // double currentValue = value;
+            // double availHeight = height;
+            //double result = (availHeight / maxValue) * currentValue;
+            double result = (height / yMax) * value;
             return Convert.ToInt16(result);
         }
 
