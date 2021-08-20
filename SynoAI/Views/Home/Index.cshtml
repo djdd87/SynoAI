@@ -45,8 +45,8 @@
 
                 @foreach (SynoAI.Models.GraphData graphData in SynoAI.Controllers.HomeController.graphData)
                 {
-                    <div class="predictions" title="@graphData.Predictions Images @@ @graphData.Hour" Hs. style="height:@SynoAI.Controllers.HomeController.GraphBar(graphData.Predictions,125).ToString()px;" ></div>
-                    <div class="objects" title="@graphData.Objects Objects @@ @graphData.Hour" Hs. style="height:@SynoAI.Controllers.HomeController.GraphBar(graphData.Objects,125).ToString()px;" ></div>
+                    <div class="predictions" title="@graphData.Predictions Images @@ @graphData.Hour Hs." style="height:@SynoAI.Controllers.HomeController.GraphBar(graphData.Predictions,125).ToString()px;" ></div>
+                    <div class="objects" title="@graphData.Objects Objects @@ @graphData.Hour Hs." style="height:@SynoAI.Controllers.HomeController.GraphBar(graphData.Objects,125).ToString()px;" ></div>
                 }
 
                 <div class="axis-x">
