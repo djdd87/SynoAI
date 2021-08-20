@@ -9,7 +9,7 @@
             .graph {background-color:#eee; width:648px; height: 150px; padding:5px; font-size:8px;}
 
             .axis-y {float:left;width:21px; height:125px; margin:0; text-align: right; padding-right:2px; border-right: 1px solid #000;}
-            .value-y {height:22px; margin:0; text-align:right; padding-right:2px;}
+            .value-y {height:25px; margin:0; text-align:right; padding-right:2px;}
 
             .predictions {width: 11px; display: inline-block; position: relative; background-color: blue; vertical-align: baseline;}
             .objects {width: 11px; display: inline-block; position: relative; background-color: lightblue; vertical-align: baseline;}
@@ -22,7 +22,7 @@
     </head>
     <body>
         <h2>SynoAI Report</h2>
-        <h4>Data updated at @DateTime.Now (UTC)</h4>
+        <h4>Data updated at @DateTime.Now</h4>
         <hr>
         @foreach (Camera camera in SynoAI.Config.Cameras)
         {
@@ -36,18 +36,17 @@
             </p>
             <h4>Valid predictions (Shows up to 24 hours of activity)</h4>
             <div class="graph">
-
                 <div class="axis-y">
-                    @for (int y=SynoAI.Controllers.HomeController.yMax; y >=0; y = y - (SynoAI.Controllers.HomeController.yMax / 5)) 
+                    @for (int y = 1; y <= 5; y++) 
                     {
-                        <div class="value-y">@y.ToString()</div>
+                        <div class="value-y">@SynoAI.Controllers.HomeController.yStepping(@SynoAI.Controllers.HomeController.yMax, y, 5)</div>
                     }                
                 </div>
 
                 @foreach (SynoAI.Models.GraphData graphData in SynoAI.Controllers.HomeController.graphData)
                 {
-                    <div class="predictions" title="@graphData.Predictions Images @@ @graphData.Hour UTC" style="height:@SynoAI.Controllers.HomeController.GraphBar(graphData.Predictions,125).ToString()px;" ></div>
-                    <div class="objects" title="@graphData.Objects Objects @@ @graphData.Hour UTC" style="height:@SynoAI.Controllers.HomeController.GraphBar(graphData.Objects,125).ToString()px;" ></div>
+                    <div class="predictions" title="@graphData.Predictions Images @@ @graphData.Hour" Hs. style="height:@SynoAI.Controllers.HomeController.GraphBar(graphData.Predictions,125).ToString()px;" ></div>
+                    <div class="objects" title="@graphData.Objects Objects @@ @graphData.Hour" Hs. style="height:@SynoAI.Controllers.HomeController.GraphBar(graphData.Objects,125).ToString()px;" ></div>
                 }
 
                 <div class="axis-x">

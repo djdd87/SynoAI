@@ -38,10 +38,9 @@ namespace SynoAI.Controllers
         /// </summary>
         public IActionResult Index()
         {
-            ViewData["Message"] = $"Valid detections per hour for {date:yyyy_MM_dd}";
+            //ViewData["Message"] = $"Valid detections per hour for {date:yyyy_MM_dd}";
             return View();
         }
-
 
 
         public static void GetGraphData(string cameraName) 
@@ -52,8 +51,7 @@ namespace SynoAI.Controllers
             cameraFiles = 0;
             cameraStorage = 0;
 
-            string directory = $"Captures";
-            directory = Path.Combine(directory, cameraName);
+            string directory = Path.Combine("Captures", cameraName);
 
             if (Directory.Exists(directory))
             {
@@ -72,34 +70,24 @@ namespace SynoAI.Controllers
                 int oldHour = -1;
                 
                 foreach (FileInfo item in files) 
-                {   
-                    // Add file size to storage counter
-                    cameraStorage += item.Length;
+                {
+                    // Add file size to storage usage counter
+                    cameraStorage += item.Length;   
 
                     // Check if current image file corresponds to a New hour                
-                    if (oldHour != item.CreationTimeUtc.Hour) 
+                    if (oldHour != item.CreationTime.Hour) 
                     {
                         // This image corresponds to a new hour (and a complete hour has already been processed):
                         if (cameraHours <= 24 && oldHour != -1)
                         {
-                            // Store past hour values
-                            graphData.Add( new GraphData() { Hour = oldHour, Objects = objectsHour, Predictions = validPredictionsHour });
-
-                            //Adjust Max value for Y axis
-                            if ( objectsHour  > yMax)
-                            {
-                               yMax = objectsHour ;
-                            } else if ( validPredictionsHour  > yMax)
-                            {
-                               yMax = validPredictionsHour ;
-                            } 
-
+                            // Add last hour as Graph data point
+                            AddGraphValue(oldHour, objectsHour, validPredictionsHour);
 
                             // Reset counters for next hour calculations
                             validPredictionsHour = 0;
                             objectsHour = 0;
                         }
-                        
+
                         oldHour = item.CreationTime.Hour;
                         cameraHours++;
                     }
@@ -118,18 +106,50 @@ namespace SynoAI.Controllers
                         {
                             objects = 0; //Could not grab
                         }
-
                         //Update counters for this ongoing hour
                         validPredictionsHour++;
                         objectsHour += objects;
                     }
                 }
+
+                //Consider "last" hour:
+                if (validPredictionsHour > 0)
+                {
+                  AddGraphValue(oldHour, objectsHour, validPredictionsHour);   
+                }
             }
         }
 
-        
+        private static void AddGraphValue(int hour, int objects, int predictions) {
+            // Store past hour values
+            graphData.Add( new GraphData() { Hour = hour, Objects = objects, Predictions = predictions });
+            //Adjust Max value for Y axis
+            if ( objects  > yMax)
+            {
+               yMax = objects ;
+            } 
+            else if ( predictions  > yMax)
+            {
+                yMax = predictions;
+            } 
+        }
 
-public static string NiceByteSize()
+        //Since Y axis shows 5 reference values, if there are less than 5 snapshots, we need to force at least "1" as integer
+        //If not, the webpage will freeze the NAS while creating the y-Axis labels, due to not being able to reach 0 by substracting 0 on current number of snapshots.
+        //  15,1,5  3,2,5 --- 3,5,5
+
+        public static String yStepping(int MaxValue, int Step, int NumberOfSteps) {
+            if (MaxValue / NumberOfSteps >= 1 || Step == 1)
+            {
+                int yValue = (MaxValue / NumberOfSteps) * (Step -1);
+                yValue = MaxValue - yValue;
+                return yValue.ToString();
+            }
+            return " ";
+        }
+
+
+        public static string NiceByteSize()
 {
     if (cameraStorage > 0) {
         int i = 0;
@@ -144,6 +164,7 @@ public static string NiceByteSize()
     return "---";
 }       
 
+
         public static int GraphBar(int value, int height) 
         {
             double maxValue = yMax;
@@ -153,6 +174,7 @@ public static string NiceByteSize()
 
             return Convert.ToInt16(result);
         }
+
 
         public static string GetTypes(Camera camera) 
         {
@@ -171,8 +193,5 @@ public static string NiceByteSize()
                 return items;
             }
         }
-
-
     }
-
 }
