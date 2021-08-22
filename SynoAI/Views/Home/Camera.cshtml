@@ -25,41 +25,34 @@
     </head>
     <body>
         <h2>SynoAI Report</h2>
-        <h4>Data presented on @DateTime.Now</h4>
+        <h4>Data for camera @ViewData["camera"] on date @ViewData["year"]-@ViewData["month"]-@ViewData["day"] @@ @ViewData["hour"] Hs. presented on @DateTime.Now</h4>
         <hr>
-        @foreach (Camera camera in SynoAI.Config.Cameras)
-        {
-            GraphData data = SynoAI.Controllers.HomeController.GetData(camera.Name, DateTime.Now, false);
+        @{ 
+            DateTime fecha = new DateTime(Int16.Parse(ViewData["year"].ToString()),Int16.Parse(ViewData["month"].ToString()),Int16.Parse(ViewData["day"].ToString()),Int16.Parse(ViewData["hour"].ToString()),59,59);
+            GraphData data = SynoAI.Controllers.HomeController.GetData(ViewData["camera"].ToString(), fecha, true); 
+        }
             <p>
-                Camera: <b>@camera.Name</b><br />
-                Threshold: <b>@camera.Threshold.ToString()</b>% certainity<br />
-                Objects: <b> @SynoAI.Controllers.HomeController.GetTypes(camera)</b><br />
-                Snapshots: <b> @data.Snapshots</b> images, distributed inside <b>@data.HoursCounter</b> Hours.<br />
-                Storage: <b>@SynoAI.Controllers.HomeController.NiceByteSize(data.Storage)</b>
+                Found <b>@data.Snapshots.ToString()</b> snapshots over <b>@data.MinutesCounter.ToString()</b> minutes of activity, using <b>@SynoAI.Controllers.HomeController.NiceByteSize(data.Storage)</b> of storage space:
             </p>
-            <h4>Number of snapshots and objects (Showing up to 24 hours of activity)</h4>
             <div class="graph">
                 <div class="axis-y">
                     @for (int y = 1; y <= @graphDraw.GraphYSteps; y++) 
                     {
                         <div class="value-y">@graphDraw.yStepping(@data.yMax, y)</div>
-                    }               
+                    }                
                 </div>
                 @foreach (SynoAI.Models.GraphPoint graphPoint in data.GraphPoints)
                 {
-                    <a href="/@camera.Name/@graphPoint.Date.Year/@graphPoint.Date.Month/@graphPoint.Date.Day/@graphPoint.Date.Hour">
-                        <div class="p" title="@graphPoint.Predictions Snapshots @@ @graphPoint.Date.ToString(@"HH") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Predictions)px; width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
-                        <div class="o" title="@graphPoint.Objects Objects @@ @graphPoint.Date.ToString(@"HH") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Objects)px;width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
-                    </a>
+                    <div class="p" title="@graphPoint.Predictions Snapshots @@ @graphPoint.Date.ToString(@"HH\:mm") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Predictions)px; width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
+                    <div class="o" title="@graphPoint.Objects Objects @@ @graphPoint.Date.ToString(@"HH\:mm") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Objects)px;width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
                 }
                 <div class="axis-x">
-                    <div class="label-x">Hours</div>
+                    <div class="label-x">Mins</div>
                     @foreach (SynoAI.Models.GraphPoint graphPoint in data.GraphPoints)
                     {
-                        <div class="value-x" style="width:@graphDraw.GraphColsWidth(data.GraphPoints.Count(), false)px">@graphPoint.Date.ToString(@"HH")</div>
+                        <div class="value-x" style="width:@graphDraw.GraphColsWidth(data.GraphPoints.Count(), false)px">@graphPoint.Date.ToString(@"mm")</div>
                     }
                 </div>
             </div>
-        }
     </body>
 </html>
