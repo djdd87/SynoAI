@@ -11,17 +11,16 @@ namespace SynoAI.Controllers
 
     public class HomeController : Controller
     {
-        public DateTime date = DateTime.Now;
-        public static List<GraphData> graphData = new List<GraphData>();
-        public static int yMax = 0;
-        public static int cameraHours = 0;
-        public static long cameraStorage = 0;
-        public static int cameraFiles = 0;
+        // public DateTime date = DateTime.Now;
+        // public static List<GraphData> graphData = new List<GraphData>();
+        // public static int yMax = 0;
+        // public static int cameraHours = 0;
+        // public static long cameraStorage = 0;
+        // public static int cameraFiles = 0;
         static readonly string[] byteSizes = { "bytes", "Kb", "Mb", "Gb", "Tb" };
 
         [Route("")]
-
-        /// <summary>
+                /// <summary>
         /// Called by the user from web browser
         /// </summary>
         public IActionResult Index()
@@ -29,139 +28,158 @@ namespace SynoAI.Controllers
             return View();
         }
 
-        /// <summary>
-        /// Analyzes snapshots saved into a given camera folder
-        /// </summary>
-        public static void GetGraphData(string cameraName) 
-        {   
-            graphData.Clear();
-            yMax = 0;
-            cameraHours = 0;
-            cameraFiles = 0;
-            cameraStorage = 0;
+        [Route("{cameraname}/{year}/{month}/{day}/{hour}")]
 
+        public IActionResult Camera(string cameraname, string year, string month, string day, string hour)
+        {
+            ViewData["camera"] = cameraname;
+            ViewData["year"] = year;
+            ViewData["month"] = month;
+            ViewData["day"] = day;
+            ViewData["hour"] = hour;
+            return View();
+        }
+
+        /// <summary>
+        /// Analyzes snapshots saved into a given camera folder, either for 24 hours, or for a specific hour
+        /// </summary>
+        public static GraphData GetData(string cameraName, DateTime date, bool GraphHour = false ) 
+        {  
+            GraphData data = new GraphData();
             string directory = Path.Combine("Captures", cameraName);
 
             if (Directory.Exists(directory))
             {
+                int objectsCounter = 0;
+                int predictionsCounter = 0;
+                DateTime oldDate = DateTime.MinValue;
+
+                //Retrieve Snapshots and order it in descending Creation DateTime (most up-to-date first)
                 var dir = new DirectoryInfo(directory);
-                FileInfo[] files = dir.GetFiles().OrderByDescending(p => p.CreationTime).ToArray();
+                FileInfo[] snapshots = dir.GetFiles().OrderByDescending(p => p.CreationTime).ToArray();
 
-                // Add total number of snapshots for this cámera into global counter
-                cameraFiles = files.Count();
+                //User is asking for global 24 hours report, so I also meter the general storage / snapshots / hours counters.
+                if (!GraphHour)
+                    data.Snapshots = snapshots.Count();
 
-                int index = -1;
-                int objects = 0;
-                string name = string.Empty;
-                int objectsHour = 0;
-                int validPredictionsHour = 0;
-                int oldHour = -1;
-                
-                foreach (FileInfo item in files) 
+                foreach (FileInfo snapshot in snapshots) 
                 {
-                    // Add file size to global storage usage counter
-                    cameraStorage += item.Length;   
+                    if (!GraphHour)                         
+                        data.Storage += snapshot.Length;   // Add file size to global storage usage counter
 
-                    // Check if current image file corresponds to a New hour                
-                    if (oldHour != item.CreationTime.Hour) 
+                    //Start working from given date
+                    if (snapshot.CreationTime <= date) 
                     {
-                        // This image corresponds to a new hour (and a complete hour has already been processed):
-                        if (cameraHours <= 24 && oldHour != -1)
+                        // Graphing minutes inside an hour
+                        if (GraphHour)
                         {
-                            // Add last hour as Graph data point
-                            AddGraphValue(oldHour, objectsHour, validPredictionsHour);
+                            // New minute!
+                            if (oldDate.Minute != snapshot.CreationTime.Minute)
+                            {
+                                //Store the old minute's data as graphpoint and reset counters for this new minute
+                                if (oldDate != DateTime.MinValue)
+                                {
+                                    data = AddGraphPoint(data, oldDate, objectsCounter, predictionsCounter);
+                                    objectsCounter = 0;
+                                    predictionsCounter = 0;
+                                }
 
-                            // Reset counters for next hour calculations
-                            validPredictionsHour = 0;
-                            objectsHour = 0;
-                        }
+                                if ((oldDate.Hour != snapshot.CreationTime.Hour && oldDate != DateTime.MinValue)) break; // Only graphing inside designated hour: work is done.
 
-                        //Move forward into next snapshot...
-                        oldHour = item.CreationTime.Hour;
-                        cameraHours++;
-                    }
-
-                    // Inside first 24 hours, also feed counters for hourly graph points
-                    if (cameraHours < 25)
-                    {
-                        name = Path.GetFileNameWithoutExtension(item.Name);
-                        index = name.IndexOf("-");
-                        if (index != -1) 
-                        {
-                            //try to extract the number of valid objects predicted inside this snapshot
-                            if (!int.TryParse(name.Substring(index +1), out objects))
-                                objects = 0;
+                                data.MinutesCounter++;
+                            }
+                            // Update counters: Add filesize to storage usage and increment snapshot counters, etc.
+                            data.Storage += snapshot.Length;
+                            data.Snapshots++;
+                            predictionsCounter++;
+                            objectsCounter += GetObjects(snapshot.Name);
                         }
                         else
                         {
-                            objects = 0; //Could not grab
-                        }
-                        //Update counters for this ongoing hour
-                        validPredictionsHour++;
-                        objectsHour += objects;
+                            //Graphing a 24 hours timespan, new hour:                      
+                            if ((oldDate.Hour != snapshot.CreationTime.Hour || oldDate == DateTime.MinValue)) 
+                            {
+                                //An hour of snapshots just passed thru: Add it to the graph!
+                                if (data.HoursCounter <= 24  && oldDate != DateTime.MinValue) {
+                                    data = AddGraphPoint(data,oldDate, objectsCounter, predictionsCounter);
+                                    objectsCounter = 0;
+                                    predictionsCounter = 0;
+                                }
+                                data.HoursCounter++;
+                            }
+
+                            // If inside 24 hours graph window, update counters
+                            if (data.HoursCounter <=24) 
+                            {
+                                predictionsCounter++;
+                                objectsCounter += GetObjects(snapshot.Name);
+                            }
+                        }                    
+
+                        //Move forward into next snapshot...
+                        oldDate = snapshot.CreationTime;
                     }
                 }
 
-                // Are there any remaining predictions, left inside the last "remaining" hour ?
-                if (validPredictionsHour > 0)
-                {
-                  AddGraphValue(oldHour, objectsHour, validPredictionsHour);   
-                }
+                // Are there any remaining predictions left, either inside the last "remaining" hour or minute  ?
+                if (predictionsCounter > 0)
+                    data = AddGraphPoint(data,oldDate, objectsCounter, predictionsCounter);       
             }
-        }
-
-        /// <summary>
-        /// Adds a value into the list of data to be graphed.
-        /// </summary>
-        private static void AddGraphValue(int hour, int objects, int predictions) 
-        {
-            // Store past hour values
-            graphData.Add( new GraphData() { Hour = hour, Objects = objects, Predictions = predictions });
-
-            //Adjust Max value for Y axis
-            if ( objects  > yMax)
-            {
-               yMax = objects ;
-            } 
-            else if ( predictions  > yMax)
-            {
-                yMax = predictions;
-            } 
+            return data;
         }
 
 
         /// <summary>
-        /// Since Y axis shows <NumberOfSteps> reference values, if there are less than <NumberOfSteps> snapshots, we need to adjust way of displaying the y-axis ref
+        /// Given the Snapshot filename, extract the number of objects detected, if available
         /// </summary>
-        public static String yStepping(int MaxValue, int Step, int NumberOfSteps) 
+        private static int GetObjects(string filename)
         {
-            double yValue = MaxValue;
-            yValue = yValue / NumberOfSteps;
-            yValue = Math.Round(yValue); 
-
-            //Y axis label results being a minimal reasonable number, or it is just the first step (top number, max value) so use it!
-            if (yValue > 1 || Step == 1)
-            {        
-                yValue = yValue * (Step -1);
-                yValue = MaxValue - yValue;
-                return yValue.ToString();
+            int objects = 0;
+            string name = Path.GetFileNameWithoutExtension(filename);
+            int index = name.IndexOf("-");
+            if (index != -1)
+            {
+                //try to extract the number of valid objects predicted inside this snapshot
+                if (!int.TryParse(name.Substring(index + 1), out objects))
+                    objects = 0;
             }
             else
             {
-                //If Y axis label results being a small number, just fill this step with a space.
-                return " ";
+                objects = 0; //Could not grab
             }
+            return objects;
+        }
+
+
+        /// <summary>
+        /// Adds a Graph Point value into the Graph data and updates max y-axis value
+        /// </summary>
+        private static GraphData AddGraphPoint(GraphData data, DateTime date, int objects, int predictions) 
+        {
+            // Store past hour values
+            data.GraphPoints.Add( new GraphPoint() { Date = date, Objects = objects, Predictions = predictions });
+
+            //Adjust Max value for Y axis
+            if ( objects  > data.yMax)
+            {
+               data.yMax = objects ;
+            } 
+            else if ( predictions  > data.yMax)
+            {
+                data.yMax = predictions;
+            } 
+            return data;
         }
 
 
         /// <summary>
         /// Create a nice string showing the filesize formatted into Kb, Mb, Gb, etc. 
         /// </summary>
-        public static string NiceByteSize()
+        public static string NiceByteSize(long numberOfBytes)
         {
-            if (cameraStorage > 0) {
+            if (numberOfBytes > 0) {
                 int i = 0;
-                decimal dValue = (decimal)cameraStorage;
+                decimal dValue = (decimal)numberOfBytes;
                 while (Math.Round(dValue, 1) >= 1000)
                 {
                     dValue /= 1024;
@@ -171,20 +189,6 @@ namespace SynoAI.Controllers
             }
             return "---";
         }       
-
-
-        /// <summary>
-        /// Calculate graph bar length, given theavailable height and the actual value to graph
-        /// </summary>
-        public static int GraphBar(int value, int height) 
-        {
-            double maxValue = yMax;
-            double currentValue = value;
-            double availHeight = height;
-            double result = (availHeight / maxValue) * currentValue;
-            //double result = (height / yMax) * value;
-            return Convert.ToInt16(result);
-        }
 
 
         /// <summary>
