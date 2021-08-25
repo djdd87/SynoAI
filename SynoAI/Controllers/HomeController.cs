@@ -3,6 +3,9 @@ using System.IO;
 using SynoAI.Models;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 
 using System.Linq;
 
@@ -11,25 +14,22 @@ namespace SynoAI.Controllers
 
     public class HomeController : Controller
     {
-        // public DateTime date = DateTime.Now;
-        // public static List<GraphData> graphData = new List<GraphData>();
-        // public static int yMax = 0;
-        // public static int cameraHours = 0;
-        // public static long cameraStorage = 0;
-        // public static int cameraFiles = 0;
         static readonly string[] byteSizes = { "bytes", "Kb", "Mb", "Gb", "Tb" };
 
-        [Route("")]
-                /// <summary>
-        /// Called by the user from web browser
+        /// <summary>
+        /// Called by the user from web browser - General view (up to 24 hours)
         /// </summary>
+        [Route("")]
         public IActionResult Index()
         {
             return View();
         }
 
-        [Route("{cameraname}/{year}/{month}/{day}/{hour}")]
 
+        /// <summary>
+        /// Called by the user from web browser - Zoom into one hour of snapshots
+        /// </summary>
+        [Route("{cameraname}/{year}/{month}/{day}/{hour}")]
         public IActionResult Camera(string cameraname, string year, string month, string day, string hour)
         {
             ViewData["camera"] = cameraname;
@@ -40,10 +40,87 @@ namespace SynoAI.Controllers
             return View();
         }
 
+
+        /// <summary>
+        /// Called by the user from web browser - Zoom into a minute of snapshots: Image gallery
+        /// </summary>
+        [Route("{cameraname}/{year}/{month}/{day}/{hour}/{minute}")]
+        public IActionResult Gallery(string cameraname, string year, string month, string day, string hour,string minute)
+        {
+            ViewData["camera"] = cameraname;
+  
+            try 
+            {
+                ViewData["date"] = new DateTime(Int16.Parse(year),Int16.Parse(month),Int16.Parse(day),Int16.Parse(hour),Int16.Parse(minute),59);;
+            }
+            catch (Exception ex) 
+            {
+                ViewData["date"] = DateTime.Now;
+            }
+            return View();
+        }
+
+
+        /// <summary>
+        /// Return snapshot image as JPEG, either in original size or a scaled down version, if asked.
+        //// In order to use System.Drawing.Common
+        //// In Terminal, issue: dotnet add SynoAI package System.Drawing.Common
+        /// </summary>
+        [Route("{cameraName}/{filename}/{width}")]
+        [Route("{cameraName}/{filename}")]
+        public ActionResult Snapshot(string cameraName, string filename, int width = 0)
+        {   
+            // Reconstruct the path to the actual snapshot inside the NAS 
+            string path = Path.Combine("Captures", cameraName);
+            path = Path.Combine(path, filename);
+
+            // Grab the original Snapshot
+            byte[] originalSnapshot = System.IO.File.ReadAllBytes(path);
+
+            if (width != 0) 
+            {
+                // New (reduced) width specified: Scale down the original snapshot
+
+                // First retrieve the original Snapshot
+                using var memoryStream = new MemoryStream(originalSnapshot);
+
+                // Second, convert it into a bitmap for resizing
+                using var originalImage = new Bitmap(memoryStream);
+
+                //Get image ratio from original bitmap width and Height: 
+                double ratio = (double)originalImage.Width / (double)originalImage.Height;   
+
+                // Calculate new height based on that ratio and the new reduced width.
+                ratio = width / ratio;
+                int height = (int)Math.Floor(ratio);
+
+                //Create a resized bitmap image
+                var resized = new Bitmap(width, height);
+                using var graphics = Graphics.FromImage(resized);
+                graphics.CompositingQuality = CompositingQuality.HighSpeed;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+
+                graphics.DrawImage(originalImage, 0, 0, width, height);
+
+                //Convert resized image into jpeg and return
+                using var stream = new MemoryStream(); 
+                resized.Save(stream, ImageFormat.Jpeg);
+                return File(stream.ToArray(), "image/jpeg");
+            }
+            else 
+            {
+                // Width 0 means full-size, just return the original fetched image.
+                return File(originalSnapshot, "image/jpeg");
+            }
+        }
+
+
         /// <summary>
         /// Analyzes snapshots saved into a given camera folder, either for 24 hours, or for a specific hour
+        ///  (used for graphing in Index.cshtml and Camera.cshtml)
         /// </summary>
-        public static GraphData GetData(string cameraName, DateTime date, bool GraphHour = false ) 
+        public static GraphData GetData(string cameraName, DateTime date, bool GraphHour = false) 
         {  
             GraphData data = new GraphData();
             string directory = Path.Combine("Captures", cameraName);
@@ -127,6 +204,36 @@ namespace SynoAI.Controllers
             }
             return data;
         }
+
+
+        /// <summary>
+        /// Analyzes snapshots saved into a given camera folder, for a specific minute
+        /// (used for grabbing the snapshots in Gallery.cshtml)
+        /// </summary>
+        public static List<String> GetSnapshots(string cameraName, DateTime date) 
+        {
+            List<String> files = new List<String>();
+            string directory = Path.Combine("Captures", cameraName);
+
+            if (Directory.Exists(directory))
+            {
+                //Retrieve Snapshots and order it in descending Creation DateTime (most up-to-date first)
+                var dir = new DirectoryInfo(directory);
+                FileInfo[] snapshots = dir.GetFiles().OrderByDescending(p => p.CreationTime).ToArray();
+
+                foreach (FileInfo snapshot in snapshots) 
+                {
+                    //Start working from given date
+                    if (snapshot.CreationTime <= date) 
+                    {
+                        if (snapshot.CreationTime.Minute != date.Minute) break; //We are not inside the current minute, any more.
+                        files.Add(snapshot.Name); //Store the snapshot filename.
+                    }
+                }
+            }
+            return files;
+        }
+
 
 
         /// <summary>
