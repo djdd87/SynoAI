@@ -43,8 +43,10 @@
                 </div>
                 @foreach (SynoAI.Models.GraphPoint graphPoint in data.GraphPoints)
                 {
-                    <div class="p" title="@graphPoint.Predictions Snapshots @@ @graphPoint.Date.ToString(@"HH\:mm") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Predictions)px; width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
-                    <div class="o" title="@graphPoint.Objects Objects @@ @graphPoint.Date.ToString(@"HH\:mm") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Objects)px;width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
+                    <a href="/@ViewData["camera"]/@graphPoint.Date.Year/@graphPoint.Date.Month/@graphPoint.Date.Day/@graphPoint.Date.Hour/@graphPoint.Date.Minute">
+                        <div class="p" title="@graphPoint.Predictions Snapshots @@ @graphPoint.Date.ToString(@"HH\:mm") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Predictions)px; width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
+                        <div class="o" title="@graphPoint.Objects Objects @@ @graphPoint.Date.ToString(@"HH\:mm") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Objects)px;width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
+                    </a>
                 }
                 <div class="axis-x">
                     <div class="label-x">Mins</div>
