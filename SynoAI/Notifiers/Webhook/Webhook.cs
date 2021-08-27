@@ -5,7 +5,6 @@ using SynoAI.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -62,10 +61,10 @@ namespace SynoAI.Notifiers.Webhook
         /// Sends a notification to the Webhook.
         /// </summary>
         /// <param name="camera">The camera that triggered the notification.</param>
-        /// <param name="snapshotManager">A thread safe object for fetching a readonly file stream.</param>
+        /// <param name="processedImage">Object for fetching the processed image.</param>
         /// <param name="foundTypes">The list of types that were found.</param>
         /// <param name="logger">A logger.</param>
-        public override async Task SendAsync(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> foundTypes, ILogger logger)
+        public override async Task SendAsync(Camera camera, ProcessedImage processedImage, IEnumerable<string> foundTypes, ILogger logger)
         {
             logger.LogInformation($"{camera.Name}: Webhook: Processing");
             using (HttpClient client = new HttpClient())
@@ -86,7 +85,6 @@ namespace SynoAI.Notifiers.Webhook
                     case "PUT":
                         if (SendImage)
                         {
-                            ProcessedImage processedImage = snapshotManager.GetImage(camera);
                             fileStream = processedImage.GetReadonlyStream();
                             data.Add(new StreamContent(fileStream), Field, processedImage.FileName);
                         }

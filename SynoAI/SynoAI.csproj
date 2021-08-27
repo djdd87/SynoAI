@@ -10,6 +10,7 @@
     <PackageReference Include="SkiaSharp" Version="2.80.2" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.80.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.6.3" />
+    <PackageReference Include="System.Drawing.Common" Version="5.0.2" />
     <PackageReference Include="Telegram.Bot" Version="15.7.1" />
   </ItemGroup>
 
