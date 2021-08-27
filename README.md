@@ -456,9 +456,17 @@ This will output the full information log and help identify where things are goi
 
 ### Trouble Shooting
 
-#### SynoAI
-* Image files are saved with a date/time different to the current local
-  * Ensure your TZ environmental variable is set in your docker configuration.
+#### Image files are saved with a date/time different to the current local
+Ensure your TZ environmental variable is set in your docker configuration.
+
+#### Snaphots taken in quick succession always return the same image
+Security cameras video stream includes I, P and B frames (See: [Wikipedia](https://en.wikipedia.org/wiki/Video_compression_picture_types)). An I-Frame is like a jpg image, holding a complete snapshot of the scene. Between each I-Frame, the camera sends a bunch of P and B frames, each one holding only those parts of the scene that had any change / movement along time. I.e: In still scenes this saves lots of bandwidth.
+
+At play back time, the video algorithm reconstructs the scene over time by first placing the I-frame as background and then composing each successive P or B frames on top, as time advances.
+
+When SynoAI requests a snapshot from your NAS, Synology API just fetches the latest I-Frame. While this action is fast and simple, depending on your camera brand and configuration, the most recent I-Frame may be several seconds old and may not even include the actual moving object!
+
+Some cameras are quite savvy on their bandwidth by really stretching the time between each I-Frame sent. I.e. DAHUA cameras brand got a configuration setting, labeled "SMART CODEC" which does just that when "ON". If this is your case, you should turn this "OFF", otherwise SynoAI may be fed old snapshots!
 
 #### "Failed due to Synology API error code X"
 * 400 Invalid password.
