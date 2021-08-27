@@ -300,6 +300,8 @@ The following instructions explain how to set up the SynoAI image using the Dock
    * Add a folder mapping from your captures directory to /app/Captures (optional)
 * On the port settings tab;
    * Enter a port mapping to port 80 from an available port on your NAS, e.g. 8080
+* On the environment tab;
+   * To change the timezone to your local time, add a variable called TZ and set the value to your [locale](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
 ### 3) Create Action Rules
 The next step is to configure actions inside Surveillance Station that will call the SynoAI API. 
@@ -453,6 +455,10 @@ If issues are encountered, to get more verbose information in the logs, change t
 This will output the full information log and help identify where things are going wrong, as well as displaying the confidence percentages from Deepstack.
 
 ### Trouble Shooting
+
+#### SynoAI
+* Image files are saved with a date/time different to the current local
+  * Ensure your TZ environmental variable is set in your docker configuration.
 
 #### "Failed due to Synology API error code X"
 * 400 Invalid password.
