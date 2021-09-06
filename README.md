@@ -474,7 +474,7 @@ Spaces in URLs should be encoded using "%20". Most programs and applications, in
 
 Wrong: http://10.0.0.10:8080/Camera/Back Door 
 
-Right: http://10.0.0.15:8080/Camera/Back%20Door
+Right: http://10.0.0.10:8080/Camera/Back%20Door
 
 #### "Failed due to Synology API error code X"
 * 400 Invalid password.
