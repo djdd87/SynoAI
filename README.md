@@ -468,6 +468,13 @@ When SynoAI requests a snapshot from your NAS, Synology API just fetches the lat
 
 Some cameras are quite savvy on their bandwidth by really stretching the time between each I-Frame sent. I.e. DAHUA cameras brand got a configuration setting, labeled "SMART CODEC" which does just that when "ON". If this is your case, you should turn this "OFF", otherwise SynoAI may be fed old snapshots!
 
+#### Camera names with spaces in cause the error "The camera with the name 'My Camera' was not found."
+
+Spaces in URLs should be encoded using "%20". Most programs and applications, including SynoAI, handle this for you, but unfortunately the action rule on Surveillance Station does not. Therefor if your camera names contains a space, then you will need to ensure the URL in your action rule has all spaces replaced with %20.
+
+Wrong: http://10.0.0.10:8080/Camera/Back Door 
+Right: http://10.0.0.15:8080/Camera/Back%20Door
+
 #### "Failed due to Synology API error code X"
 * 400 Invalid password.
   * If your password is definitely correct and you are still getting a 400 error code, then there's potentially an issue with the Synology DSM user configuration. However, if you cannot see any issues with the permissions, try creating a new user from SurveillanceStation directly.
