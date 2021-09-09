@@ -11,6 +11,8 @@ using System.Diagnostics;
 using SynoAI.Extensions;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using SynoAI.Hubs;
 
 namespace SynoAI.Controllers
 {
@@ -21,14 +23,18 @@ namespace SynoAI.Controllers
     [Route("[controller]")]
     public class CameraController : ControllerBase
     {
+        // euquiq: Needed for connecting into the SignalR hub and send valid Snapshot for rt web monitoring
+        private readonly IHubContext<SynoAIHub> _hubContext;
+
         private readonly IAIService _aiService;
         private readonly ISynologyService _synologyService;
         private readonly ILogger<CameraController> _logger;
 
         private static ConcurrentDictionary<string, DateTime> _lastCameraChecks = new ConcurrentDictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
 
-        public CameraController(IAIService aiService, ISynologyService synologyService, ILogger<CameraController> logger)
+        public CameraController(IAIService aiService, ISynologyService synologyService, ILogger<CameraController> logger, IHubContext<SynoAIHub> hubContext)
         {
+            _hubContext = hubContext;
             _aiService = aiService;
             _synologyService = synologyService;
             _logger = logger;
@@ -124,6 +130,9 @@ namespace SynoAI.Controllers
 
                             // Process and save the snapshot
                             ProcessedImage processedImage = SnapshotManager.DressImage(camera, snapshot, predictions, validPredictions, _logger);
+
+                            // Inform eventual web users about this new Snapshot, for the "realtime" option thru Web
+                            await _hubContext.Clients.All.SendAsync("ReceiveSnapshot", camera.Name, processedImage.FileName);
 
                             // Send Notifications                  
                             await SendNotifications(camera, processedImage, labels);

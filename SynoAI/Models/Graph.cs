@@ -8,7 +8,7 @@ namespace SynoAI.Models
     /// </summary>
 
     /// <summary>
-    /// Class holding definition for one data point (extracted from filenames inside a captures/camera folder) 
+    /// Class holding definition for one data point (extracted from filenames inside a Captures/camera folder) 
     /// </summary>
     public class GraphPoint
     {

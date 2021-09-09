@@ -31,7 +31,7 @@
         {
             GraphData data = SynoAI.Controllers.HomeController.GetData(camera.Name, DateTime.Now, false);
             <p>
-                Camera: <b>@camera.Name</b><br />
+                Camera: <b>@camera.Name <a href="/@camera.Name/RT">(View in realtime)</a></b><br />
                 Threshold: <b>@camera.Threshold.ToString()</b>% certainity<br />
                 Objects: <b> @SynoAI.Controllers.HomeController.GetTypes(camera)</b><br />
                 Snapshots: <b> @data.Snapshots</b> images, distributed inside <b>@data.HoursCounter</b> Hours.<br />
