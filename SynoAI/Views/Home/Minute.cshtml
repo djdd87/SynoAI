@@ -2,6 +2,7 @@
 @using System
 @{
     DateTime date = (DateTime)ViewData["date"];
+    string camera = ViewData["camera"].ToString();
 }
 
 <!DOCTYPE html>
@@ -14,7 +15,7 @@
     </head>
     <body>
         <h2>SynoAI Report</h2>
-        <h4>Snapshots for camera @ViewData["camera"] on date @date.ToString(@"yyyy-MM-dd") @@ @date.ToString(@"HH\:mm") Hs. presented on @DateTime.Now</h4>
+        <h4>Snapshots for camera <a href="/@camera/RT">(View in realtime)</a> on date @date.ToString(@"yyyy-MM-dd") @@ @date.ToString(@"HH\:mm") Hs. presented on @DateTime.Now</h4>
         <hr>
         @{
             List<String> snapshots = SynoAI.Controllers.HomeController.GetSnapshots(ViewData["camera"].ToString(), date);
@@ -29,7 +30,7 @@
             {
                 snapWidth = 210;
             }
-            string camera = ViewData["camera"].ToString();
+            
             foreach (string filename in snapshots)
             {
                 <a href="/@camera/@filename">

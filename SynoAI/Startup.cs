@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using SynoAI.Services;
 using System.Threading.Tasks;
+using SynoAI.Hubs;
 
 namespace SynoAI
 {
@@ -25,6 +26,9 @@ namespace SynoAI
             });
 
             services.AddRazorPages();
+
+            // euquiq: Needed for realtime update from each camera valid snapshot into client's web browser
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -38,6 +42,9 @@ namespace SynoAI
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "SynoAI v1"));
             }
+            
+            // euquiq: Allows /wwwroot's static files (mainly our Javascript code for RT monitoring the cameras)
+            app.UseStaticFiles();
 
             app.UseRouting();
 
@@ -45,7 +52,11 @@ namespace SynoAI
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapControllers();
+                // euquiq: Used by SignalR to contact each online client with snapshot updates
+                endpoints.MapHub<SynoAIHub>("/synoaiHub");
+
+                // euquiq: Web interface mapped inside HomeController.cs
+                endpoints.MapControllers();   
             });
 
             Task task = synologyService.InitialiseAsync();

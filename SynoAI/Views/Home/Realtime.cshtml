@@ -1,0 +1,20 @@
+@using SynoAI.Models
+@using System
+@{
+    string camera = ViewData["camera"].ToString();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>SynoAI</title>
+        <script src="~/js/signalr/dist/browser/signalr.js"></script>
+        <script src="~/js/rtimage.js"></script>  
+    </head>
+    <body>
+        <h2>SynoAI Report</h2>
+        <h4>Realtime image prediction for camera @camera</h4>
+        <hr>
+        <img id="camera-@camera" style="width:100%; height:100%;" />
+    </body>
+</html>
