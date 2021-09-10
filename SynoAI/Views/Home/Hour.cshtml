@@ -7,6 +7,7 @@
     graphDraw.GraphXAxisHeight = 24;
     graphDraw.GraphYAxisWidth = 24;
     graphDraw.GraphYSteps = 5;
+    string camera = ViewData["camera"].ToString();
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -25,7 +26,7 @@
     </head>
     <body>
         <h2>SynoAI Report</h2>
-        <h4>Data for camera @ViewData["camera"] on date @ViewData["year"]-@ViewData["month"]-@ViewData["day"] @@ @ViewData["hour"] Hs. presented on @DateTime.Now</h4>
+        <h4>Data for camera @camera <a href="/@camera/RT">(View in realtime)</a> on date @ViewData["year"]-@ViewData["month"]-@ViewData["day"] @@ @ViewData["hour"] Hs. presented on @DateTime.Now</h4>
         <hr>
         @{ 
             DateTime fecha = new DateTime(Int16.Parse(ViewData["year"].ToString()),Int16.Parse(ViewData["month"].ToString()),Int16.Parse(ViewData["day"].ToString()),Int16.Parse(ViewData["hour"].ToString()),59,59);
@@ -43,7 +44,7 @@
                 </div>
                 @foreach (SynoAI.Models.GraphPoint graphPoint in data.GraphPoints)
                 {
-                    <a href="/@ViewData["camera"]/@graphPoint.Date.Year/@graphPoint.Date.Month/@graphPoint.Date.Day/@graphPoint.Date.Hour/@graphPoint.Date.Minute">
+                    <a href="/@camera/@graphPoint.Date.Year/@graphPoint.Date.Month/@graphPoint.Date.Day/@graphPoint.Date.Hour/@graphPoint.Date.Minute">
                         <div class="p" title="@graphPoint.Predictions Snapshots @@ @graphPoint.Date.ToString(@"HH\:mm") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Predictions)px; width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
                         <div class="o" title="@graphPoint.Objects Objects @@ @graphPoint.Date.ToString(@"HH\:mm") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Objects)px;width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
                     </a>

@@ -17,11 +17,21 @@ namespace SynoAI.Controllers
         static readonly string[] byteSizes = { "bytes", "Kb", "Mb", "Gb", "Tb" };
 
         /// <summary>
-        /// Called by the user from web browser - General view (up to 24 hours)
+        /// Called by the user from web browser - General view (up to 24 latest hours)
         /// </summary>
         [Route("")]
         public IActionResult Index()
         {
+            return View();
+        }
+
+        /// <summary>
+        /// Called by the user from web browser - View snapshots in realtime for a camera
+        /// </summary>
+        [Route("{cameraname}/RT")]
+        public IActionResult Realtime(string cameraname)
+        {
+            ViewData["camera"] = cameraname;
             return View();
         }
 
@@ -30,7 +40,7 @@ namespace SynoAI.Controllers
         /// Called by the user from web browser - Zoom into one hour of snapshots
         /// </summary>
         [Route("{cameraname}/{year}/{month}/{day}/{hour}")]
-        public IActionResult Camera(string cameraname, string year, string month, string day, string hour)
+        public IActionResult Hour(string cameraname, string year, string month, string day, string hour)
         {
             ViewData["camera"] = cameraname;
             ViewData["year"] = year;
@@ -42,10 +52,10 @@ namespace SynoAI.Controllers
 
 
         /// <summary>
-        /// Called by the user from web browser - Zoom into a minute of snapshots: Image gallery
+        /// Called by the user from web browser - Zoom into a minute of snapshots and show it's snapshots
         /// </summary>
         [Route("{cameraname}/{year}/{month}/{day}/{hour}/{minute}")]
-        public IActionResult Gallery(string cameraname, string year, string month, string day, string hour,string minute)
+        public IActionResult Minute(string cameraname, string year, string month, string day, string hour,string minute)
         {
             ViewData["camera"] = cameraname;
   

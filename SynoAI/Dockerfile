@@ -11,6 +11,7 @@ WORKDIR /src
 COPY ["SynoAI.csproj", "./"]
 RUN dotnet restore "SynoAI.csproj"
 COPY . .
+
 WORKDIR "/src/."
 RUN dotnet build "SynoAI.csproj" -c Release -o /app/build
 
