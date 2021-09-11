@@ -84,7 +84,8 @@ namespace SynoAI.Controllers
                     if (rawPredictions.Count() > 0)
                     {
                         IEnumerable<AIPrediction> predictions = rawPredictions.Where(x =>
-                            x.SizeX >= camera.GetMinSizeX() && x.SizeY >= camera.GetMinSizeY())     // Is bigger than the minimum size
+                            x.SizeX >= camera.GetMinSizeX() && x.SizeY >= camera.GetMinSizeY() &&   // Is bigger than the minimum size
+                            x.SizeX <= camera.GetMaxSizeX() && x.SizeY <= camera.GetMaxSizeY())     // Is smaller than the maximum size 
                             .ToList();
 
                          IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
