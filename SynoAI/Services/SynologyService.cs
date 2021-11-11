@@ -124,7 +124,7 @@ namespace SynoAI.Services
         {
             _logger.LogInformation("Login: Authenticating");
 
-            string loginUri = string.Format(URI_LOGIN, _loginPath, Config.ApiVersionAuth, Config.Username, Config.Password);
+            string loginUri = string.Format(URI_LOGIN, _loginPath, Config.ApiVersionAuth, Config.Username, SanitisePassword(Config.Password));
             _logger.LogDebug($"Login: Logging in ({loginUri})");
 
             CookieContainer cookieContainer = new CookieContainer();
@@ -159,7 +159,16 @@ namespace SynoAI.Services
             }
             return null;
         }
-
+        
+        /// <summary>
+        /// HTML encodes any unsupported characters that DSM cannot handle in the query strings.
+        /// </summary>
+        /// <returns>The sanitised password.</returns>
+        private string SanitisePassword(string original)
+        {
+            return original.Replace("+", "%2B");
+        }
+        
         /// <summary>
         /// Fetches all of the required camera information from the API.
         /// </summary>
