@@ -112,6 +112,15 @@ namespace SynoAI
         public static int MinSizeY { get; private set; }
 
         /// <summary>
+        /// The default maximum width that an object must be to be considered valid for reporting. Can be overridden on a camera by camera basis to account for different camera resolutions.
+        /// </summary>
+        public static int MaxSizeX { get; private set; }
+        /// <summary>
+        /// The default maximum height that an object must be to be considered valid for reporting. Can be overridden on a camera by camera basis to account for different camera resolutions.
+        /// </summary>
+        public static int MaxSizeY { get; private set; }
+
+        /// <summary>
         /// The list of cameras.
         /// </summary>
         public static IEnumerable<Camera> Cameras { get; private set; }
@@ -161,6 +170,10 @@ namespace SynoAI
 
             MinSizeX = configuration.GetValue<int>("MinSizeX", 50);
             MinSizeY = configuration.GetValue<int>("MinSizeY", 50);
+
+            // euquiq: A bit overkill to use int.MaxValue :)
+            MaxSizeX = configuration.GetValue<int>("MaxSizeX", int.MaxValue);
+            MaxSizeY = configuration.GetValue<int>("MaxSizeY", int.MaxValue);
 
             LabelBelowBox = configuration.GetValue<bool>("LabelBelowBox", false);
             AlternativeLabelling = configuration.GetValue<bool>("AlternativeLabelling", false);

@@ -29,6 +29,14 @@ namespace SynoAI.Models
         /// </summary>
         public int? MinSizeY { get; set; }
         /// <summary>
+        /// The maximum size the object must be horizontally to be considered as a valid result.
+        /// </summary>
+        public int? MaxSizeX { get; set; }
+        /// <summary>
+        /// The maximum size the object must be vertically to be considered as a valid result.
+        /// </summary>
+        public int? MaxSizeY { get; set; }
+        /// <summary>
         /// The number of degrees to rotate the captured image before processing.
         /// </summary>
         public float Rotate { get; set; }
@@ -54,6 +62,21 @@ namespace SynoAI.Models
             return MinSizeY ?? Config.MinSizeY;
         }
 
+        /// <summary>
+        /// Gets the maximum size the object must be horizontally to be considered as a valid result from either the current camera, or the main config default if not specified.
+        /// </summary>
+        public int GetMaxSizeX()
+        {
+            return MaxSizeX ?? Config.MaxSizeX;
+        }
+
+        /// <summary>
+        /// Gets the maximum size the object must be vertically to be considered as a valid result from either the current camera, or the main config default if not specified.
+        /// </summary>
+        public int GetMaxSizeY()
+        {
+            return MaxSizeY ?? Config.MaxSizeY;
+        }
 
         /// <summary>
         /// Gets the maximum number of snapshots to take for the current camera, or the main config default if not specified.
