@@ -300,6 +300,8 @@ The following instructions explain how to set up the SynoAI image using the Dock
    * Add a folder mapping from your captures directory to /app/Captures (optional)
 * On the port settings tab;
    * Enter a port mapping to port 80 from an available port on your NAS, e.g. 8080
+* On the environment tab;
+   * To change the timezone to your local time, add a variable called TZ and set the value to your [locale](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones).
 
 ### 3) Create Action Rules
 The next step is to configure actions inside Surveillance Station that will call the SynoAI API. 
@@ -453,6 +455,26 @@ If issues are encountered, to get more verbose information in the logs, change t
 This will output the full information log and help identify where things are going wrong, as well as displaying the confidence percentages from Deepstack.
 
 ### Trouble Shooting
+
+#### Image files are saved with a date/time different to the current local
+Ensure your TZ environmental variable is set in your docker configuration.
+
+#### Snaphots taken in quick succession always return the same image
+Security cameras video stream includes I, P and B frames (See: [Wikipedia](https://en.wikipedia.org/wiki/Video_compression_picture_types)). An I-Frame is like a jpg image, holding a complete snapshot of the scene. Between each I-Frame, the camera sends a bunch of P and B frames, each one holding only those parts of the scene that had any change / movement along time. I.e: In still scenes this saves lots of bandwidth.
+
+At play back time, the video algorithm reconstructs the scene over time by first placing the I-frame as background and then composing each successive P or B frames on top, as time advances.
+
+When SynoAI requests a snapshot from your NAS, Synology API just fetches the latest I-Frame. While this action is fast and simple, depending on your camera brand and configuration, the most recent I-Frame may be several seconds old and may not even include the actual moving object!
+
+Some cameras are quite savvy on their bandwidth by really stretching the time between each I-Frame sent. I.e. DAHUA cameras brand got a configuration setting, labeled "SMART CODEC" which does just that when "ON". If this is your case, you should turn this "OFF", otherwise SynoAI may be fed old snapshots!
+
+#### Camera names with spaces in cause the error "The camera with the name 'My Camera' was not found."
+
+Spaces in URLs should be encoded using "%20". Most programs and applications, including SynoAI, handle this for you, but unfortunately the action rule on Surveillance Station does not. Therefor if your camera names contains a space, then you will need to ensure the URL in your action rule has all spaces replaced with %20.
+
+Wrong: http://10.0.0.10:8080/Camera/Back Door 
+
+Right: http://10.0.0.10:8080/Camera/Back%20Door
 
 #### "Failed due to Synology API error code X"
 * 400 Invalid password.
