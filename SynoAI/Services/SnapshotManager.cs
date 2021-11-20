@@ -109,6 +109,7 @@ namespace SynoAI.Services
                         {
                             Style = SKPaintStyle.Stroke,
                             Color = GetColour(Config.BoxColor)
+                            StrokeWidth = Config.StrokeWidth
                         });
                         
                         int x = prediction.MinX + Config.TextOffsetX;

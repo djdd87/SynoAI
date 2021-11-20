@@ -63,6 +63,11 @@ namespace SynoAI
         public static string BoxColor { get; private set; }
 
         /// <summary>
+        /// The hex code of the colour to use for the boxing around image matches.
+        /// </summary>
+        public static string StrokeWidth { get; private set; }
+
+        /// <summary>
         /// The font to use on the image labels.
         /// </summary>
         public static string Font { get; private set; }
