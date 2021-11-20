@@ -15,6 +15,7 @@ namespace SynoAI.Notifiers.Email
                 logger.LogInformation("Processing Email Config");
                 
                 SecureSocketOptions socketOptions = GetSecureSocketOptions(logger, section);
+                string sender = section.GetValue<string>("Sender");
                 string destination = section.GetValue<string>("Destination");
                 string host = section.GetValue<string>("Host");
                 int port = section.GetValue<int>("Port", 25);
@@ -23,6 +24,7 @@ namespace SynoAI.Notifiers.Email
 
                 return new Email()
                 {
+                    Sender = sender,
                     Destination = destination,
                     Username = username,
                     Password = password,

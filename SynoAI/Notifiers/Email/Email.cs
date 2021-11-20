@@ -22,6 +22,10 @@ namespace SynoAI.Notifiers.Email
     public class Email : NotifierBase
     {
         /// <summary>
+        /// The email address to send the notification from.
+        /// </summary>
+        public string Sender { get; set; }
+        /// <summary>
         /// The email address to send the notification to.
         /// </summary>
         public string Destination { get; set; }
@@ -66,8 +70,10 @@ namespace SynoAI.Notifiers.Email
                 try
                 {
                     // Create the email message
+                    string sender = string.IsNullOrWhiteSpace(Sender) ? Destination : Sender;
+
                     MimeMessage email = new MimeMessage();
-                    email.From.Add(new MailboxAddress("SynoAI", Destination));
+                    email.From.Add(new MailboxAddress("SynoAI", sender));
                     email.To.Add(MailboxAddress.Parse(Destination));
                     email.Subject = $"SynoAI: Movement Detected ({camera.Name})";
 
