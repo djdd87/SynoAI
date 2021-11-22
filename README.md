@@ -188,6 +188,7 @@ The email notification will send and email with the attached image to the specif
 ```json
 {
   "Type": "Email",
+  "Sender": "youremail@example.com",
   "Destination": "youremail@example.com",
   "Host": "smtp.server.com",
   "Port": 465,
@@ -197,6 +198,7 @@ The email notification will send and email with the attached image to the specif
 }
 ```
 
+* Sender [optional]: The email address that the notifications should be sent from; if missed/empty, then Destination will be used as the sender
 * Destination [required]: The email recipient for SynoAi notifications
 * Host [required]: The hostname of the SMTP server e.g. "smtp.gmail.com"
 * Port [optional] (Default: 25): The port used by the SMTP server e.g 25, 465, 587
@@ -215,6 +217,7 @@ Note that to send email using GMail you may need to log into your Google Account
 ```json
 {
   "Type": "Email",
+  "Sender": "youremail@gmail.com",
   "Destination": "youremail@gmail.com",
   "Host": "smtp.gmail.com",
   "Port": 587,
