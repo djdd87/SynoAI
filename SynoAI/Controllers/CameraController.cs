@@ -111,6 +111,7 @@ namespace SynoAI.Controllers
                 {
                     // We got predictions back from the AI, but nothing that should trigger an alert
                     _logger.LogInformation($"{id}: Nothing detected by the AI exceeding the defined confidence level and/or minimum size");
+                    _logger.LogDebug($"{id}: No objects in the specified list ({string.Join(", ", camera.Types)}) were detected by the AI exceeding the confidence level ({camera.Threshold}%) and/or minimum size ({minX}x{minY})");
                 }
                 else
                 {
