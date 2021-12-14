@@ -63,6 +63,11 @@ namespace SynoAI
         public static string BoxColor { get; private set; }
 
         /// <summary>
+        ///The stroke width of the Box drawn around the objects.
+        /// </summary>
+        public static int StrokeWidth { get; private set; }
+
+        /// <summary>
         /// The font to use on the image labels.
         /// </summary>
         public static string Font { get; private set; }
@@ -134,6 +139,8 @@ namespace SynoAI
 
             Delay = configuration.GetValue<int>("Delay", 5000);
             DrawMode = configuration.GetValue<DrawMode>("DrawMode", DrawMode.Matches);
+
+            StrokeWidth = configuration.GetValue<int>("StrokeWidth", 2);
 
             BoxColor = configuration.GetValue<string>("BoxColor", SKColors.Red.ToString());
 

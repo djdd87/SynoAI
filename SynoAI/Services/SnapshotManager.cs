@@ -108,7 +108,8 @@ namespace SynoAI.Services
                         canvas.DrawRect(rectangle, new SKPaint 
                         {
                             Style = SKPaintStyle.Stroke,
-                            Color = GetColour(Config.BoxColor)
+                            Color = GetColour(Config.BoxColor),
+                            StrokeWidth = Config.StrokeWidth
                         });
                         
                         int x = prediction.MinX + Config.TextOffsetX;
