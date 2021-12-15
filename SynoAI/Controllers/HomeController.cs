@@ -63,7 +63,7 @@ namespace SynoAI.Controllers
             {
                 ViewData["date"] = new DateTime(Int16.Parse(year),Int16.Parse(month),Int16.Parse(day),Int16.Parse(hour),Int16.Parse(minute),59,999);;
             }
-            catch (Exception ex) 
+            catch (Exception) 
             {
                 ViewData["date"] = DateTime.Now;
             }

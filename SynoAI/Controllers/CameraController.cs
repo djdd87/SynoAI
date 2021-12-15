@@ -68,7 +68,7 @@ namespace SynoAI.Controllers
                 for (int snapshotCount = 1; snapshotCount <= Config.MaxSnapshots; snapshotCount++)
                 {
                     // Take the snapshot from Surveillance Station
-                    _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} asked at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                    _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} requested at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
                     byte[] snapshot = await GetSnapshot(id);
                     _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} received at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
 
@@ -83,8 +83,11 @@ namespace SynoAI.Controllers
                     
                     if (rawPredictions.Count() > 0)
                     {
+                        int minX = camera.GetMinSizeX();
+                        int minY = camera.GetMinSizeY();
+                        
                         IEnumerable<AIPrediction> predictions = rawPredictions.Where(x =>
-                            x.SizeX >= camera.GetMinSizeX() && x.SizeY >= camera.GetMinSizeY() &&   // Is bigger than the minimum size
+                            x.SizeX >= minX && x.SizeY >= minY &&                                   // Is bigger than the minimum size
                             x.SizeX <= camera.GetMaxSizeX() && x.SizeY <= camera.GetMaxSizeY())     // Is smaller than the maximum size 
                             .ToList();
 
@@ -149,23 +152,11 @@ namespace SynoAI.Controllers
                         {
                             // We didn't get any predictions whatsoever from the AI
                             _logger.LogInformation($"{id}: Nothing detected by the AI at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                            _logger.LogDebug($"{id}: No objects in the specified list ({string.Join(", ", camera.Types)}) were detected by the AI exceeding the confidence level ({camera.Threshold}%) and/or minimum size ({minX}x{minY})");
                         }
                     }
+                    _logger.LogInformation($"{id}: Finished ({overallStopwatch.ElapsedMilliseconds}ms).");
                 }
-                snapshotCount++;
-                else if (predictions.Count() > 0)
-                {
-                    // We got predictions back from the AI, but nothing that should trigger an alert
-                    _logger.LogInformation($"{id}: Nothing detected by the AI exceeding the defined confidence level and/or minimum size");
-                    _logger.LogDebug($"{id}: No objects in the specified list ({string.Join(", ", camera.Types)}) were detected by the AI exceeding the confidence level ({camera.Threshold}%) and/or minimum size ({minX}x{minY})");
-                }
-                else
-                {
-                    // We didn't get any predictions whatsoever from the AI
-                    _logger.LogInformation($"{id}: Nothing detected by the AI");
-                }
-
-                _logger.LogInformation($"{id}: Finished ({overallStopwatch.ElapsedMilliseconds}ms).");
             }
         }
 
