@@ -407,6 +407,8 @@ services:
   "MinSizeX": 100,
   "MinSizeY": 100,
   
+  "DaysToKeepCaptures": 14,
+  
   "AI": {
     "Type": "DeepStack",
     "Url": "http://10.0.0.10:83"
