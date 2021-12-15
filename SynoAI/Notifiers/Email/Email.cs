@@ -54,17 +54,15 @@ namespace SynoAI.Notifiers.Email
         /// Sends a message and an image using the Pushbullet API.
         /// </summary>
         /// <param name="camera">The camera that triggered the notification.</param>
-        /// <param name="snapshotManager">A thread safe object for fetching the processed image.</param>
+        /// <param name="processedImage">Object for fetching the processed image.</param>
         /// <param name="foundTypes">The list of types that were found.</param>
         /// <param name="logger">A logger.</param>
-        public override async Task SendAsync(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> foundTypes, ILogger logger)
+        public override async Task SendAsync(Camera camera, ProcessedImage processedImage, IEnumerable<string> foundTypes, ILogger logger)
         {
             using (logger.BeginScope($"Email '{Destination}'"))
             {
                 // Assign camera name to variable for logger placeholder
                 string cameraName = camera.Name;
-
-                ProcessedImage processedImage = snapshotManager.GetImage(camera);
                 string filePath = processedImage.FilePath;
 
                 try

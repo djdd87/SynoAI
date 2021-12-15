@@ -1,0 +1,42 @@
+@using SynoAI.Models
+@using System
+@{
+    DateTime date = (DateTime)ViewData["date"];
+    string camera = ViewData["camera"].ToString();
+}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>SynoAI</title>
+        <style>
+            .snapshot {margin:5px; float:left;}
+        </style>
+    </head>
+    <body>
+        <h2>SynoAI Report</h2>
+        <h4>Snapshots for camera <a href="/@camera/RT">(View in realtime)</a> on date @date.ToString(@"yyyy-MM-dd") @@ @date.ToString(@"HH\:mm") Hs. presented on @DateTime.Now</h4>
+        <hr>
+        @{
+            List<String> snapshots = SynoAI.Controllers.HomeController.GetSnapshots(ViewData["camera"].ToString(), date);
+
+            //Depending on snapshots quantity, the size I will call the image
+            int snapWidth = 640;
+            if (snapshots.Count() == 2)
+            {
+                snapWidth = 320;
+            }
+            else if (snapshots.Count() > 2)
+            {
+                snapWidth = 210;
+            }
+            
+            foreach (string filename in snapshots)
+            {
+                <a href="/@camera/@filename">
+                    <img class="snapshot" src="/@camera/@filename/@snapWidth.ToString()" alt="@filename" />
+                </a>
+            }
+        }
+    </body>
+</html>

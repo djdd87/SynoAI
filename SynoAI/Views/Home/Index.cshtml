@@ -1,0 +1,65 @@
+@using SynoAI.Models
+@using System
+@{ 
+    GraphDraw graphDraw = new GraphDraw();
+    graphDraw.GraphWidth = 648;
+    graphDraw.GraphHeight = 200;
+    graphDraw.GraphXAxisHeight = 24;
+    graphDraw.GraphYAxisWidth = 24;
+    graphDraw.GraphYSteps = 5;
+}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>SynoAI</title>
+        <style>
+            .graph {background-color:#eee; width:@graphDraw.GraphWidth.ToString()px; height:@graphDraw.GraphHeight.ToString()px; padding:5px; font-size:0;}
+            .axis-y {float:left;width:21px; height:@graphDraw.GraphYAxisHeight().ToString()px; padding-right:2px; border-right: 1px solid #000; font-size:8px; text-align:right;}
+            .value-y {height:@graphDraw.GraphYStepSize().ToString()px;; padding-right:2px; border-top: 1px dotted #000;}
+            .p {display: inline-block; position: relative; background-color: blue; vertical-align: baseline;}
+            .o {display: inline-block; position: relative; background-color: lightblue; vertical-align: baseline;}
+            .axis-x {clear:both; width:@graphDraw.GraphWidth.ToString()px; height:21px; padding-top:2px; border-top: 1px solid #000; font-size:0;}
+            .label-x {display:inline-block; width:22px; padding-right:2px; font-size:8px; text-align: right;}
+            .value-x {display:inline-block; font-size:8px; text-align:center;}
+        </style>
+    </head>
+    <body>
+        <h2>SynoAI Report</h2>
+        <h4>Data presented on @DateTime.Now</h4>
+        <hr>
+        @foreach (Camera camera in SynoAI.Config.Cameras)
+        {
+            GraphData data = SynoAI.Controllers.HomeController.GetData(camera.Name, DateTime.Now, false);
+            <p>
+                Camera: <b>@camera.Name <a href="/@camera.Name/RT">(View in realtime)</a></b><br />
+                Threshold: <b>@camera.Threshold.ToString()</b>% certainity<br />
+                Objects: <b> @SynoAI.Controllers.HomeController.GetTypes(camera)</b><br />
+                Snapshots: <b> @data.Snapshots</b> images, distributed inside <b>@data.HoursCounter</b> Hours.<br />
+                Storage: <b>@SynoAI.Controllers.HomeController.NiceByteSize(data.Storage)</b>
+            </p>
+            <h4>Number of snapshots and objects (Showing up to 24 hours of activity)</h4>
+            <div class="graph">
+                <div class="axis-y">
+                    @for (int y = 1; y <= @graphDraw.GraphYSteps; y++) 
+                    {
+                        <div class="value-y">@graphDraw.yStepping(@data.yMax, y)</div>
+                    }               
+                </div>
+                @foreach (SynoAI.Models.GraphPoint graphPoint in data.GraphPoints)
+                {
+                    <a href="/@camera.Name/@graphPoint.Date.Year/@graphPoint.Date.Month/@graphPoint.Date.Day/@graphPoint.Date.Hour">
+                        <div class="p" title="@graphPoint.Predictions Snapshots @@ @graphPoint.Date.ToString(@"HH") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Predictions)px; width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
+                        <div class="o" title="@graphPoint.Objects Objects @@ @graphPoint.Date.ToString(@"HH") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Objects)px;width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
+                    </a>
+                }
+                <div class="axis-x">
+                    <div class="label-x">Hours</div>
+                    @foreach (SynoAI.Models.GraphPoint graphPoint in data.GraphPoints)
+                    {
+                        <div class="value-x" style="width:@graphDraw.GraphColsWidth(data.GraphPoints.Count(), false)px">@graphPoint.Date.ToString(@"HH")</div>
+                    }
+                </div>
+            </div>
+        }
+    </body>
+</html>

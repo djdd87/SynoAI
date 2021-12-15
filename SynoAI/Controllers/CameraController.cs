@@ -1,8 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using SkiaSharp;
-using SynoAI.AIs;
 using SynoAI.Models;
 using SynoAI.Notifiers;
 using SynoAI.Services;
@@ -10,13 +8,11 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.IO;
+using SynoAI.Extensions;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.SignalR;
+using SynoAI.Hubs;
 
 namespace SynoAI.Controllers
 {
@@ -27,19 +23,21 @@ namespace SynoAI.Controllers
     [Route("[controller]")]
     public class CameraController : ControllerBase
     {
+        // euquiq: Needed for connecting into the SignalR hub and send valid Snapshot for rt web monitoring
+        private readonly IHubContext<SynoAIHub> _hubContext;
+
         private readonly IAIService _aiService;
         private readonly ISynologyService _synologyService;
         private readonly ILogger<CameraController> _logger;
-        private readonly ILogger<ISnapshotManager>  _snapshotManagerLogger;
 
         private static ConcurrentDictionary<string, DateTime> _lastCameraChecks = new ConcurrentDictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
 
-        public CameraController(IAIService aiService, ISynologyService synologyService, ILogger<CameraController> logger, ILogger<ISnapshotManager> snapshotManagerLogger)
+        public CameraController(IAIService aiService, ISynologyService synologyService, ILogger<CameraController> logger, IHubContext<SynoAIHub> hubContext)
         {
+            _hubContext = hubContext;
             _aiService = aiService;
             _synologyService = synologyService;
             _logger = logger;
-            _snapshotManagerLogger = snapshotManagerLogger;
         }
 
         /// <summary>
@@ -60,66 +58,105 @@ namespace SynoAI.Controllers
             if (camera == null)
             {
                 _logger.LogError($"The camera with the name '{id}' was not found.");
-                return;
             }
-
-            // Enforce a delay between checks
-            if (!HasSufficientDelay(id))
+            else
             {
-                return;
-            }
+                // Create the stopwatches for reporting timings
+                Stopwatch overallStopwatch = Stopwatch.StartNew();
 
-            // Create the stopwatches for reporting timings
-            Stopwatch overallStopwatch = Stopwatch.StartNew();
-
-            // Take the snapshot from Surveillance Station
-            byte[] snapshot = await GetSnapshot(id);
-            snapshot = PreProcessSnapshot(camera, snapshot);
-
-            // Save the original unprocessed image if required
-            if (Config.SaveOriginalSnapshot)
-            {
-                _logger.LogInformation($"{id}: Saving original image before processing");
-                SnapshotManager.SaveOriginalImage(_logger, camera, snapshot);
-            }
-
-            // Get the min X and Y values
-            int minX = camera.GetMinSizeX();
-            int minY = camera.GetMinSizeY();
-
-            // Use the AI to get the valid predictions and then get all the valid predictions, which are all the AI predictions where the result from the AI is 
-            // in the list of types and where the size of the object is bigger than the defined value.
-            IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, snapshot);
-            if (predictions != null)
-            {
-                IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
-                    camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase) &&     // Is a type we care about
-                    x.SizeX >= minX && x.SizeY >= minY)                                     // Is bigger than the minimum size
-                    .ToList();
-
-                if (validPredictions.Count() > 0)
+                // Start loop for requesting snapshots until a valid prediction is found or MaxSnapshots is reached
+                for (int snapshotCount = 1; snapshotCount <= Config.MaxSnapshots; snapshotCount++)
                 {
-                    // Because we don't want to process the image if it isn't even required, then we pass the snapshot manager to the notifiers. It will then perform 
-                    // the necessary actions when it's GetImage method is called.
-                    SnapshotManager snapshotManager = new SnapshotManager(snapshot, predictions, validPredictions, _snapshotManagerLogger);
+                    // Take the snapshot from Surveillance Station
+                    _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} requested at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                    byte[] snapshot = await GetSnapshot(id);
+                    _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} received at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+
+                    // See if the image needs to be rotated (or further processing in the future ?) before being analyzed by the AI
+                    snapshot = PreProcessSnapshot(camera, snapshot);
+
+                    // Use the AI to get the valid predictions and then get all the valid predictions, where the result from the AI is 
+                    // in the list of types and where the size of the object is bigger than the defined value.
+                    IEnumerable<AIPrediction> rawPredictions = await GetAIPredications(camera, snapshot);
+
+                    _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} contains {rawPredictions.Count()} objects at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
                     
-                    // Limit the predictions to just those defined by the camera
-                    predictions = predictions.Where(x => camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase)).ToList();
-                    await SendNotifications(camera, snapshotManager, predictions.Select(x=> x.Label).ToList());
-                }
-                else if (predictions.Count() > 0)
-                {
-                    // We got predictions back from the AI, but nothing that should trigger an alert
-                    _logger.LogInformation($"{id}: Nothing detected by the AI exceeding the defined confidence level and/or minimum size");
-                    _logger.LogDebug($"{id}: No objects in the specified list ({string.Join(", ", camera.Types)}) were detected by the AI exceeding the confidence level ({camera.Threshold}%) and/or minimum size ({minX}x{minY})");
-                }
-                else
-                {
-                    // We didn't get any predictions whatsoever from the AI
-                    _logger.LogInformation($"{id}: Nothing detected by the AI");
-                }
+                    if (rawPredictions.Count() > 0)
+                    {
+                        int minX = camera.GetMinSizeX();
+                        int minY = camera.GetMinSizeY();
+                        
+                        IEnumerable<AIPrediction> predictions = rawPredictions.Where(x =>
+                            x.SizeX >= minX && x.SizeY >= minY &&                                   // Is bigger than the minimum size
+                            x.SizeX <= camera.GetMaxSizeX() && x.SizeY <= camera.GetMaxSizeY())     // Is smaller than the maximum size 
+                            .ToList();
 
-                _logger.LogInformation($"{id}: Finished ({overallStopwatch.ElapsedMilliseconds}ms).");
+                         IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
+                            camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase))       // Is a type we care about
+                            .ToList();
+
+                        if (validPredictions.Count() > 0)
+                        {
+                            // Save the original unprocessed image if required
+                            if (Config.SaveOriginalSnapshot)
+                            {
+                                _logger.LogInformation($"{id}: Saving original image");
+                                SnapshotManager.SaveOriginalImage(_logger, camera, snapshot);
+                            }
+
+                            // Generate text for notifications                  
+                            List<String> labels = new List<String>();
+                            if (Config.AlternativeLabelling && Config.DrawMode == DrawMode.Matches)
+                            {
+                                if (validPredictions.Count() == 1) 
+                                {
+                                    // If there is only a single object, then don't add a correlating number and instead just
+                                    // write out the label.
+                                    decimal confidence = Math.Round(validPredictions.First().Confidence, 0, MidpointRounding.AwayFromZero);
+                                    labels.Add($"{validPredictions.First().Label.FirstCharToUpper()} {confidence}%");
+                                }
+                                else 
+                                {
+                                    //Since there is more than one object detected, include correlating number
+                                    int counter = 1;
+                                    foreach (AIPrediction prediction in validPredictions) 
+                                    {
+                                        decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
+                                        labels.Add($"{counter}. {prediction.Label.FirstCharToUpper()} {confidence}%");
+                                        counter++;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                labels = validPredictions.Select(x => x.Label.FirstCharToUpper()).ToList();
+                            }
+
+                            // Process and save the snapshot
+                            ProcessedImage processedImage = SnapshotManager.DressImage(camera, snapshot, predictions, validPredictions, _logger);
+
+                            // Inform eventual web users about this new Snapshot, for the "realtime" option thru Web
+                            await _hubContext.Clients.All.SendAsync("ReceiveSnapshot", camera.Name, processedImage.FileName);
+
+                            // Send Notifications                  
+                            await SendNotifications(camera, processedImage, labels);
+                            _logger.LogInformation($"{id}: Valid object found in snapshot {snapshotCount} of {Config.MaxSnapshots} at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                            break;
+                        }
+                        else if (predictions.Count() > 0)
+                        {
+                            // We got predictions back from the AI, but nothing that should trigger an alert
+                            _logger.LogInformation($"{id}: No valid objects at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                        }
+                        else
+                        {
+                            // We didn't get any predictions whatsoever from the AI
+                            _logger.LogInformation($"{id}: Nothing detected by the AI at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                            _logger.LogDebug($"{id}: No objects in the specified list ({string.Join(", ", camera.Types)}) were detected by the AI exceeding the confidence level ({camera.Threshold}%) and/or minimum size ({minX}x{minY})");
+                        }
+                    }
+                    _logger.LogInformation($"{id}: Finished ({overallStopwatch.ElapsedMilliseconds}ms).");
+                }
             }
         }
 
@@ -131,23 +168,27 @@ namespace SynoAI.Controllers
         /// <returns>A byte array of the image.</returns>
         private byte[] PreProcessSnapshot(Camera camera, byte[] snapshot)
         {
-            if (camera.Rotate == 0)
+            if (camera.Rotate != 0)
+            {
+                Stopwatch stopwatch = Stopwatch.StartNew();
+
+                // Load the bitmap & rotate the image
+                //SKBitmap bitmap = SKBitmap.Decode(new MemoryStream(snapshot));
+                SKBitmap bitmap = SKBitmap.Decode(snapshot);
+
+                _logger.LogInformation($"{camera.Name}: Rotating image {camera.Rotate} degrees.");
+                bitmap = Rotate(bitmap, camera.Rotate);
+
+                using (SKPixmap pixmap = bitmap.PeekPixels())
+                using (SKData data = pixmap.Encode(SKEncodedImageFormat.Jpeg, 100)) 
+                { 
+                    _logger.LogInformation($"{camera.Name}: Image preprocessing complete ({stopwatch.ElapsedMilliseconds}ms).");
+                    return data.ToArray();
+                }
+            }
+            else 
             {
                 return snapshot;
-            }
-
-            Stopwatch stopwatch = Stopwatch.StartNew();
-
-            // Load the bitmap & rotate the image
-            SKBitmap bitmap = SKBitmap.Decode(new MemoryStream(snapshot));
-            _logger.LogInformation($"{camera.Name}: Rotating image {camera.Rotate} degrees.");
-            bitmap = Rotate(bitmap, camera.Rotate);
-
-            using (SKPixmap pixmap = bitmap.PeekPixels())
-            using (SKData data = pixmap.Encode(SKEncodedImageFormat.Jpeg, 100)) 
-            { 
-                _logger.LogInformation($"{camera.Name}: Image preprocessing complete ({stopwatch.ElapsedMilliseconds}ms).");
-                return data.ToArray();
             }
         }
 
@@ -180,7 +221,14 @@ namespace SynoAI.Controllers
             return rotatedBitmap;
         }
 
-        private async Task SendNotifications(Camera camera, ISnapshotManager snapshotManager, IEnumerable<string> labels)
+
+        /// <summary>
+        /// Sends notifications, if there is any configured
+        /// </summary>
+        /// <param name="camera">The camera responsible for this snapshot.</param>
+        /// <param name="processedImage">The path information for the snapshot.</param>
+        /// <param name="labels">The text metadata for each existing valid object.</param>
+        private async Task SendNotifications(Camera camera, ProcessedImage processedImage, IList<String> labels)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -190,11 +238,11 @@ namespace SynoAI.Controllers
             List<Task> tasks = new List<Task>();
             foreach (INotifier notifier in notifiers)
             {
-                tasks.Add(notifier.SendAsync(camera, snapshotManager, labels, _logger));
+                tasks.Add(notifier.SendAsync(camera, processedImage, labels, _logger));
             }
 
             await Task.WhenAll(tasks);
-
+            stopwatch.Stop();
             _logger.LogInformation($"{camera.Name}: Notifications sent ({stopwatch.ElapsedMilliseconds}ms).");
         }
         
@@ -205,22 +253,18 @@ namespace SynoAI.Controllers
         /// <returns>A byte array for the image, or null on failure.</returns>
         private async Task<byte[]> GetSnapshot(string cameraName)
         {
-            _logger.LogInformation($"{cameraName}: Motion detected, fetching snapshot.");
-
             Stopwatch stopwatch = Stopwatch.StartNew();
-
             byte[] imageBytes = await _synologyService.TakeSnapshotAsync(cameraName);
+            stopwatch.Stop();
+
             if (imageBytes == null)
             {
                 _logger.LogError($"{cameraName}: Failed to get snapshot.");
-                return null;
             }
             else
-            {
-                stopwatch.Stop();
-                _logger.LogInformation($"{cameraName}: Snapshot received ({stopwatch.ElapsedMilliseconds}ms).");
+            {              
+                _logger.LogInformation($"{cameraName}: Snapshot received in {stopwatch.ElapsedMilliseconds}ms.");
             }
-
             return imageBytes;
         }
 
@@ -232,59 +276,19 @@ namespace SynoAI.Controllers
         /// <returns>A list of predictions, or null on failure.</returns>
         private async Task<IEnumerable<AIPrediction>> GetAIPredications(Camera camera, byte[] imageBytes)
         {
-            _logger.LogInformation($"{camera}: Processing.");
-
             IEnumerable<AIPrediction> predictions = await _aiService.ProcessAsync(camera, imageBytes);
             if (predictions == null)
             {
                 _logger.LogError($"{camera}: Failed to get get predictions.");
-                return null;
             }
-            else
+            else if (_logger.IsEnabled(LogLevel.Information))
             {
                 foreach (AIPrediction prediction in predictions)
                 {
                     _logger.LogInformation($"{camera}: {prediction.Label} ({prediction.Confidence}%) [Size: {prediction.SizeX}x{prediction.SizeY}] [Start: {prediction.MinX},{prediction.MinY} | End: {prediction.MaxX},{prediction.MaxY}]");
                 }
             }
-
             return predictions;
-        }
-
-        /// <summary>
-        /// Ensures that the camera doesn't get called too often.
-        /// </summary>
-        /// <param name="id">The ID of the camera to check.</param>
-        /// <returns>True if enough time has passed.</returns>
-        private bool HasSufficientDelay(string id)
-        {
-            if (_lastCameraChecks.TryGetValue(id, out DateTime lastCheck))
-            {
-                TimeSpan timeSpan = DateTime.UtcNow - lastCheck;
-                _logger.LogInformation($"{id}: Camera last checked {timeSpan.Milliseconds}ms ago");
-
-                if (timeSpan.TotalMilliseconds < Config.Delay)
-                {
-                    _logger.LogInformation($"{id}: Ignoring request due to last check being under {Config.Delay}ms.");
-                    return false;
-                }
-
-                if (!_lastCameraChecks.TryUpdate(id, DateTime.UtcNow, lastCheck))
-                {
-                    _logger.LogInformation($"{id}: Ignoring request due multiple concurrent calls.");
-                    return false;
-                }
-            }
-            else
-            {
-                if (!_lastCameraChecks.TryAdd(id, DateTime.UtcNow))
-                {
-                    _logger.LogInformation($"{id}: Ignoring request due multiple concurrent calls.");
-                    return false;
-                }
-            }
-
-            return true;
         }
     }
 }
