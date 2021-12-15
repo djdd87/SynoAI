@@ -95,6 +95,11 @@ namespace SynoAI
         public static bool SaveOriginalSnapshot { get; private set; }
 
         /// <summary>
+        /// The amount of days to keep captured images before automatically deleting them.
+        /// </summary>
+        public static int DaysToKeepCaptures { get; private set; }
+
+        /// <summary>
         /// The artificial intelligence system to process the images with.
         /// </summary>
         public static AIType AI { get; private set; }
@@ -179,6 +184,7 @@ namespace SynoAI
             MinSizeY = configuration.GetValue<int>("MinSizeY", 50);
 
             // euquiq: A bit overkill to use int.MaxValue :)
+            // TODO: Just make this use 0 or null and handle appropriately
             MaxSizeX = configuration.GetValue<int>("MaxSizeX", int.MaxValue);
             MaxSizeY = configuration.GetValue<int>("MaxSizeY", int.MaxValue);
 
@@ -187,6 +193,8 @@ namespace SynoAI
             MaxSnapshots = configuration.GetValue<int>("MaxSnapshots", 1);
 
             SaveOriginalSnapshot = configuration.GetValue<bool>("SaveOriginalSnapshot", false);
+
+            DaysToKeepCaptures = configuration.GetValue<int>("DaysToKeepCaptures", 0);
 
             IConfigurationSection aiSection = configuration.GetSection("AI");
             AI = aiSection.GetValue<AIType>("Type", AIType.DeepStack);

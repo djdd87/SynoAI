@@ -9,6 +9,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using SynoAI.Extensions;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
@@ -48,6 +49,9 @@ namespace SynoAI.Controllers
         [Route("{id}")]
         public async void Get(string id)
         {
+            // Kick off the autocleanup
+            CleanupOldImages();
+
             if (string.IsNullOrWhiteSpace(id))
             {
                 throw new ArgumentNullException(nameof(id));
@@ -159,6 +163,40 @@ namespace SynoAI.Controllers
                 }
             }
         }
+
+        /// <summary>
+        /// Fires off an Async process to clean up any old records.
+        /// </summary>
+        private void CleanupOldImages()
+        {
+            if (Config.DaysToKeepCaptures > 0 && !_cleanupOldImagesRunning)
+            {
+                _logger.LogInformation($"Captures Clean Up: Cleaning up images older than {Config.DaysToKeepCaptures} day(s).");
+                Task.Run(() => 
+                {
+                    lock (_cleanUpOldImagesLock)
+                    {
+                        _cleanupOldImagesRunning = true;
+                        
+                        DirectoryInfo directory = new DirectoryInfo(Constants.DIRECTORY_CAPTURES);
+                        IEnumerable<FileInfo> files = directory.GetFiles("*", new EnumerationOptions() { RecurseSubdirectories = true });
+                        foreach (FileInfo file in files)
+                        {
+                            double age = (DateTime.Now - file.CreationTime).TotalDays;
+                            if (age > Config.DaysToKeepCaptures)
+                            {
+                                _logger.LogInformation($"Captures Clean Up: {file.FullName} is {age} day(s) old and will be deleted.");
+                                System.IO.File.Delete(file.FullName);
+                                _logger.LogInformation($"Captures Clean Up: {file.FullName} deleted.");
+                            }
+                        }
+                        _cleanupOldImagesRunning = false;
+                    }
+                });
+            }
+        }
+        private bool _cleanupOldImagesRunning;
+        private object _cleanUpOldImagesLock = new object();
 
         /// <summary>
         /// Handles any required preprocessing of the captured image.

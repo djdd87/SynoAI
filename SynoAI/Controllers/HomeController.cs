@@ -81,7 +81,7 @@ namespace SynoAI.Controllers
         public ActionResult Snapshot(string cameraName, string filename, int width = 0)
         {   
             // Reconstruct the path to the actual snapshot inside the NAS 
-            string path = Path.Combine("Captures", cameraName);
+            string path = Path.Combine(Constants.DIRECTORY_CAPTURES, cameraName);
             path = Path.Combine(path, filename);
 
             // Grab the original Snapshot
@@ -133,7 +133,7 @@ namespace SynoAI.Controllers
         public static GraphData GetData(string cameraName, DateTime date, bool GraphHour = false) 
         {  
             GraphData data = new GraphData();
-            string directory = Path.Combine("Captures", cameraName);
+            string directory = Path.Combine(Constants.DIRECTORY_CAPTURES, cameraName);
 
             if (Directory.Exists(directory))
             {
@@ -223,7 +223,7 @@ namespace SynoAI.Controllers
         public static List<String> GetSnapshots(string cameraName, DateTime date) 
         {
             List<String> files = new List<String>();
-            string directory = Path.Combine("Captures", cameraName);
+            string directory = Path.Combine(Constants.DIRECTORY_CAPTURES, cameraName);
 
             if (Directory.Exists(directory))
             {

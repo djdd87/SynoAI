@@ -119,7 +119,7 @@ namespace SynoAI.Services
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            string directory = $"Captures";
+            string directory = Constants.DIRECTORY_CAPTURES;
             directory = Path.Combine(directory, camera.Name);
 
             if (!Directory.Exists(directory))
