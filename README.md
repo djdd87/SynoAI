@@ -1,5 +1,3 @@
-Forked from https://github.com/djdd87/SynoAI so I can try some ideas and help with original project.
-
 # SynoAI
 A Synology Surveillance Station notification system utilising DeepStack AI, inspired by Christopher Adams' [sssAI](https://github.com/Christofo/sssAI) implementation.
 
