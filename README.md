@@ -81,7 +81,7 @@ An example appsettings.json configuration file can be found [here](#example-apps
 * TextOffsetX [optional] (Default: ```2```) : The number of pixels to offset the label from the left of the inside of the boundary image on the output image
 * TextOffsetY [optional] (Default: ```2```) : The number of pixels to offset the label from the top of the inside of the boundary image on the output image
 * SaveOriginalSnapshot [optional] (Default: ```false```): Whether to save the source snapshot that was captured from the API before it was sent to and processed by the AI.
-* DaysToKeepCaptures [optional] (Default: ```0```): The number of days to keep images for. Every time motion is detected, the captures directory will be processed and any images older than the specified number of days will be deleted.
+* DaysToKeepCaptures [optional] (Default: ```0```): The number of days to keep images for. Every time motion is detected, the captures directory will be processed and any images older than the specified number of days will be deleted. A value of ```0``` means that captures will be kept forever.
 
 ## Development Configs
 Configs which should be changed for debugging (change at own risk):
