@@ -1,3 +1,9 @@
+# Build an image to upload
+    * Ctrl+Shift+P
+    * Enter Docker Build
+    * Enter the name of the image
+    * Push the image via docker desktop
+
 # Build the docker image
     * Navigate into SynoAI (cd SynoAI)
     * docker build -t synoai:0.1 .

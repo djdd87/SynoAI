@@ -99,7 +99,7 @@ namespace SynoAI.Controllers
 
                     // Get any predictions that fall within the exclusion zones
                     List<Tuple<AIPrediction, Zone>> exclusionZonePredictions = new List<Tuple<AIPrediction, Zone>>();
-                    if (camera.Exclusions.Count() > 0)
+                    if (camera.Exclusions != null && camera.Exclusions.Count() > 0)
                     {
                         for (int i = 0; i < validPredictions.Count; i++)
                         {
