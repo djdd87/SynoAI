@@ -31,7 +31,7 @@ namespace SynoAI.AIs.DeepStack
 
                 client.BaseAddress = new Uri(Config.AIUrl);
 
-                logger.LogDebug($"{camera.Name}: DeepStackAI: Sending image.");
+                logger.LogDebug($"{camera.Name}: DeepStackAI: Sending image with minimum confidence of {minConfidence} ({camera.Threshold}%).");
 
                 HttpResponseMessage response = await client.PostAsync(Config.AIPath, multipartContent);
                 if (response.IsSuccessStatusCode)
