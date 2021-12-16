@@ -22,7 +22,9 @@ namespace SynoAI.Controllers
         [Route("")]
         public IActionResult Index()
         {
-            return View();
+            // Not ready for prime-time just yet
+            //return View();
+            return new EmptyResult();
         }
 
         /// <summary>

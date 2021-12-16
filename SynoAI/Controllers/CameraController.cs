@@ -14,6 +14,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using SynoAI.Hubs;
+using System.Drawing;
 
 namespace SynoAI.Controllers
 {
@@ -92,9 +93,32 @@ namespace SynoAI.Controllers
                         x.SizeX <= camera.GetMaxSizeX() && x.SizeY <= camera.GetMaxSizeY())     // Is smaller than the maximum size 
                         .ToList();
 
-                    IEnumerable<AIPrediction> validPredictions = predictions.Where(x =>
-                        camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase))       // Is a type we care about
+                    List<AIPrediction> validPredictions = predictions.Where(x =>
+                        camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase))     // Is a type we care about
                         .ToList();
+
+                    // Get any predictions that fall within the exclusion zones
+                    List<Tuple<AIPrediction, Zone>> exclusionZonePredictions = new List<Tuple<AIPrediction, Zone>>();
+                    if (camera.Exclusions.Count() > 0)
+                    {
+                        for (int i = 0; i < validPredictions.Count; i++)
+                        {
+                            AIPrediction validPrediction = validPredictions[i];
+                            Rectangle boundary = new Rectangle(validPrediction.MinX, validPrediction.MinY, validPrediction.SizeX, validPrediction.SizeY);
+
+                            foreach (Zone exclusionZone in camera.Exclusions)
+                            {
+                                Rectangle exclusionZoneBoundary = new Rectangle(exclusionZone.Start.X, exclusionZone.Start.Y, exclusionZone.End.X - exclusionZone.Start.X, exclusionZone.End.Y - exclusionZone.Start.Y);
+                                if (exclusionZoneBoundary.Contains(boundary))
+                                {
+                                    exclusionZonePredictions.Add(new Tuple<AIPrediction, Zone>(validPrediction, exclusionZone));
+                                    validPredictions.Remove(validPrediction);
+                                    i--;
+                                    break;
+                                }
+                            }
+                        }
+                    }
 
                     // Save the original unprocessed image if required
                     if (Config.SaveOriginalSnapshot == SaveSnapshotMode.Always ||
@@ -150,6 +174,14 @@ namespace SynoAI.Controllers
                     {
                         // We got predictions back from the AI, but nothing that should trigger an alert
                         _logger.LogInformation($"{id}: No valid objects at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+
+                        // Log out any matches that fell within the exclusion zones
+                        foreach (var exclusion in exclusionZonePredictions)
+                        {
+                            AIPrediction prediction = exclusion.Item1;
+                            Zone exclusionZone = exclusion.Item2;
+                            _logger.LogInformation($"{id}: Ignored matching {prediction.Label} ([{prediction.MinX},{prediction.MinY}],[{prediction.MaxX},{prediction.MaxY}]) as it fell within the exclusion zone ([{exclusionZone.Start.X},{exclusionZone.Start.Y}],[{exclusionZone.End.X},{exclusionZone.End.Y}]) at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                        }
                     }
                     else
                     {
