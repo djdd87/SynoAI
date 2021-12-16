@@ -63,6 +63,12 @@ An example appsettings.json configuration file can be found [here](#example-apps
   * MinSizeY [optional] (Default: ```NULL```): The minimum pixels that the object must be vertically to trigger a change (will override the default set on the top level MinSizeY)
   * Rotate [optional] (Default: ```0```): The degrees to rotate the image after it's captured from SurveillanceStation. The rotation will be applied before it's passed to the AI
   * Exclusions [optional]: An array of exclusion zones to ignore found objects within. If the entirity of an object is within the exclusion zone, then it won't be reported by the notifiers.
+    * Start
+      * X: The start X co-ordinate of the exclusion zone
+      * Y: The start Y co-ordinate of the exclusion zone
+    * End
+      * X: The end X co-ordinate of the exclusion zone
+      * Y: The end Y co-ordinate of the exclusion zone
 * Notifiers [required]: See [notifications](#notifications)
 * Quality [optional] (Default: ```Balanced```): The quality, aka "profile type" to use when taking a snapshot. This will be based upon the settings of the streams you have configured in Surveillance Station. i.e. if your low, balanced and high streams have the same settings in Surveillance Station, then this setting will make no difference. But if you have a high quality 4k stream, a balance 1080p stream and a low 720p stream, then setting to high will return and process a 4k image. Note that the higher quality the snapshot, the longer the notification will take. Additionally, the larger the image, the smaller your detected objects may be, so ensure you set the MinSizeX/MinSizeY values respectively.
   * High: Takes the snapshot using the profile type "High quality"
@@ -264,6 +270,7 @@ Multiple webhooks can be set up, each pointed at a different HomeAssistant Push 
 ## Caveats
 * SynoAI still relies on Surveillance Station triggering the motion alerts
 * Looking for an object, such as a car on a driveway, will continually trigger alerts if that object is in view of the camera when Surveillance Station detects movement, e.g. a tree blowing in the wind.
+  * To avoid this, exclusion zones can be defined to ignore matching objects.
 
 ## Configuration
 The configuration instructions below are primarily aimed at running SynoAI in a docker container on DSM (Synology's operating system). Docker will be required anyway as Deepstack is assumed to be setup inside a Docker container. It is entirely possible to run SynoAI on a webserver instead, or to install it on a Docker instance that's not running on your Synology NAS, however that is outside the scope of these instructions. Additionally, the configuration of the third party notification systems (e.g. generating a Pushbullet API Key) is outside the scope of these instructions and can be found on the respective applications help guides.
@@ -445,7 +452,17 @@ services:
     {
       "Name": "BackDoor",
       "Types": [ "Person" ],
-      "Threshold": 30
+      "Threshold": 30,
+      "Exclusions": [
+        {
+            "Start": { "X": 1800, "Y": 400 },
+            "End": { "X": 2350, "Y": 900 }
+        },
+        {
+            "Start": { "X": 0, "Y": 0 },
+            "End": { "X": 200, "Y": 500 }
+        }
+      ]
     }
   ]
 }
