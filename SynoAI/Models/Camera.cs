@@ -45,6 +45,10 @@ namespace SynoAI.Models
         /// use the value specified on the main config.
         /// </summary>
         public int? MaxSnapshots { get; private set; } 
+        /// <summary>
+        /// The zones to exclude when checking for objects of interest.
+        /// </summary>
+        public List<Zone> Exclusions { get; set; } 
 
         /// <summary>
         /// Gets the minimum size the object must be horizontally to be considered as a valid result from either the current camera, or the main config default if not specified.

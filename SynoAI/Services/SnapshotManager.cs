@@ -28,6 +28,27 @@ namespace SynoAI.Services
             // Load the bitmap 
             SKBitmap image = SKBitmap.Decode(snapshot);
 
+            // Draw the exclusion zones if enabled
+            if (Config.DrawExclusions)
+            {
+                logger.LogInformation($"{camera.Name}: Drawing exclusion zones.");
+                
+                using (SKCanvas canvas = new SKCanvas(image))
+                {
+                    // Draw the zone
+                    foreach (Zone zone in camera.Exclusions)
+                    {
+                        SKRect rectangle = SKRect.Create(zone.Start.X, zone.Start.Y, zone.End.X - zone.Start.X, zone.End.Y - zone.Start.Y);
+                        canvas.DrawRect(rectangle, new SKPaint 
+                        {
+                            Style = SKPaintStyle.Stroke,
+                            Color = GetColour(Config.ExclusionBoxColor),
+                            StrokeWidth = Config.StrokeWidth
+                        });
+                    }
+                }
+            }
+
             // Don't process the drawing if the drawing mode is off
             if (Config.DrawMode == DrawMode.Off)
             {
@@ -35,8 +56,8 @@ namespace SynoAI.Services
             }
             else 
             {
-                logger.LogInformation($"{camera.Name}: Dressing image with boundaries.");
                 // Draw the predictions
+                logger.LogInformation($"{camera.Name}: Dressing image with boundaries.");
                 using (SKCanvas canvas = new SKCanvas(image))
                 {
                     int counter = 1; //used for assigning a reference number on each prediction if AlternativeLabelling is true
@@ -92,7 +113,7 @@ namespace SynoAI.Services
             stopwatch.Stop();
             logger.LogInformation($"{camera.Name}: Finished dressing image boundaries ({stopwatch.ElapsedMilliseconds}ms).");
 
-            //Save the image, including the amount of valid predictions as suffix.
+            // Save the image, including the amount of valid predictions as suffix.
             String filePath = SaveImage(logger,camera, image, validPredictions.Count().ToString());
             return new ProcessedImage(filePath);
         }

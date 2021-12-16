@@ -51,6 +51,10 @@ namespace SynoAI
         /// The hex code of the colour to use for the boxing around image matches.
         /// </summary>
         public static string BoxColor { get; private set; }
+        /// <summary>
+        /// The hex code of the colour to use for the exclusion boxes.
+        /// </summary>
+        public static string ExclusionBoxColor { get; private set; }
 
         /// <summary>
         ///The stroke width of the Box drawn around the objects.
@@ -92,7 +96,7 @@ namespace SynoAI
         /// <summary>
         /// Whether this original snapshot generated from the API should be saved to the file system.
         /// </summary>
-        public static bool SaveOriginalSnapshot { get; private set; }
+        public static SaveSnapshotMode SaveOriginalSnapshot { get; private set; }
 
         /// <summary>
         /// The amount of days to keep captured images before automatically deleting them.
@@ -142,6 +146,10 @@ namespace SynoAI
         ///  - Or draw nothing.
         /// </summary>
         public static DrawMode DrawMode {get; private set; }
+        /// <summary>
+        /// Whether the draw the exclusion zone boxes on images. Useful for testing box locations.
+        /// </summary>
+        public static bool DrawExclusions {get; private set; }
 
         /// <summary>
         /// The list of possible notifiers.
@@ -168,10 +176,12 @@ namespace SynoAI
             Quality = configuration.GetValue<CameraQuality>("Quality", CameraQuality.Balanced);
             
             DrawMode = configuration.GetValue<DrawMode>("DrawMode", DrawMode.Matches);
+            DrawExclusions = configuration.GetValue<bool>("DrawExclusions", false);
 
             StrokeWidth = configuration.GetValue<int>("StrokeWidth", 2);
 
             BoxColor = configuration.GetValue<string>("BoxColor", SKColors.Red.ToString());
+            ExclusionBoxColor = configuration.GetValue<string>("ExclusionBoxColor", SKColors.Green.ToString());
 
             Font = configuration.GetValue<string>("Font", "Tahoma");
             FontColor = configuration.GetValue<string>("FontColor", SKColors.Red.ToString());
@@ -192,7 +202,7 @@ namespace SynoAI
             AlternativeLabelling = configuration.GetValue<bool>("AlternativeLabelling", false);
             MaxSnapshots = configuration.GetValue<int>("MaxSnapshots", 1);
 
-            SaveOriginalSnapshot = configuration.GetValue<bool>("SaveOriginalSnapshot", false);
+            SaveOriginalSnapshot = configuration.GetValue<SaveSnapshotMode>("SaveOriginalSnapshot", SaveSnapshotMode.Off);
 
             DaysToKeepCaptures = configuration.GetValue<int>("DaysToKeepCaptures", 0);
 

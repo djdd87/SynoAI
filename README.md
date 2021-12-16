@@ -60,8 +60,9 @@ An example appsettings.json configuration file can be found [here](#example-apps
   * Types: [required]: An array of types that will trigger a notification when detected by the AI, e.g. ["Person", "Car"]
   * Threshold [required]: An integer denoting the required confidence of the AI to trigger the notification, e.g. 40 means that the AI must be 40% sure that the object detected was a person before SynoAI sends a notification
   * MinSizeX [optional] (Default: ```NULL```): The minimum pixels that the object must be horizontally to trigger a change (will override the default set on the top level MinSizeX)
-  * MinSizeY [optional] (Default: ```NULL```): The minimum pixels that the object must be vertically to trigger a change (will override the default set on the top level MinSizeY).
-  * Rotate [optional] (Default: ```0```) The degrees to rotate the image after it's captured from SurveillanceStation. The rotation will be applied before it's passed to the AI.
+  * MinSizeY [optional] (Default: ```NULL```): The minimum pixels that the object must be vertically to trigger a change (will override the default set on the top level MinSizeY)
+  * Rotate [optional] (Default: ```0```): The degrees to rotate the image after it's captured from SurveillanceStation. The rotation will be applied before it's passed to the AI
+  * Exclusions [optional]: An array of exclusion zones to ignore found objects within. If the entirity of an object is within the exclusion zone, then it won't be reported by the notifiers.
 * Notifiers [required]: See [notifications](#notifications)
 * Quality [optional] (Default: ```Balanced```): The quality, aka "profile type" to use when taking a snapshot. This will be based upon the settings of the streams you have configured in Surveillance Station. i.e. if your low, balanced and high streams have the same settings in Surveillance Station, then this setting will make no difference. But if you have a high quality 4k stream, a balance 1080p stream and a low 720p stream, then setting to high will return and process a 4k image. Note that the higher quality the snapshot, the longer the notification will take. Additionally, the larger the image, the smaller your detected objects may be, so ensure you set the MinSizeX/MinSizeY values respectively.
   * High: Takes the snapshot using the profile type "High quality"
@@ -74,13 +75,19 @@ An example appsettings.json configuration file can be found [here](#example-apps
   * Matches: Will draw boundary boxes over any object/person that matches the types defined on the cameras
   * All: Will draw boundary boxes over any object/person that the AI detected
   * Off: Will not draw boundary boxes (note - this will speed up time between detection and notification as SynoAI will not have to manipulate the image)
+* DrawExclusions [optional] (Default: ```false```): Whether to draw the exclusion zone boundary boxes on the image. Useful for setting up the initial exclusion zones
 * BoxColor [optiona] (Default: ```#FF0000```): The colour of the border of the boundary box
+* ExclusionBoxColour [optional] (Default: ```#00FF00```): The colour of the border of the exclusion boundary box
 * Font [optiona] (Default: ```Tahoma```): The font to use when labelling the boundary boxes on the output image
 * FontSize [optiona] (Default: ```12```): The size of the font to use (in pixels) when labelling the boundary boxes on the output image
 * FontColor [optiona] (Default: ```#FF0000```): The colour of the text for the labels when labelling the boundary boxes on the output image
 * TextOffsetX [optional] (Default: ```2```) : The number of pixels to offset the label from the left of the inside of the boundary image on the output image
 * TextOffsetY [optional] (Default: ```2```) : The number of pixels to offset the label from the top of the inside of the boundary image on the output image
-* SaveOriginalSnapshot [optional] (Default: ```false```): Whether to save the source snapshot that was captured from the API before it was sent to and processed by the AI.
+* SaveOriginalSnapshot [optional] (Default: ```Off```): A mode determining whether to save the source snapshot that was captured from the API before it was sent to and processed by the AI:
+  * Off: Will never save the original snapshot
+  * Always: Will save every single snapshot every time motion is detected
+  * WithPredictions: Will save the snapshot if the AI makes one or more predictions (note that this will include predictions which aren't valid)
+  * WithValidPredictions: Will save the snapshot only if the AI makes one or more predictions which are deemed as valid, e.g. within size limits, boundaries and expected types
 * DaysToKeepCaptures [optional] (Default: ```0```): The number of days to keep images for. Every time motion is detected, the captures directory will be processed and any images older than the specified number of days will be deleted. A value of ```0``` means that captures will be kept forever.
 
 ## Development Configs
