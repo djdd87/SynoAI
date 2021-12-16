@@ -82,40 +82,60 @@ namespace SynoAI.Controllers
 
                     // Use the AI to get the valid predictions and then get all the valid predictions, where the result from the AI is 
                     // in the list of types and where the size of the object is bigger than the defined value.
-                    IEnumerable<AIPrediction> rawPredictions = await GetAIPredications(camera, snapshot);
-                    _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} contains {rawPredictions.Count()} objects at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                    IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, snapshot);                    
+                    _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} contains {predictions.Count()} objects at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
                 
-                    int minX = camera.GetMinSizeX();
-                    int minY = camera.GetMinSizeY();
-                    
-                    IEnumerable<AIPrediction> predictions = rawPredictions.Where(x =>
-                        x.SizeX >= minX && x.SizeY >= minY &&                                   // Is bigger than the minimum size
-                        x.SizeX <= camera.GetMaxSizeX() && x.SizeY <= camera.GetMaxSizeY())     // Is smaller than the maximum size 
-                        .ToList();
+                    int minSizeX = camera.GetMinSizeX();
+                    int minSizeY = camera.GetMinSizeY();
+                    int maxSizeX = camera.GetMaxSizeX();
+                    int maxSizeY = camera.GetMaxSizeY();
 
-                    List<AIPrediction> validPredictions = predictions.Where(x =>
-                        camera.Types.Contains(x.Label, StringComparer.OrdinalIgnoreCase))     // Is a type we care about
-                        .ToList();
-
-                    // Get any predictions that fall within the exclusion zones
-                    List<Tuple<AIPrediction, Zone>> exclusionZonePredictions = new List<Tuple<AIPrediction, Zone>>();
-                    if (camera.Exclusions != null && camera.Exclusions.Count() > 0)
+                    List<AIPrediction> validPredictions = new List<AIPrediction>();
+                    foreach (AIPrediction prediction in predictions)
                     {
-                        for (int i = 0; i < validPredictions.Count; i++)
+                        // Check if the prediction label is in the list of types the camera is looking for
+                        if (camera.Types != null && !camera.Types.Contains(prediction.Label, StringComparer.OrdinalIgnoreCase))
                         {
-                            AIPrediction validPrediction = validPredictions[i];
-                            Rectangle boundary = new Rectangle(validPrediction.MinX, validPrediction.MinY, validPrediction.SizeX, validPrediction.SizeY);
-
-                            foreach (Zone exclusionZone in camera.Exclusions)
+                            _logger.LogDebug($"{id}: Ignored '{prediction.Label}' ([{prediction.MinX},{prediction.MinY}],[{prediction.MaxX},{prediction.MaxY}]) as it's not in the valid type list ({string.Join(",", camera.Types)}) at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                        }
+                        else
+                        {
+                            // Ensure that the prediction is bigger than the minimum size
+                            if (prediction.SizeX < minSizeX || prediction.SizeY < minSizeY)
                             {
-                                Rectangle exclusionZoneBoundary = new Rectangle(exclusionZone.Start.X, exclusionZone.Start.Y, exclusionZone.End.X - exclusionZone.Start.X, exclusionZone.End.Y - exclusionZone.Start.Y);
-                                bool exclude = exclusionZone.Mode == OverlapMode.Contains ? exclusionZoneBoundary.Contains(boundary) : exclusionZoneBoundary.IntersectsWith(boundary);
-                                if (exclude)
+                                // The prediction is under the minimum specified size
+                                _logger.LogDebug($"{id}: Ignored '{prediction.Label}' ([{prediction.MinX},{prediction.MinY}],[{prediction.MaxX},{prediction.MaxY}]) as it's under the minimum specified size ({minSizeX}x{minSizeY}) at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                            }
+                            else if (prediction.SizeX > maxSizeX || prediction.SizeY > maxSizeY)
+                            {
+                                // The prediction has exceeded the maximum specified size
+                                _logger.LogDebug($"{id}: Ignored '{prediction.Label}' ([{prediction.MinX},{prediction.MinY}],[{prediction.MaxX},{prediction.MaxY}]) as it exceeds the maximum specified size ({maxSizeX}x{maxSizeY}) at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                            }
+                            else
+                            {
+                                // Check if the prediction falls within the exclusion zones
+                                bool include = true;
+                                if (camera.Exclusions != null && camera.Exclusions.Count() > 0)
                                 {
-                                    exclusionZonePredictions.Add(new Tuple<AIPrediction, Zone>(validPrediction, exclusionZone));
-                                    validPredictions.Remove(validPrediction);
-                                    i--;
-                                    break;
+                                    Rectangle boundary = new Rectangle(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY);
+                                    foreach (Zone exclusion in camera.Exclusions)
+                                    {
+                                        Rectangle exclusionZoneBoundary = new Rectangle(exclusion.Start.X, exclusion.Start.Y, exclusion.End.X - exclusion.Start.X, exclusion.End.Y - exclusion.Start.Y);
+                                        bool exclude = exclusion.Mode == OverlapMode.Contains ? exclusionZoneBoundary.Contains(boundary) : exclusionZoneBoundary.IntersectsWith(boundary);
+                                        if (exclude)
+                                        {                
+                                            // The prediction boundary is contained within or intersects and exclusion zone, so ignore it    
+                                            include = false;                
+                                            _logger.LogDebug($"{id}: Ignored matching '{prediction.Label}' ([{prediction.MinX},{prediction.MinY}],[{prediction.MaxX},{prediction.MaxY}]) as it fell within the exclusion zone ([{exclusion.Start.X},{exclusion.Start.Y}],[{exclusion.End.X},{exclusion.End.Y}]) with exclusion mode '{exclusion.Mode}' at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (include)
+                                {
+                                    validPredictions.Add(prediction);
+                                    _logger.LogDebug($"{id}: Found valid prediction '{prediction.Label}' ([{prediction.MinX},{prediction.MinY}],[{prediction.MaxX},{prediction.MaxY}]) at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
                                 }
                             }
                         }
@@ -163,11 +183,12 @@ namespace SynoAI.Controllers
                         // Process and save the snapshot
                         ProcessedImage processedImage = SnapshotManager.DressImage(camera, snapshot, predictions, validPredictions, _logger);
 
+                        // Send Notifications                  
+                        await SendNotifications(camera, processedImage, labels);
+                        
                         // Inform eventual web users about this new Snapshot, for the "realtime" option thru Web
                         await _hubContext.Clients.All.SendAsync("ReceiveSnapshot", camera.Name, processedImage.FileName);
 
-                        // Send Notifications                  
-                        await SendNotifications(camera, processedImage, labels);
                         _logger.LogInformation($"{id}: Valid object found in snapshot {snapshotCount} of {Config.MaxSnapshots} at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
                         break;
                     }
@@ -175,20 +196,12 @@ namespace SynoAI.Controllers
                     {
                         // We got predictions back from the AI, but nothing that should trigger an alert
                         _logger.LogInformation($"{id}: No valid objects at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
-
-                        // Log out any matches that fell within the exclusion zones
-                        foreach (var exclusion in exclusionZonePredictions)
-                        {
-                            AIPrediction prediction = exclusion.Item1;
-                            Zone exclusionZone = exclusion.Item2;
-                            _logger.LogInformation($"{id}: Ignored matching {prediction.Label} ([{prediction.MinX},{prediction.MinY}],[{prediction.MaxX},{prediction.MaxY}]) as it fell within the exclusion zone ([{exclusionZone.Start.X},{exclusionZone.Start.Y}],[{exclusionZone.End.X},{exclusionZone.End.Y}]) with exclusion mode '{exclusionZone.Mode}' at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
-                        }
                     }
                     else
                     {
                         // We didn't get any predictions whatsoever from the AI
                         _logger.LogInformation($"{id}: Nothing detected by the AI at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
-                        _logger.LogDebug($"{id}: No objects in the specified list ({string.Join(", ", camera.Types)}) were detected by the AI exceeding the confidence level ({camera.Threshold}%) and/or minimum size ({minX}x{minY})");
+                        _logger.LogDebug($"{id}: No objects in the specified list ({string.Join(", ", camera.Types)}) were detected by the AI exceeding the confidence level ({camera.Threshold}%) and/or minimum size ({minSizeX}x{minSizeY} and/or maximum size ({maxSizeX},{maxSizeY}))");
                     }
                         
                     _logger.LogInformation($"{id}: Finished ({overallStopwatch.ElapsedMilliseconds}ms).");
@@ -350,13 +363,12 @@ namespace SynoAI.Controllers
             {
                 _logger.LogError($"{camera}: Failed to get get predictions.");
             }
-            else if (_logger.IsEnabled(LogLevel.Information))
+            
+            foreach (AIPrediction prediction in predictions)
             {
-                foreach (AIPrediction prediction in predictions)
-                {
-                    _logger.LogInformation($"{camera}: {prediction.Label} ({prediction.Confidence}%) [Size: {prediction.SizeX}x{prediction.SizeY}] [Start: {prediction.MinX},{prediction.MinY} | End: {prediction.MaxX},{prediction.MaxY}]");
-                }
+                _logger.LogInformation($"AI Detected '{camera}': {prediction.Label} ({prediction.Confidence}%) [Size: {prediction.SizeX}x{prediction.SizeY}] [Start: {prediction.MinX},{prediction.MinY} | End: {prediction.MaxX},{prediction.MaxY}]");
             }
+            
             return predictions;
         }
     }
