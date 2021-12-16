@@ -109,7 +109,8 @@ namespace SynoAI.Controllers
                             foreach (Zone exclusionZone in camera.Exclusions)
                             {
                                 Rectangle exclusionZoneBoundary = new Rectangle(exclusionZone.Start.X, exclusionZone.Start.Y, exclusionZone.End.X - exclusionZone.Start.X, exclusionZone.End.Y - exclusionZone.Start.Y);
-                                if (exclusionZoneBoundary.Contains(boundary))
+                                bool exclude = exclusionZone.Mode == OverlapMode.Contains ? exclusionZoneBoundary.Contains(boundary) : exclusionZoneBoundary.IntersectsWith(boundary);
+                                if (exclude)
                                 {
                                     exclusionZonePredictions.Add(new Tuple<AIPrediction, Zone>(validPrediction, exclusionZone));
                                     validPredictions.Remove(validPrediction);
@@ -180,7 +181,7 @@ namespace SynoAI.Controllers
                         {
                             AIPrediction prediction = exclusion.Item1;
                             Zone exclusionZone = exclusion.Item2;
-                            _logger.LogInformation($"{id}: Ignored matching {prediction.Label} ([{prediction.MinX},{prediction.MinY}],[{prediction.MaxX},{prediction.MaxY}]) as it fell within the exclusion zone ([{exclusionZone.Start.X},{exclusionZone.Start.Y}],[{exclusionZone.End.X},{exclusionZone.End.Y}]) at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
+                            _logger.LogInformation($"{id}: Ignored matching {prediction.Label} ([{prediction.MinX},{prediction.MinY}],[{prediction.MaxX},{prediction.MaxY}]) as it fell within the exclusion zone ([{exclusionZone.Start.X},{exclusionZone.Start.Y}],[{exclusionZone.End.X},{exclusionZone.End.Y}]) with exclusion mode '{exclusionZone.Mode}' at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
                         }
                     }
                     else
