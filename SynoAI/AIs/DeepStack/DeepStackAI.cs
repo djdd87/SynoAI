@@ -36,7 +36,7 @@ namespace SynoAI.AIs.DeepStack
                 HttpResponseMessage response = await client.PostAsync(Config.AIPath, multipartContent);
                 if (response.IsSuccessStatusCode)
                 {
-                    DeepStackResponse deepStackResponse = await GetResponse(response);
+                    DeepStackResponse deepStackResponse = await GetResponse(logger, camera, response);
                     if (deepStackResponse.Success)
                     {
                         IEnumerable<AIPrediction> predictions = deepStackResponse.Predictions.Where(x=> x.Confidence >= minConfidence).Select(x => new AIPrediction()  
@@ -72,9 +72,11 @@ namespace SynoAI.AIs.DeepStack
         /// </summary>
         /// <param name="message">The message to parse.</param>
         /// <returns>A usable object.</returns>
-        private async Task<DeepStackResponse> GetResponse(HttpResponseMessage message)
+        private async Task<DeepStackResponse> GetResponse(ILogger logger, Camera camera, HttpResponseMessage message)
         {
-            string content = await message.Content.ReadAsStringAsync();
+            string content = await message.Content.ReadAsStringAsync();                
+            logger.LogDebug($"{camera.Name}: DeepStackAI: Responded with {content}.");
+
             return JsonConvert.DeserializeObject<DeepStackResponse>(content);
         }
     }
