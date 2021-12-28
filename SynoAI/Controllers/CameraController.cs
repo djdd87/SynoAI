@@ -82,7 +82,13 @@ namespace SynoAI.Controllers
 
                     // Use the AI to get the valid predictions and then get all the valid predictions, where the result from the AI is 
                     // in the list of types and where the size of the object is bigger than the defined value.
-                    IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, snapshot);                    
+                    IEnumerable<AIPrediction> predictions = await GetAIPredications(camera, snapshot);   
+                    if (predictions == null)
+                    {
+                        // An error occured fetching predictions, so bail-out early.
+                        return;
+                    }
+
                     _logger.LogInformation($"Snapshot {snapshotCount} of {Config.MaxSnapshots} contains {predictions.Count()} objects at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
                 
                     int minSizeX = camera.GetMinSizeX();
@@ -362,6 +368,7 @@ namespace SynoAI.Controllers
             if (predictions == null)
             {
                 _logger.LogError($"{camera}: Failed to get get predictions.");
+                return null;
             }
             
             foreach (AIPrediction prediction in predictions)
