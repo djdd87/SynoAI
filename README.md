@@ -59,6 +59,7 @@ An example appsettings.json configuration file can be found [here](#example-apps
   * Name: [required]: The name of the camera on Surveillance Station
   * Types: [required]: An array of types that will trigger a notification when detected by the AI, e.g. ["Person", "Car"]
   * Threshold [required]: An integer denoting the required confidence of the AI to trigger the notification, e.g. 40 means that the AI must be 40% sure that the object detected was a person before SynoAI sends a notification
+  * Wait [optional]: An integer for the number of milliseconds to wait before requesting a snapshot once triggered, e.g. 2500 will wait for 2500ms (2.5 seconds) before requesting a snapshot from Surveillance Station
   * MinSizeX [optional] (Default: ```NULL```): The minimum pixels that the object must be horizontally to trigger a change (will override the default set on the top level MinSizeX)
   * MinSizeY [optional] (Default: ```NULL```): The minimum pixels that the object must be vertically to trigger a change (will override the default set on the top level MinSizeY)
   * Rotate [optional] (Default: ```0```): The degrees to rotate the image after it's captured from SurveillanceStation. The rotation will be applied before it's passed to the AI
@@ -448,6 +449,11 @@ services:
       "Threshold": 45,
       "MinSizeX": 250,
       "MinSizeY": 500
+    },
+    {
+      "Name": "SideGate",
+      "Types": [ "Person" ],
+      "Wait": 2500
     },
     {
       "Name": "BackDoor",

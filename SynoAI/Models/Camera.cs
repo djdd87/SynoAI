@@ -21,6 +21,10 @@ namespace SynoAI.Models
         /// </summary>
         public decimal Threshold { get; set; }
         /// <summary>
+        /// The number of milliseconds to wait until taking a snapshot after motion is detected.
+        /// </summary>
+        public int Wait { get; set; }
+        /// <summary>
         /// The minimum size the object must be horizontally to be considered as a valid result.
         /// </summary>
         public int? MinSizeX { get; set; }

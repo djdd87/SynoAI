@@ -66,6 +66,13 @@ namespace SynoAI.Controllers
             }
             else
             {
+                // Wait if the camera has a wait
+                if (camera.Wait > 0)
+                {
+                    _logger.LogInformation($"Waiting for {camera.Wait}ms before fetching snapshot.");
+                    await Task.Delay(camera.Wait);
+                }
+
                 // Create the stopwatches for reporting timings
                 Stopwatch overallStopwatch = Stopwatch.StartNew();
 
