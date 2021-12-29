@@ -39,6 +39,7 @@ namespace SynoAI.Notifiers
 
             INotifier notifier = factory.Create(logger, section);
             notifier.Cameras = section.GetSection("Cameras").Get<List<string>>();
+            notifier.Types = section.GetSection("Types").Get<List<string>>();
 
             return notifier;
         }

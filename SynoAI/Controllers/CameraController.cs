@@ -323,12 +323,15 @@ namespace SynoAI.Controllers
         /// <param name="camera">The camera responsible for this snapshot.</param>
         /// <param name="processedImage">The path information for the snapshot.</param>
         /// <param name="labels">The text metadata for each existing valid object.</param>
-        private async Task SendNotifications(Camera camera, ProcessedImage processedImage, IList<String> labels)
+        private async Task SendNotifications(Camera camera, ProcessedImage processedImage, IList<string> labels)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
-            IEnumerable<INotifier> notifiers = Config.Notifiers.Where(x=> x.Cameras == null || x.Cameras.Count() == 0 ||
-                x.Cameras.Any(c=> c.Equals(camera.Name, StringComparison.OrdinalIgnoreCase))).ToList();
+            IEnumerable<INotifier> notifiers = Config.Notifiers
+                .Where(x=> 
+                    (x.Cameras == null || x.Cameras.Count() == 0 || x.Cameras.Any(c => c.Equals(camera.Name, StringComparison.OrdinalIgnoreCase))) && 
+                    (x.Types == null || x.Types.Count() == 0 || x.Types.Any(t => labels.Contains(t, StringComparer.OrdinalIgnoreCase)))
+                ).ToList();
 
             List<Task> tasks = new List<Task>();
             foreach (INotifier notifier in notifiers)
