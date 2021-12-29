@@ -521,6 +521,13 @@ Wrong: http://10.0.0.10:8080/Camera/Back Door
 
 Right: http://10.0.0.10:8080/Camera/Back%20Door
 
+#### Logs show timeout exceptions and SynoAI fails to initialise or the logs show crashes when passing snapshot requests to the AI
+
+Example error:
+> System.Threading.Tasks.TaskCanceledException: The request was canceled due to the configured HttpClient.Timeout of 100 seconds elapsing.
+
+The issue is a networking/firewall issue and is not a fault with SynoAI. This has been [reported](https://github.com/djdd87/SynoAI/issues/67) when using the dockerbridge network when all the containers are running on Synology DSM. In order to connect to all the containers, use the dockerbridge gateway IP address instead of the local IP from the Synology NAS.
+
 #### "Failed due to Synology API error code X"
 * 400 Invalid password.
   * If your password is definitely correct and you are still getting a 400 error code, then there's potentially an issue with the Synology DSM user configuration. However, if you cannot see any issues with the permissions, try creating a new user from SurveillanceStation directly.
