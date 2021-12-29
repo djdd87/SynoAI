@@ -15,8 +15,10 @@ I made this application mostly for myself in order to improve upon Christopher A
 
 * [Features](#features)
 * [Config](#config)
-* [Development Configs](#development-configs)
-* [Support AIs](#supported-ais)  
+  * [General](#general-config)
+  * [Cameras](#camera-config)
+  * [Development](#development-config)
+* [Support AIs](#supported-ais)
   * [Deepstack](#deepstack)
 * [Notifications](#notifications)
   * [Pushbullet](#pushbullet)
