@@ -27,7 +27,8 @@ namespace SynoAI.AIs.DeepStack
 
                 MultipartFormDataContent multipartContent = new MultipartFormDataContent();
                 multipartContent.Add(new StreamContent(new MemoryStream(image)), "image", "image");
-                multipartContent.Add(new StringContent(requestJson, null, "application/json")); 
+                //multipartContent.Add(new StringContent(requestJson, null, "application/json")); 
+                multipartContent.Add(new StringContent(minConfidence.ToString()), "min_confidence"); 
 
                 client.BaseAddress = new Uri(Config.AIUrl);
 

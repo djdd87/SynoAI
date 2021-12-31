@@ -29,7 +29,7 @@ namespace SynoAI.Services
             SKBitmap image = SKBitmap.Decode(snapshot);
 
             // Draw the exclusion zones if enabled
-            if (Config.DrawExclusions)
+            if (Config.DrawExclusions && camera.Exclusions != null)
             {
                 logger.LogInformation($"{camera.Name}: Drawing exclusion zones.");
                 
