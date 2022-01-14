@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using SynoAI.Notifiers.Email;
 using SynoAI.Notifiers.Pushbullet;
+using SynoAI.Notifiers.Pushover;
 using SynoAI.Notifiers.Telegram;
 using SynoAI.Notifiers.Webhook;
 using System;
@@ -21,17 +22,20 @@ namespace SynoAI.Notifiers
             NotifierFactory factory;
             switch (type)
             {
-                case NotifierType.Pushbullet:
-                    factory = new PushbulletFactory();
-                    break;
-                case NotifierType.Webhook:
-                    factory = new WebhookFactory();
-                    break;
                 case NotifierType.Email:
                     factory = new EmailFactory();
                     break;
+                case NotifierType.Pushbullet:
+                    factory = new PushbulletFactory();
+                    break;
+                case NotifierType.Pushover:
+                    factory = new PushoverFactory();
+                    break;
                 case NotifierType.Telegram:
                     factory = new TelegramFactory();
+                    break;
+                case NotifierType.Webhook:
+                    factory = new WebhookFactory();
                     break;
                 default:
                     throw new NotImplementedException(type.ToString());

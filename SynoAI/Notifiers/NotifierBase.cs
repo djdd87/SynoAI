@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using SynoAI.Models;
 using SynoAI.Services;
 
@@ -50,6 +52,18 @@ namespace SynoAI.Notifiers
             }
 
             return result;
+        }
+
+
+        /// <summary>
+        /// Fetches the response content and parses it as the specified type.
+        /// </summary>
+        /// <param name="message">The message to parse.</param>
+        /// <returns>A usable object.</returns>
+        protected async Task<T> GetResponse<T>(HttpResponseMessage message)
+        {
+            string content = await message.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<T>(content);
         }
     }
 }
