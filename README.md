@@ -273,7 +273,7 @@ HomeAssistant requires the POSTed image field to be called "image" (which is the
 }	
 ```
 
-Automations can be created using this webhook by checking for changes for the camera entity state. When the Push camera is not receiving any data, it will be in the state of "Idle". When the state switches to "Recording", it means that the webhook has started receiving data. For the fastest automation responses, perform your actions immediately on that state change.
+Automations can be created using this webhook by checking for changes for the camera entity state. When the Push camera is not receiving any data, it will be in the state of `idle`. When the state switches to `recording`, it means that the webhook has started receiving data. For the fastest automation responses, perform your actions immediately on that state change.
 
 Multiple webhooks can be set up, each pointed at a different HomeAssistant Push camera. Additionally, you can create an automation that is triggered on a Webhook call. Then just use the SynoAI webhook notification to call that webhook. Note that it's wasteful to send an image when triggering the non-Push webhooks on HomeAssistant, so ensure that SendImage is set to false.
 
