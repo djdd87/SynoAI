@@ -8,19 +8,21 @@ namespace SynoAI.Notifiers.Pushover
     {
         public override INotifier Create(ILogger logger, IConfigurationSection section)
         {
+            logger.LogInformation("Processing Pushover Config");
+
             string apiKey = section.GetValue<string>("ApiKey");
             string userKey = section.GetValue<string>("UserKey");
             List<string> devices = section.GetValue<List<string>>("Devices");
             string sound = section.GetValue<string>("Sound");   // https://pushover.net/api#sounds
-            int priority = section.GetValue<int>("Priority");   // https://pushover.net/api#priority
-            string title = section.GetValue<string>("Title");   
-
-            logger.LogInformation("Processing Pushover Config", apiKey);
+            PushoverPriority priority = section.GetValue<PushoverPriority>("Priority", PushoverPriority.Normal); 
 
             return new Pushover()
             {
                 ApiKey = apiKey,
-                UserKey = userKey
+                UserKey = userKey,
+                Devices = devices, 
+                Sound = sound,
+                Priority = priority,
             };
         }
     }

@@ -26,6 +26,7 @@ I made this application mostly for myself in order to improve upon Christopher A
   * [Telegram](#telegram)
   * [Email](#email) 
   * [HomeAssistant](#homeassistant)
+  * [Pushover](#pushover)
 * [Caveats](#caveats)
 * [Configuration](#configuration)
   * [1) Configure Deepstack](#1-configure-deepstack)
@@ -276,6 +277,25 @@ HomeAssistant requires the POSTed image field to be called "image" (which is the
 Automations can be created using this webhook by checking for changes for the camera entity state. When the Push camera is not receiving any data, it will be in the state of `idle`. When the state switches to `recording`, it means that the webhook has started receiving data. For the fastest automation responses, perform your actions immediately on that state change.
 
 Multiple webhooks can be set up, each pointed at a different HomeAssistant Push camera. Additionally, you can create an automation that is triggered on a Webhook call. Then just use the SynoAI webhook notification to call that webhook. Note that it's wasteful to send an image when triggering the non-Push webhooks on HomeAssistant, so ensure that SendImage is set to false.
+
+### Pushover
+The [Pushover](https://www.pushover.net/) notification will send an image and a message containing a list of detected object types. An API key and user key will need to be obtained from your Pushover account. An array of devices can be specified to limit the devices that receive the notifications, or the `device` field can be left blank
+
+```json
+{
+  "Type": "Pushover",
+  "ApiKey": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "UserKey": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "Device": [
+	"iphone"
+  ]
+}
+```
+* ApiKey [required]: The API key for the Pushover service
+* UserKey [required]: The User key for the Pushover service
+* Device [optional]: An array of device names to send the notifications to. If left blank, the notifications will be sent to all devices
+* Sound [optional]: The [sound](https://pushover.net/api#sounds) to override the user's default sound choice
+* Priority [optional]: The [priority](https://pushover.net/api#priority) with which to send the message
 
 ## Caveats
 * SynoAI still relies on Surveillance Station triggering the motion alerts

@@ -54,7 +54,6 @@ namespace SynoAI.Notifiers
             return result;
         }
 
-
         /// <summary>
         /// Fetches the response content and parses it as the specified type.
         /// </summary>

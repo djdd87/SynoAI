@@ -154,16 +154,5 @@ namespace SynoAI.Notifiers.Webhook
 
             return new AuthenticationHeaderValue(Authentication.ToString(), parameter);
         }
-
-        /// <summary>
-        /// Fetches the response content and parses it a DeepStack object.
-        /// </summary>
-        /// <param name="message">The message to parse.</param>
-        /// <returns>A usable object.</returns>
-        private async Task<T> GetResponse<T>(HttpResponseMessage message)
-        {
-            string content = await message.Content.ReadAsStringAsync();
-            return JsonConvert.DeserializeObject<T>(content);
-        }
     }
 }

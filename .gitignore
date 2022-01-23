@@ -366,6 +366,7 @@ FodyWeavers.xsd
 
 # Custom
 appsettings.Development.json
+appsettings.*.json
 PrivateNotes.txt
 Captures
 docker-compose.debug.yml
