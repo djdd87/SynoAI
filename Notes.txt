@@ -8,6 +8,7 @@
     * Navigate into SynoAI (cd SynoAI)
     * docker build -t synoai:0.1 .
         * Where 0.1 is the tag and the "." is the current working directory.
+	* The ending "." is important to denote the current directory, or use the folder path relative to the current directory.
 
 # Run the application and map the appsettings.Development.json to the actual appsettings.json
 -- docker run -it --rm -v /run/desktop/mnt/host/c/Projects/GitHub/SynoAI/SynoAI/appsettings.Development.json:/app/appsettings.json -v /run/desktop/mnt/host/c/Projects/GitHub/SynoAI/SynoAI/Captures:/app/Captures -p 8080:80 synoai:latest
