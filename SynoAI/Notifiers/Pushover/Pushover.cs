@@ -76,7 +76,7 @@ namespace SynoAI.Notifiers.Pushover
                 form.Add(imageContent, "attachment", "image.png");
 
                 // Remove content type that is not in the docs
-                    foreach (var param in form)
+                foreach (var param in form)
                 {
                     param.Headers.ContentType = null;
                 }
