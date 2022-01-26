@@ -41,18 +41,29 @@ namespace SynoAI.Notifiers.Pushover
 
         public override async Task SendAsync(Camera camera, ProcessedImage processedImage, IEnumerable<string> foundTypes, ILogger logger)
         {
+            if (string.IsNullOrWhiteSpace(ApiKey))
+            {
+                logger.LogError($"{nameof(ApiKey)} must be specified.");
+                return;
+            }
+            else if (string.IsNullOrWhiteSpace(UserKey))
+            {
+                logger.LogError($"{nameof(UserKey)} must be specified.");
+                return;
+            }
+
             // Build the form message
             logger.LogInformation($"{camera.Name}: Pushover: Building message");
 
             string message = GetMessage(camera, foundTypes);
-            string device = Devices == null || Devices.Count() == 0 ? String.Empty : string.Join(',', Devices);
+            string device = Devices == null || !Devices.Any() ? String.Empty : string.Join(',', Devices);
             string title = $"{camera.Name}: Movement Detected";
 
             MultipartFormDataContent form = new MultipartFormDataContent();
             form.Add(new StringContent(device), "\"device\"");
             form.Add(new StringContent(message), "\"message\"");
             form.Add(new StringContent(((int)Priority).ToString()), "\"priority\"");
-            form.Add(new StringContent(Sound), "\"sound\"");
+            form.Add(new StringContent(Sound ?? String.Empty), "\"sound\"");
             form.Add(new StringContent(ApiKey), "\"token\"");
             form.Add(new StringContent(UserKey), "\"user\"");
             form.Add(new StringContent(title), "\"title\"");
@@ -65,7 +76,7 @@ namespace SynoAI.Notifiers.Pushover
                 form.Add(imageContent, "attachment", "image.png");
 
                 // Remove content type that is not in the docs
-                foreach (var param in form)
+                    foreach (var param in form)
                 {
                     param.Headers.ContentType = null;
                 }
