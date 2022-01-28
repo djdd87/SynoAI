@@ -76,6 +76,7 @@ An example appsettings.json configuration file can be found [here](#example-apps
 * DrawExclusions [optional] (Default: ```false```): Whether to draw the exclusion zone boundary boxes on the image. Useful for setting up the initial exclusion zones
 * BoxColor [optional] (Default: ```#FF0000```): The colour of the border of the boundary box
 * ExclusionBoxColour [optional] (Default: ```#00FF00```): The colour of the border of the exclusion boundary box
+* StrokeWidth [optional] (Default: ```2```): The width, in pixels, of the border around the boundary box
 * Font [optional] (Default: ```Tahoma```): The font to use when labelling the boundary boxes on the output image
 * FontSize [optional] (Default: ```12```): The size of the font to use (in pixels) when labelling the boundary boxes on the output image
 * FontColor [optional] (Default: ```#FF0000```): The colour of the text for the labels when labelling the boundary boxes on the output image
