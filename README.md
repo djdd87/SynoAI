@@ -11,6 +11,12 @@ SynoAI aims to solve this problem by side-stepping the Synology notifications en
 
 I made this application mostly for myself in order to improve upon Christopher Adams' original idea and don't expect anything in return. However, if you find it useful and would like to buy me a coffee, feel free to do it at [__Buy me a coffee! :coffee:__](https://buymeacoff.ee/djdd87). This is entirely optional, but would be appreciated! Or even better, help supported this project by contributing changes such as expanding the supported notification systems (or even AIs).
 
+## Versioning
+
+The documentation you see here corresponds to the branch/tag selected above. The documentation will be accurate for the version tag you have selected, however if viewing the main branch, this is assumed to be the documentation that corresponds to the latest commit and latest image.
+
+For example, if you are using the docker image/version v1.1.0, then ensure you have selected the tag for v1.1.0, otherwise you may see features or options which are not available on your version of SynoAI.
+
 ## Table of Contents
 
 * [Features](#features)
