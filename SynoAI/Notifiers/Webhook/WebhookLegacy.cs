@@ -16,7 +16,7 @@ namespace SynoAI.Notifiers.Webhook
     /// <summary>
     /// Calls a third party API.
     /// </summary>
-    public class Webhook : NotifierBase
+    public class WebhookLegacy : NotifierBase
     {
         /// <summary>
         /// The URL to send the request to.
@@ -34,25 +34,28 @@ namespace SynoAI.Notifiers.Webhook
         /// <summary>
         /// The username when using Basic authentication.
         /// </summary>
-        public string Username { get; set; }
+        public string Username {get;set;}
         /// <summary>
         /// The password to use when using Basic authentication.
         /// </summary>
-        public string Password { get; set; }
+        public string Password {get;set;}
         /// <summary>
         /// The token to use when using Bearer authentication.
         /// </summary>
-        public string Token { get; set; }
-
+        public string Token {get;set;}
+        
         /// <summary>
         /// The field name when posting the image.
         /// </summary>
         public string Field { get; set; }
         /// <summary>
-        /// Whether the image should be sent in POST/PUT/PATCH requests. When this property is true, the request will made using 
-        /// content-type of multipart/form-data.
+        /// Whether the image should be sent in POST/PUT/PATCH requests.
         /// </summary>
         public bool SendImage { get; set; }
+        /// <summary>
+        /// Whether the message should be sent in POST/PUT/PATCH requests.
+        /// </summary>
+        public bool SendTypes { get; set; }
 
         /// <summary>
         /// Sends a notification to the Webhook.
@@ -68,19 +71,11 @@ namespace SynoAI.Notifiers.Webhook
             {
                 client.DefaultRequestHeaders.Authorization = GetAuthenticationHeader();
 
-                MultipartFormDataContent form = new MultipartFormDataContent();
-                //form.Add(new StringContent(device), "\"device\"");
-                //form.Add(new StringContent(message), "\"message\"");
-                //form.Add(new StringContent(((int)Priority).ToString()), "\"priority\"");
-                //form.Add(new StringContent(Sound ?? String.Empty), "\"sound\"");
-                //form.Add(new StringContent(ApiKey), "\"token\"");
-                //form.Add(new StringContent(UserKey), "\"user\"");
-                //form.Add(new StringContent(title), "\"title\"");
-
+                MultipartFormDataContent data = new MultipartFormDataContent();
                 if (SendTypes)
                 {
-                    form.Add(JsonContent.Create(foundTypes));
-                }
+                    data.Add(JsonContent.Create(foundTypes));
+                } 
 
                 FileStream fileStream = null;
                 switch (Method)
@@ -91,9 +86,9 @@ namespace SynoAI.Notifiers.Webhook
                         if (SendImage)
                         {
                             fileStream = processedImage.GetReadonlyStream();
-                            form.Add(new StreamContent(fileStream), Field, processedImage.FileName);
+                            data.Add(new StreamContent(fileStream), Field, processedImage.FileName);
                         }
-                        break;
+                        break;                            
                 }
 
                 logger.LogInformation($"{camera.Name}: Webhook: Calling {Method}.");
@@ -108,13 +103,13 @@ namespace SynoAI.Notifiers.Webhook
                         message = await client.GetAsync(Url);
                         break;
                     case "PATCH":
-                        message = await client.PatchAsync(Url, form);
+                        message = await client.PatchAsync(Url, data);
                         break;
                     case "POST":
-                        message = await client.PostAsync(Url, form);
+                        message = await client.PostAsync(Url, data);
                         break;
                     case "PUT":
-                        message = await client.PutAsync(Url, form);
+                        message = await client.PutAsync(Url, data);
                         break;
                     default:
                         logger.LogError($"{camera.Name}: Webhook: The method type '{Method}' is not supported.");
