@@ -1,4 +1,4 @@
-name: Docker Image CI
+name: Publish Latest Image
 
 # Only trigger, when the build workflow succeeded
 on:
