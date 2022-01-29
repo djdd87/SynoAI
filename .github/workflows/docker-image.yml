@@ -16,3 +16,5 @@ jobs:
     - uses: actions/checkout@v2
     - name: Build the Docker image
       run: docker build -t djdd87/synoai:latest SynoAI
+    - name: Publish the Docker image
+      run: docker publish djdd87/synoai:latest
