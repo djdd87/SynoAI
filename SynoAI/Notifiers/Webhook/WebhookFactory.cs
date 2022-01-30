@@ -16,7 +16,7 @@ namespace SynoAI.Notifiers.Webhook
                 string username = section.GetValue<string>("Username", null);
                 string password = section.GetValue<string>("Password", null);
                 string token = section.GetValue<string>("Token", null);
-                string field = section.GetValue<string>("Field", "image");
+                string imageField = section.GetValue<string>("ImageField", "image");
                 string method = section.GetValue<string>("Method", "POST");
                 bool sendImage = section.GetValue<bool>("SendImage", true);
                 bool sendTypes = section.GetValue<bool>("SendTypes", false);
@@ -31,9 +31,9 @@ namespace SynoAI.Notifiers.Webhook
                     SendImage = sendImage
                 };
 
-                if (!string.IsNullOrWhiteSpace(field))
+                if (!string.IsNullOrWhiteSpace(imageField))
                 {
-                    webhook.Field = field.Trim();
+                    webhook.ImageField = imageField.Trim();
                 }
 
                 if (!string.IsNullOrWhiteSpace(method))

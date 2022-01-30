@@ -179,9 +179,6 @@ The webhook notification will POST an image to the specified URL with a specifie
 {
   "Url": "http://servername/resource",
   "Method": "POST",
-  "Field": "image",
-  "SendImage": true,
-  "SendTypes": false
 }
 ```
 * Url [required]: The URL to send the image to
@@ -197,9 +194,8 @@ The webhook notification will POST an image to the specified URL with a specifie
     * Password [optional]: The password to use when using Basic Authorization
   * Bearer
     * Token [optional]: The token to use when using Basic Authorization
-* Field [optional] (Default: ```image```): The field name of the image in the POST data
-* SendImage [optional] (Default: ```true```): The image will be sent to the webhook when the method is POST, PATCH or PUT
-* SendTypes [optional] (Default: ```false```): The list of found types will be sent to the webhook in the body of the request as a JSON string array.
+* ImageField [optional] (Default: ```image```): The field name of the image in the POST data
+* SendImage [optional] (Default: ```true```): The image will be sent to the webhook when the method is POST, PATCH or PUT.
 
 ### Telegram
 The telegram bot will send notifications and images when motion has been detected. To use this notification, you will need to set up your own Telegram bot using [one](https://core.telegram.org/bots#6-botfather) of the many [guides](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-channel-connect-telegram?view=azure-bot-service-4.0) available.

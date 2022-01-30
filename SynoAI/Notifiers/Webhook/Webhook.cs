@@ -47,7 +47,7 @@ namespace SynoAI.Notifiers.Webhook
         /// <summary>
         /// The field name when posting the image.
         /// </summary>
-        public string Field { get; set; }
+        public string ImageField { get; set; }
         /// <summary>
         /// Whether the image should be sent in POST/PUT/PATCH requests. When this property is true, the request will made using 
         /// content-type of multipart/form-data.
@@ -66,68 +66,82 @@ namespace SynoAI.Notifiers.Webhook
             logger.LogInformation($"{camera.Name}: Webhook: Processing");
             using (HttpClient client = new HttpClient())
             {
+                FileStream fileStream = null;
                 client.DefaultRequestHeaders.Authorization = GetAuthenticationHeader();
 
-                MultipartFormDataContent form = new MultipartFormDataContent();
-                //form.Add(new StringContent(device), "\"device\"");
-                //form.Add(new StringContent(message), "\"message\"");
-                //form.Add(new StringContent(((int)Priority).ToString()), "\"priority\"");
-                //form.Add(new StringContent(Sound ?? String.Empty), "\"sound\"");
-                //form.Add(new StringContent(ApiKey), "\"token\"");
-                //form.Add(new StringContent(UserKey), "\"user\"");
-                //form.Add(new StringContent(title), "\"title\"");
+                string message = GetMessage(camera, foundTypes);
 
-                if (SendTypes)
+                HttpContent content;
+                if (SendImage)
                 {
-                    form.Add(JsonContent.Create(foundTypes));
-                }
+                    // If we're sending the image, then we need to send the data as multipart/form-data.
+                    string typesJson = JsonConvert.SerializeObject(foundTypes);
 
-                FileStream fileStream = null;
-                switch (Method)
-                {
-                    case "PATCH":
-                    case "POST":
-                    case "PUT":
-                        if (SendImage)
-                        {
+                    MultipartFormDataContent form = new MultipartFormDataContent
+                    {
+                        { new StringContent(camera.Name), "\"camera\"" },
+                        { new StringContent(typesJson), "\"foundTypes\"" },
+                        { new StringContent(message), "\"message\"" }
+                    };
+
+                    switch (Method)
+                    {
+                        case "PATCH":
+                        case "POST":
+                        case "PUT":
                             fileStream = processedImage.GetReadonlyStream();
-                            form.Add(new StreamContent(fileStream), Field, processedImage.FileName);
-                        }
-                        break;
+                            form.Add(new StreamContent(fileStream), ImageField, processedImage.FileName);
+                            break;
+                    }
+
+                    content = form;
+                }
+                else
+                {
+                    // Otherwise we can just use a simple JSON object
+                    var request = new
+                    {
+                        camera = camera.Name,
+                        foundTypes = foundTypes,
+                        message = message
+                    };
+
+                    string requestJson = JsonConvert.SerializeObject(request);
+                    content = new StringContent(requestJson, null, "application/json");
                 }
 
                 logger.LogInformation($"{camera.Name}: Webhook: Calling {Method}.");
 
-                HttpResponseMessage message;
+                HttpResponseMessage response;
                 switch (Method)
                 {
                     case "DELETE":
-                        message = await client.DeleteAsync(Url);
+                        response = await client.DeleteAsync(Url);
                         break;
                     case "GET":
-                        message = await client.GetAsync(Url);
+                        response = await client.GetAsync(Url);
                         break;
                     case "PATCH":
-                        message = await client.PatchAsync(Url, form);
+                        response = await client.PatchAsync(Url, content);
                         break;
                     case "POST":
-                        message = await client.PostAsync(Url, form);
+                        response = await client.PostAsync(Url, content);
                         break;
                     case "PUT":
-                        message = await client.PutAsync(Url, form);
+                        response = await client.PutAsync(Url, content);
                         break;
                     default:
                         logger.LogError($"{camera.Name}: Webhook: The method type '{Method}' is not supported.");
                         return;
                 }
 
-                if (message.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
                 {
                     logger.LogInformation($"{camera.Name}: Webhook: Success.");
                 }
                 else
                 {
-                    logger.LogWarning($"{camera.Name}: Webhook: The end point responded with HTTP status code '{message.StatusCode}'.");
+                    logger.LogWarning($"{camera.Name}: Webhook: The end point responded with HTTP status code '{response.StatusCode}'.");
                 }
 
                 if (fileStream != null)
