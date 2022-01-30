@@ -16,7 +16,7 @@ namespace SynoAI.Notifiers.Webhook
     /// <summary>
     /// Calls a third party API.
     /// </summary>
-    public class Webhook : NotifierBase
+    public class WebhookLegacy : NotifierBase
     {
         /// <summary>
         /// The URL to send the request to.
@@ -34,25 +34,28 @@ namespace SynoAI.Notifiers.Webhook
         /// <summary>
         /// The username when using Basic authentication.
         /// </summary>
-        public string Username { get; set; }
+        public string Username {get;set;}
         /// <summary>
         /// The password to use when using Basic authentication.
         /// </summary>
-        public string Password { get; set; }
+        public string Password {get;set;}
         /// <summary>
         /// The token to use when using Bearer authentication.
         /// </summary>
-        public string Token { get; set; }
-
+        public string Token {get;set;}
+        
         /// <summary>
         /// The field name when posting the image.
         /// </summary>
-        public string ImageField { get; set; }
+        public string Field { get; set; }
         /// <summary>
-        /// Whether the image should be sent in POST/PUT/PATCH requests. When this property is true, the request will made using 
-        /// content-type of multipart/form-data.
+        /// Whether the image should be sent in POST/PUT/PATCH requests.
         /// </summary>
         public bool SendImage { get; set; }
+        /// <summary>
+        /// Whether the message should be sent in POST/PUT/PATCH requests.
+        /// </summary>
+        public bool SendTypes { get; set; }
 
         /// <summary>
         /// Sends a notification to the Webhook.
@@ -66,82 +69,60 @@ namespace SynoAI.Notifiers.Webhook
             logger.LogInformation($"{camera.Name}: Webhook: Processing");
             using (HttpClient client = new HttpClient())
             {
-                FileStream fileStream = null;
                 client.DefaultRequestHeaders.Authorization = GetAuthenticationHeader();
 
-                string message = GetMessage(camera, foundTypes);
-
-                HttpContent content;
-                if (SendImage)
+                MultipartFormDataContent data = new MultipartFormDataContent();
+                if (SendTypes)
                 {
-                    // If we're sending the image, then we need to send the data as multipart/form-data.
-                    string typesJson = JsonConvert.SerializeObject(foundTypes);
+                    data.Add(JsonContent.Create(foundTypes));
+                } 
 
-                    MultipartFormDataContent form = new MultipartFormDataContent
-                    {
-                        { new StringContent(camera.Name), "\"camera\"" },
-                        { new StringContent(typesJson), "\"foundTypes\"" },
-                        { new StringContent(message), "\"message\"" }
-                    };
-
-                    switch (Method)
-                    {
-                        case "PATCH":
-                        case "POST":
-                        case "PUT":
+                FileStream fileStream = null;
+                switch (Method)
+                {
+                    case "PATCH":
+                    case "POST":
+                    case "PUT":
+                        if (SendImage)
+                        {
                             fileStream = processedImage.GetReadonlyStream();
-                            form.Add(new StreamContent(fileStream), ImageField, processedImage.FileName);
-                            break;
-                    }
-
-                    content = form;
-                }
-                else
-                {
-                    // Otherwise we can just use a simple JSON object
-                    var request = new
-                    {
-                        camera = camera.Name,
-                        foundTypes = foundTypes,
-                        message = message
-                    };
-
-                    string requestJson = JsonConvert.SerializeObject(request);
-                    content = new StringContent(requestJson, null, "application/json");
+                            data.Add(new StreamContent(fileStream), Field, processedImage.FileName);
+                        }
+                        break;                            
                 }
 
                 logger.LogInformation($"{camera.Name}: Webhook: Calling {Method}.");
 
-                HttpResponseMessage response;
+                HttpResponseMessage message;
                 switch (Method)
                 {
                     case "DELETE":
-                        response = await client.DeleteAsync(Url);
+                        message = await client.DeleteAsync(Url);
                         break;
                     case "GET":
-                        response = await client.GetAsync(Url);
+                        message = await client.GetAsync(Url);
                         break;
                     case "PATCH":
-                        response = await client.PatchAsync(Url, content);
+                        message = await client.PatchAsync(Url, data);
                         break;
                     case "POST":
-                        response = await client.PostAsync(Url, content);
+                        message = await client.PostAsync(Url, data);
                         break;
                     case "PUT":
-                        response = await client.PutAsync(Url, content);
+                        message = await client.PutAsync(Url, data);
                         break;
                     default:
                         logger.LogError($"{camera.Name}: Webhook: The method type '{Method}' is not supported.");
                         return;
                 }
 
-                if (response.IsSuccessStatusCode)
+                if (message.IsSuccessStatusCode)
                 {
                     logger.LogInformation($"{camera.Name}: Webhook: Success.");
                 }
                 else
                 {
-                    logger.LogWarning($"{camera.Name}: Webhook: The end point responded with HTTP status code '{response.StatusCode}'.");
+                    logger.LogWarning($"{camera.Name}: Webhook: The end point responded with HTTP status code '{message.StatusCode}'.");
                 }
 
                 if (fileStream != null)

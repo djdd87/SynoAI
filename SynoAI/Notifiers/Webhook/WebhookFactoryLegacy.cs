@@ -3,11 +3,11 @@ using Microsoft.Extensions.Logging;
 
 namespace SynoAI.Notifiers.Webhook
 {
-    public class WebhookFactory : NotifierFactory
+    public class WebhookFactoryLegacy : NotifierFactory
     {
         public override INotifier Create(ILogger logger, IConfigurationSection section)
         {
-            using (logger.BeginScope(nameof(WebhookFactory)))
+            using (logger.BeginScope(nameof(WebhookFactoryLegacy)))
             {
                 logger.LogInformation("Processing Webhook Config");
 
@@ -16,24 +16,25 @@ namespace SynoAI.Notifiers.Webhook
                 string username = section.GetValue<string>("Username", null);
                 string password = section.GetValue<string>("Password", null);
                 string token = section.GetValue<string>("Token", null);
-                string imageField = section.GetValue<string>("ImageField", "image");
+                string field = section.GetValue<string>("Field", "image");
                 string method = section.GetValue<string>("Method", "POST");
                 bool sendImage = section.GetValue<bool>("SendImage", true);
                 bool sendTypes = section.GetValue<bool>("SendTypes", false);
 
-                Webhook webhook = new Webhook()
+                WebhookLegacy webhook = new WebhookLegacy()
                 {
                     Url = url,
                     Authentication = authentication,
                     Username = username,
                     Password = password,
                     Token = token,
-                    SendImage = sendImage
+                    SendImage = sendImage,
+                    SendTypes = sendTypes
                 };
 
-                if (!string.IsNullOrWhiteSpace(imageField))
+                if (!string.IsNullOrWhiteSpace(field))
                 {
-                    webhook.ImageField = imageField.Trim();
+                    webhook.Field = field.Trim();
                 }
 
                 if (!string.IsNullOrWhiteSpace(method))
