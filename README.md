@@ -74,11 +74,11 @@ An example appsettings.json configuration file can be found [here](#example-apps
   * All: Will draw boundary boxes over any object/person that the AI detected
   * Off: Will not draw boundary boxes (note - this will speed up time between detection and notification as SynoAI will not have to manipulate the image)
 * DrawExclusions [optional] (Default: ```false```): Whether to draw the exclusion zone boundary boxes on the image. Useful for setting up the initial exclusion zones
-* BoxColor [optional] (Default: ```#FF0000```): The colour of the border of the boundary box
-* ExclusionBoxColour [optional] (Default: ```#00FF00```): The colour of the border of the exclusion boundary box
+* BoxColor [optional] (Default: ```#00FF00``` aka ```green```): The colour of the border of the boundary box
+* ExclusionBoxColour [optional] (Default: ```#FF0000``` aka ```red```): The colour of the border of the exclusion boundary box
 * Font [optional] (Default: ```Tahoma```): The font to use when labelling the boundary boxes on the output image
 * FontSize [optional] (Default: ```12```): The size of the font to use (in pixels) when labelling the boundary boxes on the output image
-* FontColor [optional] (Default: ```#FF0000```): The colour of the text for the labels when labelling the boundary boxes on the output image
+* FontColor [optional] (Default: ```#00FF00``` aka ```green```): The colour of the text for the labels when labelling the boundary boxes on the output image
 * TextOffsetX [optional] (Default: ```2```) : The number of pixels to offset the label from the left of the inside of the boundary image on the output image
 * TextOffsetY [optional] (Default: ```2```) : The number of pixels to offset the label from the top of the inside of the boundary image on the output image
 * SaveOriginalSnapshot [optional] (Default: ```Off```): A mode determining whether to save the source snapshot that was captured from the API before it was sent to and processed by the AI:

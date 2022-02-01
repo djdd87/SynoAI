@@ -181,10 +181,10 @@ namespace SynoAI
             StrokeWidth = configuration.GetValue<int>("StrokeWidth", 2);
 
             BoxColor = configuration.GetValue<string>("BoxColor", SKColors.Green.ToString());
-            ExclusionBoxColor = configuration.GetValue<string>("ExclusionBoxColor", SKColors.Green.ToString());
+            FontColor = configuration.GetValue<string>("FontColor", SKColors.Green.ToString());
+            ExclusionBoxColor = configuration.GetValue<string>("ExclusionBoxColor", SKColors.Red.ToString());
 
             Font = configuration.GetValue<string>("Font", "Tahoma");
-            FontColor = configuration.GetValue<string>("FontColor", SKColors.Green.ToString());
             FontSize = configuration.GetValue<int>("FontSize", 12);
             
             TextOffsetX = configuration.GetValue<int>("TextOffsetX", 4);
