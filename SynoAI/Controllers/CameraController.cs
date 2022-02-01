@@ -227,6 +227,11 @@ namespace SynoAI.Controllers
         /// </summary>
         private void CleanupOldImages()
         {
+            if (!Directory.Exists(Constants.DIRECTORY_CAPTURES))
+            {
+                return;
+            }
+
             if (Config.DaysToKeepCaptures > 0 && !_cleanupOldImagesRunning)
             {
                 _logger.LogInformation($"Captures Clean Up: Cleaning up images older than {Config.DaysToKeepCaptures} day(s).");

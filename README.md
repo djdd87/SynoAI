@@ -7,9 +7,18 @@ While sssAI is a great solution, it is hamstrung by the Synology notification sy
 
 SynoAI aims to solve this problem by side-stepping the Synology notifications entirely by allowing other notification systems to be used.
 
+![Building](https://github.com/djdd87/SynoAI/actions/workflows/dotnet.yml/badge.svg)
+![LatestImage](https://github.com/djdd87/SynoAI/actions/workflows/docker-image.yml/badge.svg)
+
 ## Buy Me A Coffee! :coffee:
 
 I made this application mostly for myself in order to improve upon Christopher Adams' original idea and don't expect anything in return. However, if you find it useful and would like to buy me a coffee, feel free to do it at [__Buy me a coffee! :coffee:__](https://buymeacoff.ee/djdd87). This is entirely optional, but would be appreciated! Or even better, help supported this project by contributing changes such as expanding the supported notification systems (or even AIs).
+
+## Versioning
+
+The documentation you see here corresponds to the branch/tag selected above. The documentation will be accurate for the version tag you have selected, however if viewing the main branch, this is assumed to be the documentation that corresponds to the latest commit and latest image.
+
+For example, if you are using the docker image/version v1.1.0, then ensure you have selected the tag for v1.1.0, otherwise you may see features or options which are not available on your version of SynoAI.
 
 ## Table of Contents
 
@@ -74,8 +83,9 @@ An example appsettings.json configuration file can be found [here](#example-apps
   * All: Will draw boundary boxes over any object/person that the AI detected
   * Off: Will not draw boundary boxes (note - this will speed up time between detection and notification as SynoAI will not have to manipulate the image)
 * DrawExclusions [optional] (Default: ```false```): Whether to draw the exclusion zone boundary boxes on the image. Useful for setting up the initial exclusion zones
-* BoxColor [optional] (Default: ```#00FF00``` aka ```green```): The colour of the border of the boundary box
-* ExclusionBoxColour [optional] (Default: ```#FF0000``` aka ```red```): The colour of the border of the exclusion boundary box
+* BoxColor [optional] (Default: ```#FF0000```): The colour of the border of the boundary box
+* ExclusionBoxColour [optional] (Default: ```#00FF00```): The colour of the border of the exclusion boundary box
+* StrokeWidth [optional] (Default: ```2```): The width, in pixels, of the border around the boundary box
 * Font [optional] (Default: ```Tahoma```): The font to use when labelling the boundary boxes on the output image
 * FontSize [optional] (Default: ```12```): The size of the font to use (in pixels) when labelling the boundary boxes on the output image
 * FontColor [optional] (Default: ```#00FF00``` aka ```green```): The colour of the text for the labels when labelling the boundary boxes on the output image
@@ -169,9 +179,6 @@ The webhook notification will POST an image to the specified URL with a specifie
 {
   "Url": "http://servername/resource",
   "Method": "POST",
-  "Field": "image",
-  "SendImage": true,
-  "SendTypes": false
 }
 ```
 * Url [required]: The URL to send the image to
@@ -187,9 +194,8 @@ The webhook notification will POST an image to the specified URL with a specifie
     * Password [optional]: The password to use when using Basic Authorization
   * Bearer
     * Token [optional]: The token to use when using Basic Authorization
-* Field [optional] (Default: ```image```): The field name of the image in the POST data
-* SendImage [optional] (Default: ```true```): The image will be sent to the webhook when the method is POST, PATCH or PUT
-* SendTypes [optional] (Default: ```false```): The list of found types will be sent to the webhook in the body of the request as a JSON string array.
+* ImageField [optional] (Default: ```image```): The field name of the image in the POST data
+* SendImage [optional] (Default: ```true```): The image will be sent to the webhook when the method is POST, PATCH or PUT.
 
 ### Telegram
 The telegram bot will send notifications and images when motion has been detected. To use this notification, you will need to set up your own Telegram bot using [one](https://core.telegram.org/bots#6-botfather) of the many [guides](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-channel-connect-telegram?view=azure-bot-service-4.0) available.
