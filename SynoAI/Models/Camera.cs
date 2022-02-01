@@ -48,7 +48,7 @@ namespace SynoAI.Models
         /// Upon movement, the maximum number of snapshots sequentially retrieved from SSS until finding an object of interest (i.e. 4 snapshots). If not specified, this will 
         /// use the value specified on the main config.
         /// </summary>
-        public int? MaxSnapshots { get; private set; } 
+        public int? MaxSnapshots { get; set; } 
         /// <summary>
         /// The zones to exclude when checking for objects of interest.
         /// </summary>
