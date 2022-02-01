@@ -115,7 +115,16 @@ namespace SynoAI
         /// Development use only. The internal path to call the AI. Potentially a better way to do this would be to support multiple AIs and have separate configs baked into each AI.
         /// </summary>
         public static string AIPath { get; private set; }
-        
+
+        /// <summary>
+        /// The period of time in milliseconds (ms) that must occur between the last motion detection of camera and the next time it'll be processed.
+        /// </summary>
+        public static int Delay { get; private set; }
+        /// <summary>
+        /// The period of time in milliseconds (ms) that must occur between the last successful motion detection of camera and the next time it'll be processed.
+        /// </summary>
+        public static int DelayAfterSuccess { get; private set; }
+
         /// <summary>
         /// The default minimum width that an object must be to be considered valid for reporting. Can be overridden on a camera by camera basis to account for different camera resolutions.
         /// </summary>

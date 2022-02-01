@@ -78,6 +78,7 @@ An example appsettings.json configuration file can be found [here](#example-apps
 * MinSizeX [optional] (Default: ```50```): The minimum size in pixels that the object must be to trigger a change (will be ignored if specified on the Camera)
 * MinSizeY [optional] (Default: ```50```): The minimum size in pixels that the object must be to trigger a change (will be ignored if specified on the Camera).
 * Delay [optional] (Default: ```5000```): The period of time in milliseconds (ms) that must occur between the last motion detection of camera and the next time it'll be processed. i.e. if your delay is set to 5000 and your camera reports motion 4 seconds after it had already reported motion to SynoAI, then the check will be ignored. However, if the report from Surveillance Station is more than 5000ms, then the cameras image will be processed.
+* DelayAfterSuccess [optional] (Default: ```0```): The period of time in milliseconds (ms) that must occur between the last successful motion detection of camera and the next time it'll be processed. i.e. if you set the delay to 15000, then 15 seconds must pass before another motion detection is processed
 * MaxSnapshots [optional] (Default: ```1```): Upon movement, the maximum number of snapshots sequentially retrieved from SSS until finding an object of interest. e.g. if 4 is specified, then SynoAI will make a maximum of 4 requests until it finds a type of interest. If a matching type is found on the 1st snapshot, then no further snapshots will be taken. If nothing is found within the 4 requests, then no further snapshots will be taken until the next time Surveillance Station detects motion
 * DrawMode [optional] (Default: ```Matches```): Whether to draw all predictions from the AI on the capture image:
   * Matches: Will draw boundary boxes over any object/person that matches the types defined on the cameras
@@ -104,9 +105,11 @@ An example appsettings.json configuration file can be found [here](#example-apps
 * Name: [required]: The name of the camera on Surveillance Station
 * Types: [required]: An array of types that will trigger a notification when detected by the AI, e.g. ["Person", "Car"]
 * Threshold [required]: An integer denoting the required confidence of the AI to trigger the notification, e.g. 40 means that the AI must be 40% sure that the object detected was a person before SynoAI sends a notification
-* MinSizeX [optional] (Default: ```NULL```): The minimum pixels that the object must be horizontally to trigger a change (will override the default set on the top level MinSizeX)
-* MinSizeY [optional] (Default: ```NULL```): The minimum pixels that the object must be vertically to trigger a change (will override the default set on the top level MinSizeY)
+* MinSizeX [optional] (Default: ```NULL```): Will override the default set on the top level ```MinSizeX```
+* MinSizeY [optional] (Default: ```NULL```): Will override the default set on the top level ```MinSizeY```
 * Wait [optional]: An integer for the number of milliseconds to wait before requesting a snapshot once triggered, e.g. 2500 will wait for 2500ms (2.5 seconds) before requesting a snapshot from Surveillance Station
+* Delay [optional] (Default: ```NULL```): Will override the value set on the top level ```Delay```
+* DelayAfterSuccess [optional] (Default: ```0```): Will override the value set on the top level ```DelayAfterSuccess```
 * MaxSnapshots [optional] (Default: ```NULL```): Upon movement, the maximum number of snapshots sequentially retrieved from SSS until finding an object of interest (i.e. 4 snapshots). If not specified, will use the value from the main config.
 * Rotate [optional] (Default: ```0```): The degrees to rotate the image after it's captured from SurveillanceStation. The rotation will be applied before it's passed to the AI
 * Exclusions [optional]: An array of exclusion zones to ignore found objects within. If the entirity of an object is within the exclusion zone, then it won't be reported by the notifiers.
