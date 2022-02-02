@@ -123,7 +123,7 @@ namespace SynoAI
         /// <summary>
         /// The period of time in milliseconds (ms) that must occur between the last successful motion detection of camera and the next time it'll be processed.
         /// </summary>
-        public static int DelayAfterSuccess { get; private set; }
+        public static int? DelayAfterSuccess { get; private set; }
 
         /// <summary>
         /// The default minimum width that an object must be to be considered valid for reporting. Can be overridden on a camera by camera basis to account for different camera resolutions.
@@ -201,6 +201,9 @@ namespace SynoAI
 
             MinSizeX = configuration.GetValue<int>("MinSizeX", 50);
             MinSizeY = configuration.GetValue<int>("MinSizeY", 50);
+
+            Delay = configuration.GetValue<int>("Delay", 0);
+            DelayAfterSuccess = configuration.GetValue<int>("DelayAfterSuccess", 0);
 
             // euquiq: A bit overkill to use int.MaxValue :)
             // TODO: Just make this use 0 or null and handle appropriately

@@ -103,7 +103,7 @@ namespace SynoAI.Models
         }
 
         /// <summary>
-        /// Gets the delay between the last camera motion call and the next.
+        /// Gets the delay between the last camera motion detection and processing and the next.
         /// </summary>
         public int GetDelay()
         {
@@ -111,11 +111,11 @@ namespace SynoAI.Models
         }
 
         /// <summary>
-        /// Gets the delay between the last camera motion call and the next after the successful detection.
+        /// Gets the delay between the last camera motion detection and processing and the next after the successful detection. 
         /// </summary>
         public int GetDelayAfterSuccess()
         {
-            return DelayAfterSuccess ?? Config.DelayAfterSuccess;
+            return DelayAfterSuccess ?? Config.DelayAfterSuccess ?? GetDelay();
         }
 
         public override string ToString()
