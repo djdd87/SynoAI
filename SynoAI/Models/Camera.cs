@@ -25,6 +25,14 @@ namespace SynoAI.Models
         /// </summary>
         public int Wait { get; set; }
         /// <summary>
+        /// The period of time in milliseconds (ms) that must occur between the last motion detection of camera and the next time it'll be processed.
+        /// </summary>
+        public int? Delay { get; set; }
+        /// <summary>
+        /// The period of time in milliseconds (ms) that must occur between the last successful motion detection of camera and the next time it'll be processed.
+        /// </summary>
+        public int? DelayAfterSuccess { get; set; }
+        /// <summary>
         /// The minimum size the object must be horizontally to be considered as a valid result.
         /// </summary>
         public int? MinSizeX { get; set; }
@@ -92,6 +100,22 @@ namespace SynoAI.Models
         public int GetMaxSnapshots()
         {
             return MaxSnapshots ?? Config.MaxSnapshots;
+        }
+
+        /// <summary>
+        /// Gets the delay between the last camera motion detection and processing and the next.
+        /// </summary>
+        public int GetDelay()
+        {
+            return Delay ?? Config.Delay;
+        }
+
+        /// <summary>
+        /// Gets the delay between the last camera motion detection and processing and the next after the successful detection. 
+        /// </summary>
+        public int GetDelayAfterSuccess()
+        {
+            return DelayAfterSuccess ?? Config.DelayAfterSuccess ?? GetDelay();
         }
 
         public override string ToString()
