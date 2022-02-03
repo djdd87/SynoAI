@@ -414,8 +414,8 @@ SynoAI can be installed as a docker image, which is [available from DockerHub](h
 ### Images
 The following is a list of the available images and their meaning:
  
-* Latest: The latest version
-* Stable: A known stable version, which will only periodically receive updates (ensure the readme on the stable branch is followed as the latest branch's readme may contain changes that are not relevant to the stable image).
+* Latest: The latest version. This is the live development version - YMMV
+* v*.*.*: A known stable [release](https://github.com/djdd87/SynoAI/releases).
 
 ### Docker Configuration
 The image can be pulled using the Docker cli by calling:
