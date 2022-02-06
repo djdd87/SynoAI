@@ -37,9 +37,6 @@ namespace SynoAI.Notifiers
                 case NotifierType.Webhook:
                     factory = new WebhookFactory();
                     break;
-                case NotifierType.WebhookLegacy:
-                    factory = new WebhookFactoryLegacy();
-                    break;
                 default:
                     throw new NotImplementedException(type.ToString());
             }

@@ -19,6 +19,6 @@ namespace SynoAI.Notifiers
         /// <summary>
         /// Handles the send of the notification.
         /// </summary>
-        Task SendAsync(Camera camera, ProcessedImage processedImage, IEnumerable<string> foundTypes, ILogger logger);
+        Task SendAsync(Camera camera, Notification notification, ILogger logger);
     }
 }

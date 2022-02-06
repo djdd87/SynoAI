@@ -58,17 +58,17 @@ namespace SynoAI.Notifiers.Webhook
         /// Sends a notification to the Webhook.
         /// </summary>
         /// <param name="camera">The camera that triggered the notification.</param>
-        /// <param name="processedImage">Object for fetching the processed image.</param>
-        /// <param name="foundTypes">The list of types that were found.</param>
+        /// <param name="notification">The notification data to process.</param>
         /// <param name="logger">A logger.</param>
-        public override async Task SendAsync(Camera camera, ProcessedImage processedImage, IEnumerable<string> foundTypes, ILogger logger)
+        public override async Task SendAsync(Camera camera, Notification notification, ILogger logger)
         {
             logger.LogInformation($"{camera.Name}: Webhook: Processing");
-            using (HttpClient client = new HttpClient())
+            using (HttpClient client = new())
             {
                 FileStream fileStream = null;
                 client.DefaultRequestHeaders.Authorization = GetAuthenticationHeader();
 
+                IEnumerable<string> foundTypes = notification.FoundTypes;
                 string message = GetMessage(camera, foundTypes);
 
                 HttpContent content;
@@ -76,11 +76,13 @@ namespace SynoAI.Notifiers.Webhook
                 {
                     // If we're sending the image, then we need to send the data as multipart/form-data.
                     string typesJson = JsonConvert.SerializeObject(foundTypes);
+                    string validPredictionsJson = JsonConvert.SerializeObject(notification.ValidPredictions);
 
-                    MultipartFormDataContent form = new MultipartFormDataContent
+                    MultipartFormDataContent form = new()
                     {
                         { new StringContent(camera.Name), "\"camera\"" },
                         { new StringContent(typesJson), "\"foundTypes\"" },
+                        { new StringContent(validPredictionsJson), "\"predictions\"" },
                         { new StringContent(message), "\"message\"" }
                     };
 
@@ -89,6 +91,7 @@ namespace SynoAI.Notifiers.Webhook
                         case "PATCH":
                         case "POST":
                         case "PUT":
+                            ProcessedImage processedImage = notification.ProcessedImage;
                             fileStream = processedImage.GetReadonlyStream();
                             form.Add(new StreamContent(fileStream), ImageField, processedImage.FileName);
                             break;
@@ -103,6 +106,7 @@ namespace SynoAI.Notifiers.Webhook
                     {
                         camera = camera.Name,
                         foundTypes = foundTypes,
+                        predictions = notification.ValidPredictions,
                         message = message
                     };
 

@@ -39,7 +39,7 @@ namespace SynoAI.Notifiers.Pushover
         /// </summary>
         public string Sound { get; set; }
 
-        public override async Task SendAsync(Camera camera, ProcessedImage processedImage, IEnumerable<string> foundTypes, ILogger logger)
+        public override async Task SendAsync(Camera camera, Notification notification, ILogger logger)
         {
             if (string.IsNullOrWhiteSpace(ApiKey))
             {
@@ -55,22 +55,24 @@ namespace SynoAI.Notifiers.Pushover
             // Build the form message
             logger.LogInformation($"{camera.Name}: Pushover: Building message");
 
-            string message = GetMessage(camera, foundTypes);
+            string message = GetMessage(camera, notification.FoundTypes);
             string device = Devices == null || !Devices.Any() ? String.Empty : string.Join(',', Devices);
             string title = $"{camera.Name}: Movement Detected";
 
-            MultipartFormDataContent form = new MultipartFormDataContent();
-            form.Add(new StringContent(device), "\"device\"");
-            form.Add(new StringContent(message), "\"message\"");
-            form.Add(new StringContent(((int)Priority).ToString()), "\"priority\"");
-            form.Add(new StringContent(Sound ?? String.Empty), "\"sound\"");
-            form.Add(new StringContent(ApiKey), "\"token\"");
-            form.Add(new StringContent(UserKey), "\"user\"");
-            form.Add(new StringContent(title), "\"title\"");
+            MultipartFormDataContent form = new()
+            {
+                { new StringContent(device), "\"device\"" },
+                { new StringContent(message), "\"message\"" },
+                { new StringContent(((int)Priority).ToString()), "\"priority\"" },
+                { new StringContent(Sound ?? String.Empty), "\"sound\"" },
+                { new StringContent(ApiKey), "\"token\"" },
+                { new StringContent(UserKey), "\"user\"" },
+                { new StringContent(title), "\"title\"" }
+            };
 
             // Send the message
-            using (FileStream imageStream = processedImage.GetReadonlyStream())
-            using (StreamContent imageContent = new StreamContent(imageStream))
+            using (FileStream imageStream = notification.ProcessedImage.GetReadonlyStream())
+            using (StreamContent imageContent = new(imageStream))
             {
                 imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
                 form.Add(imageContent, "attachment", "image.png");

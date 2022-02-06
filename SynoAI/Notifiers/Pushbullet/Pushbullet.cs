@@ -32,12 +32,12 @@ namespace SynoAI.Notifiers.Pushbullet
         /// Sends a message and an image using the Pushbullet API.
         /// </summary>
         /// <param name="camera">The camera that triggered the notification.</param>
-        /// <param name="processedImage">Object for fetching the processed image.</param>
-        /// <param name="foundTypes">The list of types that were found.</param>
         /// <param name="logger">A logger.</param>
-        public override async Task SendAsync(Camera camera, ProcessedImage processedImage, IEnumerable<string> foundTypes, ILogger logger)
+        public override async Task SendAsync(Camera camera, Notification notification, ILogger logger)
         {
             // Pushbullet file uploads are a two part process. First we need to request to upload a file
+            ProcessedImage processedImage = notification.ProcessedImage;
+
             string fileName = processedImage.FileName;
             string requestJson = JsonConvert.SerializeObject(new PushbulletUploadRequest()
             {
@@ -82,7 +82,7 @@ namespace SynoAI.Notifiers.Pushbullet
                     {
                         Type = uploadSuccess ? "file" : "note",
                         Title = $"{camera.Name}: Movement Detected",
-                        Body = GetMessage(camera, foundTypes, errorMessage: uploadError),
+                        Body = GetMessage(camera, notification.FoundTypes, errorMessage: uploadError),
                         FileName = uploadSuccess ? uploadRequestResult.FileName : null,
                         FileUrl = uploadSuccess ? uploadRequestResult.FileUrl : null,
                         FileType = uploadSuccess ? uploadRequestResult.FileType : null

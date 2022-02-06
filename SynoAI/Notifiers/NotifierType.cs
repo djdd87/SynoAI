@@ -25,10 +25,6 @@ namespace SynoAI.Notifiers
         /// <summary>
         /// Calls a webhook with the image attached.
         /// </summary>
-        Webhook,
-        /// <summary>
-        /// Legacy implementation of Webhook
-        /// </summary>
-        WebhookLegacy
+        Webhook
     }
 }

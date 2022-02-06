@@ -20,9 +20,11 @@ namespace SynoAI.AIs.DeepStack
 
             decimal minConfidence = camera.Threshold / 100m;
 
-            MultipartFormDataContent multipartContent = new MultipartFormDataContent();
-            multipartContent.Add(new StreamContent(new MemoryStream(image)), "image", "image");
-            multipartContent.Add(new StringContent(minConfidence.ToString()), "min_confidence"); // From face detection example - using JSON with MinConfidence didn't always work
+            MultipartFormDataContent multipartContent = new()
+            {
+                { new StreamContent(new MemoryStream(image)), "image", "image" },
+                { new StringContent(minConfidence.ToString()), "min_confidence" } // From face detection example - using JSON with MinConfidence didn't always work
+            };
 
             logger.LogDebug($"{camera.Name}: DeepStackAI: POSTing image with minimum confidence of {minConfidence} ({camera.Threshold}%) to {string.Join("/", Config.AIUrl, Config.AIPath)}.");
 
@@ -69,7 +71,7 @@ namespace SynoAI.AIs.DeepStack
         /// <returns>A <see cref="Uri"/> for the combined base and resource.</returns>
         protected Uri GetUri(string basePath, string resourcePath)
         {
-            Uri baseUri = new Uri(basePath);
+            Uri baseUri = new(basePath);
             return new Uri(baseUri, resourcePath);
         }
 

@@ -15,7 +15,7 @@ namespace SynoAI.Notifiers
         public IEnumerable<string> Cameras { get; set; } 
         public IEnumerable<string> Types { get; set; } 
         
-        public abstract Task SendAsync(Camera camera, ProcessedImage processedImage, IEnumerable<string> foundTypes, ILogger logger);
+        public abstract Task SendAsync(Camera camera, Notification notification, ILogger logger);
 
         protected string GetMessage(Camera camera, IEnumerable<string> foundTypes, string errorMessage = null)
         {

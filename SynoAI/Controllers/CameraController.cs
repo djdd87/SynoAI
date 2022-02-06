@@ -32,8 +32,8 @@ namespace SynoAI.Controllers
         private readonly ISynologyService _synologyService;
         private readonly ILogger<CameraController> _logger;
 
-        private static ConcurrentDictionary<string, bool> _runningCameraChecks = new ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
-        private static ConcurrentDictionary<string, DateTime> _delayedCameraChecks = new ConcurrentDictionary<string, DateTime>(StringComparer.OrdinalIgnoreCase);
+        private static ConcurrentDictionary<string, bool> _runningCameraChecks = new(StringComparer.OrdinalIgnoreCase);
+        private static ConcurrentDictionary<string, DateTime> _delayedCameraChecks = new(StringComparer.OrdinalIgnoreCase);
 
         public CameraController(IAIService aiService, ISynologyService synologyService, ILogger<CameraController> logger, IHubContext<SynoAIHub> hubContext)
         {
@@ -134,7 +134,7 @@ namespace SynoAI.Controllers
                     int maxSizeX = camera.GetMaxSizeX();
                     int maxSizeY = camera.GetMaxSizeY();
 
-                    List<AIPrediction> validPredictions = new List<AIPrediction>();
+                    List<AIPrediction> validPredictions = new();
                     foreach (AIPrediction prediction in predictions)
                     {
                         // Check if the prediction label is in the list of types the camera is looking for
@@ -178,14 +178,17 @@ namespace SynoAI.Controllers
 
                     if (validPredictions.Count() > 0)
                     {
-                        // Generate text for notifications                  
-                        IEnumerable<string> labels = GetLabels(validPredictions);
-
                         // Process and save the snapshot
                         ProcessedImage processedImage = SnapshotManager.DressImage(camera, snapshot, predictions, validPredictions, _logger);
 
                         // Send Notifications                  
-                        await SendNotifications(camera, processedImage, labels);
+                        Notification notification = new()
+                        {
+                            ProcessedImage = processedImage,
+                            ValidPredictions = validPredictions
+                        };
+
+                        await SendNotifications(camera, notification);
 
                         // Inform eventual web users about this new Snapshot, for the "realtime" option thru Web
                         await _hubContext.Clients.All.SendAsync("ReceiveSnapshot", camera.Name, processedImage.FileName);
@@ -239,10 +242,10 @@ namespace SynoAI.Controllers
             // Check if the prediction falls within the exclusion zones
             if (camera.Exclusions != null && camera.Exclusions.Count() > 0)
             {
-                Rectangle boundary = new Rectangle(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY);
+                Rectangle boundary = new(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY);
                 foreach (Zone exclusion in camera.Exclusions)
                 {
-                    Rectangle exclusionZoneBoundary = new Rectangle(exclusion.Start.X, exclusion.Start.Y, exclusion.End.X - exclusion.Start.X, exclusion.End.Y - exclusion.Start.Y);
+                    Rectangle exclusionZoneBoundary = new(exclusion.Start.X, exclusion.Start.Y, exclusion.End.X - exclusion.Start.X, exclusion.End.Y - exclusion.Start.Y);
                     bool exclude = exclusion.Mode == OverlapMode.Contains ? exclusionZoneBoundary.Contains(boundary) : exclusionZoneBoundary.IntersectsWith(boundary);
                     if (exclude)
                     {
@@ -254,43 +257,6 @@ namespace SynoAI.Controllers
             }
 
             return true;
-        }
-
-        /// <summary>
-        /// Gets the labels from the predictions to use in the notifications.
-        /// </summary>
-        /// <param name="validPredictions">The predictions to process.</param>
-        /// <returns>A list of labels.</returns>
-        private IEnumerable<string> GetLabels(IEnumerable<AIPrediction> validPredictions)
-        {
-            if (Config.AlternativeLabelling && Config.DrawMode == DrawMode.Matches)
-            {
-                List<String> labels = new List<String>();
-                if (validPredictions.Count() == 1)
-                {
-                    // If there is only a single object, then don't add a correlating number and instead just
-                    // write out the label.
-                    decimal confidence = Math.Round(validPredictions.First().Confidence, 0, MidpointRounding.AwayFromZero);
-                    labels.Add($"{validPredictions.First().Label.FirstCharToUpper()} {confidence}%");
-                }
-                else
-                {
-                    // Since there is more than one object detected, include correlating number
-                    int counter = 1;
-                    foreach (AIPrediction prediction in validPredictions)
-                    {
-                        decimal confidence = Math.Round(prediction.Confidence, 0, MidpointRounding.AwayFromZero);
-                        labels.Add($"{counter}. {prediction.Label.FirstCharToUpper()} {confidence}%");
-                        counter++;
-                    }
-                }
-
-                return labels;
-            }
-            else
-            {
-                return validPredictions.Select(x => x.Label.FirstCharToUpper()).ToList();
-            }
         }
 
         /// <summary>
@@ -332,7 +298,7 @@ namespace SynoAI.Controllers
                     {
                         _cleanupOldImagesRunning = true;
 
-                        DirectoryInfo directory = new DirectoryInfo(Constants.DIRECTORY_CAPTURES);
+                        DirectoryInfo directory = new(Constants.DIRECTORY_CAPTURES);
                         IEnumerable<FileInfo> files = directory.GetFiles("*", new EnumerationOptions() { RecurseSubdirectories = true });
                         foreach (FileInfo file in files)
                         {
@@ -350,7 +316,7 @@ namespace SynoAI.Controllers
             }
         }
         private bool _cleanupOldImagesRunning;
-        private object _cleanUpOldImagesLock = new object();
+        private object _cleanUpOldImagesLock = new();
 
         /// <summary>
         /// Handles any required preprocessing of the captured image.
@@ -399,8 +365,8 @@ namespace SynoAI.Controllers
             int rotatedWidth = (int)(cosine * originalWidth + sine * originalHeight);
             int rotatedHeight = (int)(cosine * originalHeight + sine * originalWidth);
 
-            SKBitmap rotatedBitmap = new SKBitmap(rotatedWidth, rotatedHeight);
-            using (SKCanvas canvas = new SKCanvas(rotatedBitmap))
+            SKBitmap rotatedBitmap = new(rotatedWidth, rotatedHeight);
+            using (SKCanvas canvas = new(rotatedBitmap))
             {
                 canvas.Clear();
                 canvas.Translate(rotatedWidth / 2, rotatedHeight / 2);
@@ -417,22 +383,23 @@ namespace SynoAI.Controllers
         /// Sends notifications, if there is any configured
         /// </summary>
         /// <param name="camera">The camera responsible for this snapshot.</param>
-        /// <param name="processedImage">The path information for the snapshot.</param>
-        /// <param name="labels">The text metadata for each existing valid object.</param>
-        private async Task SendNotifications(Camera camera, ProcessedImage processedImage, IEnumerable<string> labels)
+        /// <param name="notification">The notification data to process.</param>
+        private async Task SendNotifications(Camera camera, Notification notification)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
+            IEnumerable<string> labels = notification.ValidPredictions.Select(x => x.Label).Distinct().ToList();
+
             IEnumerable<INotifier> notifiers = Config.Notifiers
                 .Where(x =>
-                    (x.Cameras == null || x.Cameras.Count() == 0 || x.Cameras.Any(c => c.Equals(camera.Name, StringComparison.OrdinalIgnoreCase))) &&
-                    (x.Types == null || x.Types.Count() == 0 || x.Types.Any(t => labels.Contains(t, StringComparer.OrdinalIgnoreCase)))
+                    (x.Cameras == null || !x.Cameras.Any() || x.Cameras.Any(c => c.Equals(camera.Name, StringComparison.OrdinalIgnoreCase))) &&
+                    (x.Types == null || !x.Types.Any() || x.Types.Any(t => labels.Contains(t, StringComparer.OrdinalIgnoreCase)))
                 ).ToList();
 
-            List<Task> tasks = new List<Task>();
+            List<Task> tasks = new();
             foreach (INotifier notifier in notifiers)
             {
-                tasks.Add(notifier.SendAsync(camera, processedImage, labels, _logger));
+                tasks.Add(notifier.SendAsync(camera, notification, _logger));
             }
 
             await Task.WhenAll(tasks);
