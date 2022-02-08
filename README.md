@@ -182,12 +182,16 @@ The [Pushbullet](https://www.pushbullet.com/) notification will send an image an
 * ApiKey [required]: The API key for the Pushbullet service
 
 ### Webhook 
-The webhook notification will POST an image to the specified URL with a specified field name.
+The webhook notification can be used to make web requests (e.g. API calls) either with or without the image that triggered the alert.
 
+#### Configuration
 ```json
 {
   "Url": "http://servername/resource",
   "Method": "POST",
+  "Authentication": "Bearer",
+  "Token": "XYZ.123456",
+  "SendImage": "false"
 }
 ```
 * Url [required]: The URL to send the image to
@@ -206,6 +210,30 @@ The webhook notification will POST an image to the specified URL with a specifie
 * ImageField [optional] (Default: ```image```): The field name of the image in the POST data
 * SendImage [optional] (Default: ```true```): The image will be sent to the webhook when the method is POST, PATCH or PUT.
 
+#### Example POST data
+The following is example data for when ```SendImage``` is ```false```.
+
+```json
+{
+  "camera": "Driveway",
+  "foundTypes": [
+    "Car"
+  ],
+  "predictions": [
+    {
+      "Label": "car",
+      "Confidence": 67.89117,
+      "MinX": 1738,
+      "MinY": 420,
+      "MaxX": 2304,
+      "MaxY": 844,
+      "SizeX": 566,
+      "SizeY": 424
+    }
+  ],
+  "message": "Motion detected on Driveway\n\nDetected 1 objects:\nCar"
+}
+```
 ### Telegram
 The telegram bot will send notifications and images when motion has been detected. To use this notification, you will need to set up your own Telegram bot using [one](https://core.telegram.org/bots#6-botfather) of the many [guides](https://docs.microsoft.com/en-us/azure/bot-service/bot-service-channel-connect-telegram?view=azure-bot-service-4.0) available.
 
