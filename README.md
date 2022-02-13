@@ -341,7 +341,7 @@ The [Pushover](https://www.pushover.net/) notification will send an image and a 
 * Priority [optional]: The [priority](https://pushover.net/api#priority) with which to send the message
 
 ### Discord
-Send notifications to a discord server via Discord Webhooks. You can get a Discord Webhook URL for your Discord server by following the instructions [here](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks).
+Send notifications to a Discord server via Discord Webhooks. You can get a Discord Webhook URL for your Discord server by following the instructions [here](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks).
 
 ```json
 {
