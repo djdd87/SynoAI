@@ -25,6 +25,10 @@ namespace SynoAI.Notifiers
         /// <summary>
         /// Calls a webhook with the image attached.
         /// </summary>
-        Webhook
+        Webhook,
+        /// <summary>
+        /// Sends a notification message using Discord with the image attached.
+        /// </summary>
+        Discord
     }
 }

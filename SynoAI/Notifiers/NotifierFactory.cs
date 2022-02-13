@@ -5,6 +5,7 @@ using SynoAI.Notifiers.Pushbullet;
 using SynoAI.Notifiers.Pushover;
 using SynoAI.Notifiers.Telegram;
 using SynoAI.Notifiers.Webhook;
+using SynoAI.Notifiers.Discord;
 using System;
 using System.Collections.Generic;
 
@@ -36,6 +37,9 @@ namespace SynoAI.Notifiers
                     break;
                 case NotifierType.Webhook:
                     factory = new WebhookFactory();
+                    break;
+                case NotifierType.Discord:
+                    factory = new DiscordFactory();
                     break;
                 default:
                     throw new NotImplementedException(type.ToString());

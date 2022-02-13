@@ -340,6 +340,18 @@ The [Pushover](https://www.pushover.net/) notification will send an image and a 
 * Sound [optional]: The [sound](https://pushover.net/api#sounds) to override the user's default sound choice
 * Priority [optional]: The [priority](https://pushover.net/api#priority) with which to send the message
 
+### Discord
+Send notifications to a discord server via Discord Webhooks. You can get a Discord Webhook URL for your Discord server by following the instructions [here](https://support.discord.com/hc/en-us/articles/228383668-Intro-to-Webhooks).
+
+```json
+{
+  "Type": "Discord",
+  "DiscordWebhookUrl": " https://discord.com/api/webhooks/F4K3W3BH00K"
+}
+```
+* DiscordWebhookUrl [required]: The URL of the Discord Webhook you want to send messages to. 
+
+
 ## Caveats
 * SynoAI still relies on Surveillance Station triggering the motion alerts
 * Looking for an object, such as a car on a driveway, will continually trigger alerts if that object is in view of the camera when Surveillance Station detects movement, e.g. a tree blowing in the wind.
