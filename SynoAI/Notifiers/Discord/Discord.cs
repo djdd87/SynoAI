@@ -25,7 +25,7 @@ namespace SynoAI.Notifiers.Discord
             var formData = new MultipartFormDataContent();
             ProcessedImage processedImage = notification.ProcessedImage;
             
-            var message = base.GetMessage(camera, notification.FoundTypes);
+            var message = GetMessage(camera, notification.FoundTypes);
             //Discord seems to require double escaped newlines
             message = message.Replace("\n", "\\n");
             
