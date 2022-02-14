@@ -7,12 +7,12 @@ namespace SynoAI.Notifiers.Discord
     {
         public override INotifier Create(ILogger logger, IConfigurationSection section)
         {
-            string discordWebhookUrl = section.GetValue<string>("DiscordWebhookUrl");
-            logger.LogInformation("Processing Discord Config", discordWebhookUrl);
+            string url = section.GetValue<string>("Url");
+            logger.LogInformation("Processing Discord Config", url);
 
             return new Discord()
             {
-                DiscordWebhookUrl = discordWebhookUrl
+                Url = url
             };
         }
     }

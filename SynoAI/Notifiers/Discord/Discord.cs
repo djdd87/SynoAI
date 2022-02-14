@@ -15,24 +15,24 @@ namespace SynoAI.Notifiers.Discord
 {
     public class Discord : NotifierBase
     {
-        
         /// <summary>
-        /// Discord Webhook Url
+        /// Discord Webhook Url.
         /// </summary>
-        public string DiscordWebhookUrl { get; set; }
+        public string Url { get; set; }
+
         public override async Task SendAsync(Camera camera, Notification notification, ILogger logger)
         {
             var formData = new MultipartFormDataContent();
             ProcessedImage processedImage = notification.ProcessedImage;
             
+            // Discord seems to require double escaped newlines
             var message = GetMessage(camera, notification.FoundTypes);
-            //Discord seems to require double escaped newlines
             message = message.Replace("\n", "\\n");
             
             formData.Add(new StringContent($"{{\"content\":\"{message}\"}}"),"payload_json");
             formData.Add(new StreamContent(processedImage.GetReadonlyStream()),"file",processedImage.FileName);
 
-            HttpResponseMessage responseMessage = await Shared.HttpClient.PostAsync(DiscordWebhookUrl, formData);
+            HttpResponseMessage responseMessage = await Shared.HttpClient.PostAsync(Url, formData);
             if (responseMessage.IsSuccessStatusCode)
             {
                 logger.LogInformation($"{camera.Name}: Discord: Notification sent successfully");

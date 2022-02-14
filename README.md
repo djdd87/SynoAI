@@ -36,6 +36,7 @@ For example, if you are using the docker image/version v1.1.0, then ensure you h
   * [Email](#email) 
   * [HomeAssistant](#homeassistant)
   * [Pushover](#pushover)
+  * [Discord](#discord)
 * [Caveats](#caveats)
 * [Configuration](#configuration)
   * [1) Configure Deepstack](#1-configure-deepstack)
@@ -346,10 +347,10 @@ Send notifications to a Discord server via Discord Webhooks. You can get a Disco
 ```json
 {
   "Type": "Discord",
-  "DiscordWebhookUrl": " https://discord.com/api/webhooks/F4K3W3BH00K"
+  "Url": " https://discord.com/api/webhooks/F4K3W3BH00K"
 }
 ```
-* DiscordWebhookUrl [required]: The URL of the Discord Webhook you want to send messages to. 
+* Url [required]: The URL of the Discord Webhook you want to send messages to. 
 
 
 ## Caveats
