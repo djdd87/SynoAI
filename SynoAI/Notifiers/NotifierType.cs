@@ -7,6 +7,10 @@ namespace SynoAI.Notifiers
     public enum NotifierType
     {
         /// <summary>
+        /// Sends a notification message using Discord with the image attached.
+        /// </summary>
+        Discord,
+        /// <summary>
         /// Sends a notification email with the image attached.
         /// </summary>
         Email,
@@ -19,6 +23,10 @@ namespace SynoAI.Notifiers
         /// </summary>
         Pushover,
         /// <summary>
+        /// Sends a notification message and image using the SynologyChat API.
+        /// </summary>
+        SynologyChat,
+        /// <summary>
         /// Sends a notification to Telegram with the image attached.
         /// </summary>
         Telegram,
@@ -26,9 +34,5 @@ namespace SynoAI.Notifiers
         /// Calls a webhook with the image attached.
         /// </summary>
         Webhook,
-        /// <summary>
-        /// Sends a notification message using Discord with the image attached.
-        /// </summary>
-        Discord
     }
 }
