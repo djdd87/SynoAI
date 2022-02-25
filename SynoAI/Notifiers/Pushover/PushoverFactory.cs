@@ -14,9 +14,9 @@ namespace SynoAI.Notifiers.Pushover
             string userKey = section.GetValue<string>("UserKey");
             List<string> devices = section.GetValue<List<string>>("Devices");
             string sound = section.GetValue<string>("Sound");   // https://pushover.net/api#sounds
-            PushoverPriority priority = section.GetValue<PushoverPriority>("Priority", PushoverPriority.Normal); 
-            int retry = section.GetValue<int>("retry");
-            int expire = section.GetValue<int>("expire");
+            PushoverPriority priority = section.GetValue("Priority", PushoverPriority.Normal); 
+            int retry = section.GetValue<int>("Retry");
+            int expire = section.GetValue<int>("Expire");
 
             return new Pushover()
             {
