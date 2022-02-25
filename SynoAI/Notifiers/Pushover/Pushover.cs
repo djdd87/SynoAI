@@ -35,9 +35,18 @@ namespace SynoAI.Notifiers.Pushover
         /// </summary>
         public PushoverPriority Priority { get; set; }
         /// <summary>
+        /// How often (in seconds) the Pushover servers will send the same notification to the user (minimum 30 seconds).
+        /// </summary>
+        public int Retry { get; set; }
+        /// <summary>
+        /// How many seconds your notification will continue to be retried for (every retry seconds) (maximum 10800 seconds).
+        /// </summary>
+        public int Expire { get; set; }        
+        /// <summary>
         /// The pushover sound to use.
         /// </summary>
         public string Sound { get; set; }
+        
 
         public override async Task SendAsync(Camera camera, Notification notification, ILogger logger)
         {
@@ -64,6 +73,8 @@ namespace SynoAI.Notifiers.Pushover
                 { new StringContent(device), "\"device\"" },
                 { new StringContent(message), "\"message\"" },
                 { new StringContent(((int)Priority).ToString()), "\"priority\"" },
+                { new StringContent(Retry), "\"retry\"" },
+                { new StringContent(Expire), "\"expire\"" },
                 { new StringContent(Sound ?? String.Empty), "\"sound\"" },
                 { new StringContent(ApiKey), "\"token\"" },
                 { new StringContent(UserKey), "\"user\"" },
