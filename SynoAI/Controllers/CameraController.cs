@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using SynoAI.Hubs;
 using System.Drawing;
+using System.Text;
 
 namespace SynoAI.Controllers
 {
@@ -214,7 +215,15 @@ namespace SynoAI.Controllers
                     {
                         // We didn't get any predictions whatsoever from the AI
                         _logger.LogInformation($"{id}: Nothing detected by the AI at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
-                        _logger.LogDebug($"{id}: No objects in the specified list ({string.Join(", ", camera.Types)}) were detected by the AI exceeding the confidence level ({camera.Threshold}%) and/or minimum size ({minSizeX}x{minSizeY} and/or maximum size ({maxSizeX},{maxSizeY}))");
+
+                        StringBuilder nothingFoundOutput = new StringBuilder($"{id}: No objects ");
+                        if (camera.Types != null && camera.Types.Any())
+                        {
+                            nothingFoundOutput.Append($"in the specified list ({string.Join(", ", camera.Types)}) ");
+                        }
+                        nothingFoundOutput.Append($"were detected by the AI exceeding the confidence level ({camera.Threshold}%) and/or minimum size ({minSizeX}x{minSizeY} and/or maximum size ({maxSizeX},{maxSizeY}))");
+
+                        _logger.LogDebug(nothingFoundOutput.ToString());
                     }
 
                     _logger.LogInformation($"{id}: Finished ({overallStopwatch.ElapsedMilliseconds}ms).");
