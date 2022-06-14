@@ -113,6 +113,12 @@ namespace SynoAI.Controllers
                     // Take the snapshot from Surveillance Station
                     _logger.LogInformation($"{id}: Snapshot {snapshotCount} of {Config.MaxSnapshots} requested at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
                     byte[] snapshot = await GetSnapshot(id);
+                    if (snapshot == null)
+                    {
+                        // Failed to get any result, so skip over this snapshot
+                        continue;
+                    }
+
                     _logger.LogInformation($"{id}: Snapshot {snapshotCount} of {Config.MaxSnapshots} received at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
 
                     // See if the image needs to be rotated (or further processing in the future ?) before being analyzed by the AI
@@ -176,7 +182,7 @@ namespace SynoAI.Controllers
                         SnapshotManager.SaveOriginalImage(_logger, camera, snapshot);
                     }
 
-                    if (validPredictions.Count() > 0)
+                    if (validPredictions.Count > 0)
                     {
                         // Process and save the snapshot
                         ProcessedImage processedImage = SnapshotManager.DressImage(camera, snapshot, predictions, validPredictions, _logger);
@@ -199,7 +205,7 @@ namespace SynoAI.Controllers
                         AddCameraDelay(id, successDelay);
                         return;
                     }
-                    else if (predictions.Count() > 0)
+                    else if (predictions.Any())
                     {
                         // We got predictions back from the AI, but nothing that should trigger an alert
                         _logger.LogInformation($"{id}: No valid objects at EVENT TIME {overallStopwatch.ElapsedMilliseconds}ms.");
