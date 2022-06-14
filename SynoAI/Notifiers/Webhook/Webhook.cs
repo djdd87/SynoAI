@@ -141,7 +141,8 @@ namespace SynoAI.Notifiers.Webhook
 
                 if (response.IsSuccessStatusCode)
                 {
-                    logger.LogInformation($"{camera.Name}: Webhook: Success with HTTP status code '{response.StatusCode}'.");
+                    logger.LogInformation($"{camera.Name}: Webhook: Success.");
+                    logger.LogDebug($"{camera.Name}: Webhook: Success with HTTP status code '{response.StatusCode}'.");
                 }
                 else
                 {
