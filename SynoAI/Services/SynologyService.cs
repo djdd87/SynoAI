@@ -294,6 +294,22 @@ namespace SynoAI.Services
                     return;
                 }
 
+                // If no cameras are specified, then bail out
+                if (Config.Cameras == null || !Config.Cameras.Any())
+                {
+                    _logger.LogWarning("Aborting Initialisation: No Cameras were specified in the config.");
+                    _applicationLifetime.StopApplication();
+                    return;
+                }
+
+                // If no notifications are specified, then bail out
+                if (Config.Notifiers == null || !Config.Notifiers.Any())
+                {
+                    _logger.LogWarning("Aborting Initialisation: No Notifications were specified in the config.");
+                    _applicationLifetime.StopApplication();
+                    return;
+                }
+
                 // Fetch all the cameras and store a Name to ID dictionary for quick lookup
                 IEnumerable<SynologyCamera> synologyCameras = await GetCamerasAsync();
                 if (synologyCameras == null)
@@ -310,7 +326,7 @@ namespace SynoAI.Services
                         SynologyCamera match = synologyCameras.FirstOrDefault(x => x.GetName().Equals(camera.Name, StringComparison.OrdinalIgnoreCase));
                         if (match == null)
                         {
-                            _logger.LogWarning($"GetCameras: The camera with the name '{camera.Name}' was not found in the Surveillance Station camera list.");
+                            _logger.LogWarning($"Initialise: The camera with the name '{camera.Name}' was not found in the Surveillance Station camera list.");
                         }
                         else
                         {
