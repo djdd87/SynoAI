@@ -8,6 +8,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace SynoAI.Services
 {
@@ -161,9 +162,9 @@ namespace SynoAI.Services
         /// HTML encodes any unsupported characters that DSM cannot handle in the query strings.
         /// </summary>
         /// <returns>The sanitised password.</returns>
-        private string SanitisePassword(string original)
+        private static string SanitisePassword(string original)
         {
-            return original.Replace("+", "%2B");
+            return HttpUtility.UrlEncode(original);
         }
         
         /// <summary>
