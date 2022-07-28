@@ -217,27 +217,29 @@ namespace SynoAI.Services
                     _logger.LogDebug($"{cameraName}: Taking snapshot from '{resource}'.");
 
                     _logger.LogInformation($"{cameraName}: Taking snapshot");
-                    HttpResponseMessage response = await client.GetAsync(resource);
-                    response.EnsureSuccessStatusCode();
+                    using (HttpResponseMessage response = await client.GetAsync(resource, HttpCompletionOption.ResponseHeadersRead))
+                    {
+                        response.EnsureSuccessStatusCode();
 
-                    if (response.Content.Headers.ContentType.MediaType == "image/jpeg")
-                    {
-                        // Only return the bytes when we have a valid image back
-                        _logger.LogDebug($"{cameraName}: Reading snapshot");
-                        return await response.Content.ReadAsByteArrayAsync();
-                    }
-                    else
-                    {
-                        // We didn't get an image type back, so this must have errored
-                        SynologyResponse errorResponse = await GetErrorResponse(response);
-                        if (errorResponse.Success)
+                        if (response.Content.Headers.ContentType.MediaType == "image/jpeg")
                         {
-                            // This should never happen, but let's add logging just in case
-                            _logger.LogError($"{cameraName}: Failed to get snapshot, but the API reported success.");
+                            // Only return the bytes when we have a valid image back
+                            _logger.LogDebug($"{cameraName}: Reading snapshot");
+                            return await response.Content.ReadAsByteArrayAsync();
                         }
                         else
                         {
-                            _logger.LogError($"{cameraName}: Failed to get snapshot with error code '{errorResponse.Error.Code}'");
+                            // We didn't get an image type back, so this must have errored
+                            SynologyResponse errorResponse = await GetErrorResponse(response);
+                            if (errorResponse.Success)
+                            {
+                                // This should never happen, but let's add logging just in case
+                                _logger.LogError($"{cameraName}: Failed to get snapshot, but the API reported success.");
+                            }
+                            else
+                            {
+                                _logger.LogError($"{cameraName}: Failed to get snapshot with error code '{errorResponse.Error.Code}'");
+                            }
                         }
                     }
                 }
