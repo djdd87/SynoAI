@@ -577,6 +577,12 @@ This will output the full information log and help identify where things are goi
 
 ### Trouble Shooting
 
+#### Not receiving notifications when one should have been detected
+SynoAI is fast, but reliant on SSS to both notify it and return the current image. If you believe that a notification should have been triggered, then it's likely a configuration or performance issue with your configuration.
+
+* Ensure that there is no delay set in your SSS camera configuration to ignore short-lived motion. For example, if you tell SSS to ignore 2 seconds of motion, that's a 2 second delay between the camera seeing the motion and then running the action rule to tell SynoAI to process the image
+* Investigate your logs for [performance issues](#snapshots-are-slow-to-fetch-from-sss).
+
 #### Image files are saved with a date/time different to the current local
 Ensure your TZ environmental variable is set in your docker configuration.
 
