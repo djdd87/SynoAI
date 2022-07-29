@@ -589,6 +589,19 @@ When SynoAI requests a snapshot from your NAS, Synology API just fetches the lat
 
 Some cameras are quite savvy on their bandwidth by really stretching the time between each I-Frame sent. I.e. DAHUA cameras brand got a configuration setting, labeled "SMART CODEC" which does just that when "ON". If this is your case, you should turn this "OFF", otherwise SynoAI may be fed old snapshots!
 
+#### Snapshots are slow to fetch from SSS
+Generally snapshots should be returned within a second or, at most, two. If taking a snapshot is taking too long, please try the following before reporting an issue.
+
+* Try using the IP to your DSM instance instead of a hostname as DNS lookups can caused a performance bottleneck depending on your system
+* Try updating the base image with `apt-get update` from a new bash terminal
+* Try all three quality profiles to determine if it's an issue with the performance of your hardware.
+
+Example slow log excerpt:
+
+>info: SynoAI.Controllers.CameraController[0]
+>      Front Courtyard: Snapshot received in 4167ms.
+
+
 #### Camera names with spaces in cause the error "The camera with the name 'My Camera' was not found."
 
 Spaces in URLs should be encoded using "%20". Most programs and applications, including SynoAI, handle this for you, but unfortunately the action rule on Surveillance Station does not. Therefor if your camera names contains a space, then you will need to ensure the URL in your action rule has all spaces replaced with %20.
