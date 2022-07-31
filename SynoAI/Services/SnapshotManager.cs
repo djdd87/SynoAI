@@ -92,20 +92,52 @@ namespace SynoAI.Services
 
                         // Label positioning
                         int x = prediction.MinX + Config.TextOffsetX;
-                        int y = prediction.MinY + Config.FontSize + Config.TextOffsetY;
+                        int y = prediction.MinY + Config.FontSize + Config.TextOffsetY; // FontSize is added as text is drawn above the bottom co-ordinate
 
                         // Consider below box placement
                         if (Config.LabelBelowBox) 
                         {
                             y += prediction.SizeY;
                         }
-        
-                        // Draw the text
-                        SKFont font = new SKFont(SKTypeface.FromFamilyName(Config.Font), Config.FontSize);
-                        canvas.DrawText(label, x, y, font, new SKPaint 
+
+                        // Draw background box for the text if required
+                        SKTypeface typeface = SKTypeface.FromFamilyName(Config.Font);
+
+                        SKPaint paint = new SKPaint
                         {
-                            Color = GetColour(Config.FontColor)
-                        });   
+                            FilterQuality = SKFilterQuality.High,
+                            IsAntialias = true,
+                            Color = GetColour(Config.FontColor),
+                            TextSize = Config.FontSize,
+                            Typeface = typeface
+                        };
+
+                        string textBoxColor = Config.TextBoxColor;
+                        if (!string.IsNullOrWhiteSpace(textBoxColor) && !textBoxColor.Equals(SKColors.Transparent.ToString(), StringComparison.OrdinalIgnoreCase))
+                        {
+                            float textWidth = paint.MeasureText(label);
+                            float textBoxWidth = textWidth + (Config.TextOffsetX * 2);
+                            float textBoxHeight = Config.FontSize + (Config.TextOffsetY * 2);
+
+                            float textBoxX = prediction.MinX + Config.StrokeWidth;
+                            float textBoxY = prediction.MinY + Config.TextOffsetY;
+                            if (Config.LabelBelowBox)
+                            {
+                                textBoxY += prediction.SizeY;
+                            }
+
+                            SKRect textRectangle = SKRect.Create(textBoxX, textBoxY, textBoxWidth, textBoxHeight);
+                            canvas.DrawRect(textRectangle, new SKPaint
+                            {
+                                Style = SKPaintStyle.StrokeAndFill,
+                                Color = GetColour(textBoxColor),
+                                StrokeWidth = Config.StrokeWidth
+                            });
+                        }
+
+                        // Draw the text
+                        SKFont font = new SKFont(typeface, Config.FontSize);
+                        canvas.DrawText(label, x, y, paint);   
                     }
                 }
             }

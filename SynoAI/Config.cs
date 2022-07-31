@@ -55,6 +55,10 @@ namespace SynoAI
         /// The hex code of the colour to use for the exclusion boxes.
         /// </summary>
         public static string ExclusionBoxColor { get; private set; }
+        /// <summary>
+        /// The hex code of the colour to use behind the text on the image outputs.
+        /// </summary>
+        public static string TextBoxColor { get; private set; }
 
         /// <summary>
         ///The stroke width of the Box drawn around the objects.
@@ -192,6 +196,7 @@ namespace SynoAI
             BoxColor = configuration.GetValue<string>("BoxColor", SKColors.Green.ToString());
             FontColor = configuration.GetValue<string>("FontColor", SKColors.Green.ToString());
             ExclusionBoxColor = configuration.GetValue<string>("ExclusionBoxColor", SKColors.Red.ToString());
+            TextBoxColor = configuration.GetValue<string>("TextBoxColor", SKColors.Transparent.ToString());
 
             Font = configuration.GetValue<string>("Font", "Tahoma");
             FontSize = configuration.GetValue<int>("FontSize", 12);

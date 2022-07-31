@@ -91,6 +91,7 @@ An example appsettings.json configuration file can be found [here](#example-apps
   * Off: Will not draw boundary boxes (note - this will speed up time between detection and notification as SynoAI will not have to manipulate the image)
 * DrawExclusions [optional] (Default: ```false```): Whether to draw the exclusion zone boundary boxes on the image. Useful for setting up the initial exclusion zones
 * BoxColor [optional] (Default: ```#FF0000```): The colour of the border of the boundary box
+* TextBoxColor [opional] (Default: ```#00FFFFFF``` aka ```transparent```): The colour of the box to draw behind the text to aid in making text more visible
 * ExclusionBoxColour [optional] (Default: ```#00FF00```): The colour of the border of the exclusion boundary box
 * StrokeWidth [optional] (Default: ```2```): The width, in pixels, of the border around the boundary box
 * Font [optional] (Default: ```Tahoma```): The font to use when labelling the boundary boxes on the output image
