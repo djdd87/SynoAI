@@ -24,13 +24,13 @@ namespace SynoAI.Notifiers.Discord
         {
             var formData = new MultipartFormDataContent();
             ProcessedImage processedImage = notification.ProcessedImage;
-            
+
             // Discord seems to require double escaped newlines
             var message = GetMessage(camera, notification.FoundTypes);
             message = message.Replace("\n", "\\n");
-            
-            formData.Add(new StringContent($"{{\"content\":\"{message}\"}}"),"payload_json");
-            formData.Add(new StreamContent(processedImage.GetReadonlyStream()),"file",processedImage.FileName);
+
+            formData.Add(new StringContent($"{{\"content\":\"{message}\"}}"), "payload_json");
+            formData.Add(new StreamContent(processedImage.GetReadonlyStream()), "file", processedImage.FileName);
 
             HttpResponseMessage responseMessage = await Shared.HttpClient.PostAsync(Url, formData);
             if (responseMessage.IsSuccessStatusCode)

@@ -29,35 +29,42 @@ namespace SynoAI.AIs.DeepStack
             logger.LogDebug($"{camera.Name}: DeepStackAI: POSTing image with minimum confidence of {minConfidence} ({camera.Threshold}%) to {string.Join("/", Config.AIUrl, Config.AIPath)}.");
 
             Uri uri = GetUri(Config.AIUrl, Config.AIPath);
-            HttpResponseMessage response = await Shared.HttpClient.PostAsync(uri, multipartContent);
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                DeepStackResponse deepStackResponse = await GetResponse(logger, camera, response);
-                if (deepStackResponse.Success)
+                HttpResponseMessage response = await Shared.HttpClient.PostAsync(uri, multipartContent);
+                if (response.IsSuccessStatusCode)
                 {
-                    IEnumerable<AIPrediction> predictions = deepStackResponse.Predictions.Where(x => x.Confidence >= minConfidence).Select(x => new AIPrediction()
+                    DeepStackResponse deepStackResponse = await GetResponse(logger, camera, response);
+                    if (deepStackResponse.Success)
                     {
-                        Confidence = x.Confidence * 100,
-                        Label = x.Label,
-                        MaxX = x.MaxX,
-                        MaxY = x.MaxY,
-                        MinX = x.MinX,
-                        MinY = x.MinY
-                    }).ToList();
+                        IEnumerable<AIPrediction> predictions = deepStackResponse.Predictions.Where(x => x.Confidence >= minConfidence).Select(x => new AIPrediction()
+                        {
+                            Confidence = x.Confidence * 100,
+                            Label = x.Label,
+                            MaxX = x.MaxX,
+                            MaxY = x.MaxY,
+                            MinX = x.MinX,
+                            MinY = x.MinY
+                        }).ToList();
 
-                    stopwatch.Stop();
-                    logger.LogInformation($"{camera.Name}: DeepStackAI: Processed successfully ({stopwatch.ElapsedMilliseconds}ms).");
-                    return predictions;
+                        stopwatch.Stop();
+                        logger.LogInformation($"{camera.Name}: DeepStackAI: Processed successfully ({stopwatch.ElapsedMilliseconds}ms).");
+                        return predictions;
+                    }
+                    else
+                    {
+                        logger.LogWarning($"{camera.Name}: DeepStackAI: Failed with unknown error.");
+                    }
                 }
                 else
                 {
-                    logger.LogWarning($"{camera.Name}: DeepStackAI: Failed with unknown error.");
+                    logger.LogWarning($"{camera.Name}: DeepStackAI: Failed to call API with HTTP status code '{response.StatusCode}'.");
                 }
             }
-            else
+            catch (HttpRequestException ex)
             {
-                logger.LogWarning($"{camera.Name}: DeepStackAI: Failed to call API with HTTP status code '{response.StatusCode}'.");
+                logger.LogError($"{camera.Name}: DeepStackAI: Failed to call API error '{ex}'.");
             }
 
             return null;
