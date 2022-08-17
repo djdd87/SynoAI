@@ -216,7 +216,7 @@ namespace SynoAI.Services
 
                 if (saved)
                 {    
-                    logger.LogInformation($"{camera}: Imaged saved to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
+                    logger.LogInformation($"{camera}: Image saved to '{filePath}' ({stopwatch.ElapsedMilliseconds}ms).");
                 }
                 else
                 {
