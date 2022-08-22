@@ -51,6 +51,7 @@ For example, if you are using the docker image/version v1.1.0, then ensure you h
 * [Problems/Debugging](#problemsdebugging)
   * [Logging](#logging)
   * [Trouble Shooting](#trouble-shooting)
+* [FAQ](#faq)
 
 ## Features
 * Triggered via an Action Rule from Synology Surveillance Station
@@ -658,3 +659,29 @@ The issue is a networking/firewall issue and is not a fault with SynoAI. This ha
 
 * DeepStackAI: Failed to call API with HTTP status code 'Forbidden'
   * Ensure that you have enabled VISION-DETECTION and correctly spelled it
+
+## FAQ
+
+### How do you set up a notification for each camera?
+
+You need to specify a list of cameras against each notification. If a notification has cameras specified, then it will only send it to those cameras. If the Cameras list is empty or not specified, then the notification will be used for all cameras:
+
+``` json
+"Notifiers": [
+  {
+    "Type": "Webhook",
+    "URL": "https://server/url_1"
+    "Cameras": [ "Camera1" ]
+  },
+  {
+    "Type": "Webhook",
+    "URL": "https://server/url_2"
+    "Cameras": [ "Camera2" ]
+  },
+  {
+    "Type": "Webhook",
+    "URL": "https://server/url_3and4"
+    "Cameras": [ "Camera3", "Camera4" ]
+  }
+]
+```
