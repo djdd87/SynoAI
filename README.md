@@ -120,12 +120,15 @@ An example appsettings.json configuration file can be found [here](#example-apps
 * MaxSnapshots [optional] (Default: ```NULL```): Upon movement, the maximum number of snapshots sequentially retrieved from SSS until finding an object of interest (i.e. 4 snapshots). If not specified, will use the value from the main config.
 * Rotate [optional] (Default: ```0```): The degrees to rotate the image after it's captured from SurveillanceStation. The rotation will be applied before it's passed to the AI
 * Exclusions [optional]: An array of exclusion zones to ignore found objects within. If the entirity of an object is within the exclusion zone, then it won't be reported by the notifiers.
-  * Start
+  * Start [required]
     * X: The start X co-ordinate of the exclusion zone
     * Y: The start Y co-ordinate of the exclusion zone
-  * End
+  * End [required]
     * X: The end X co-ordinate of the exclusion zone
     * Y: The end Y co-ordinate of the exclusion zone
+  * Mode [optional] (Default: ```Contains```)
+    * Contains: The entire detected object must be contained within the exclusion zone for it to be ignored, i.e. if 1 or more pixel is outside of the boundary, then it will *not* be ignored
+    * Intersect: Any part of the detected object must overlap with the exclusion zone for it to be ignored, i.e. if 1 or more pixel is within the boundary, then it *will* be ignored
 
 ### Development Config
 
