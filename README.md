@@ -74,9 +74,9 @@ An example appsettings.json configuration file can be found [here](#example-apps
 * Cameras [required]: An array of camera objects - see [Camera Config](#camera-config)
 * Notifiers [required]: See [notifications](#notifications)
 * Quality [optional] (Default: ```Balanced```): The quality, aka "profile type" to use when taking a snapshot. This will be based upon the settings of the streams you have configured in Surveillance Station. i.e. if your low, balanced and high streams have the same settings in Surveillance Station, then this setting will make no difference. But if you have a high quality 4k stream, a balance 1080p stream and a low 720p stream, then setting to high will return and process a 4k image. Note that the higher quality the snapshot, the longer the notification will take. Additionally, the larger the image, the smaller your detected objects may be, so ensure you set the MinSizeX/MinSizeY values respectively.
-  * High: Takes the snapshot using the profile type "High quality"
-  * Balanced: Takes the snapshot using the profile type "Balanced"
-  * Low: Takes the snapshot using the profile type "Low bandwidth" 
+  * `High`: Takes the snapshot using the profile type "High quality"
+  * `Balanced`: Takes the snapshot using the profile type "Balanced"
+  * `Low`: Takes the snapshot using the profile type "Low bandwidth" 
 * MinSizeX [optional] (Default: ```50```): The minimum size in pixels that the object must be to trigger a change (will be ignored if specified on the Camera)
 * MinSizeY [optional] (Default: ```50```): The minimum size in pixels that the object must be to trigger a change (will be ignored if specified on the Camera).
 * Delay [optional] (Default: ```5000```): The period of time in milliseconds (ms) that must occur between the end of the last motion detection of camera and the next time it'll be processed. 
@@ -87,9 +87,9 @@ An example appsettings.json configuration file can be found [here](#example-apps
   * However, if the report from Surveillance Station is more than 5000ms, then the cameras image will be processed. If this value isn't specified, then ```Delay``` will be used.
 * MaxSnapshots [optional] (Default: ```1```): Upon movement, the maximum number of snapshots sequentially retrieved from SSS until finding an object of interest. e.g. if 4 is specified, then SynoAI will make a maximum of 4 requests until it finds a type of interest. If a matching type is found on the 1st snapshot, then no further snapshots will be taken. If nothing is found within the 4 requests, then no further snapshots will be taken until the next time Surveillance Station detects motion
 * DrawMode [optional] (Default: ```Matches```): Whether to draw all predictions from the AI on the capture image:
-  * Matches: Will draw boundary boxes over any object/person that matches the types defined on the cameras
-  * All: Will draw boundary boxes over any object/person that the AI detected
-  * Off: Will not draw boundary boxes (note - this will speed up time between detection and notification as SynoAI will not have to manipulate the image)
+  * `Matches`: Will draw boundary boxes over any object/person that matches the types defined on the cameras
+  * `All`: Will draw boundary boxes over any object/person that the AI detected
+  * `Off`: Will not draw boundary boxes (note - this will speed up time between detection and notification as SynoAI will not have to manipulate the image)
 * DrawExclusions [optional] (Default: ```false```): Whether to draw the exclusion zone boundary boxes on the image. Useful for setting up the initial exclusion zones
 * BoxColor [optional] (Default: ```#FF0000```): The colour of the border of the boundary box
 * TextBoxColor [opional] (Default: ```#00FFFFFF``` aka ```transparent```): The colour of the box to draw behind the text to aid in making text more visible
@@ -101,10 +101,10 @@ An example appsettings.json configuration file can be found [here](#example-apps
 * TextOffsetX [optional] (Default: ```2```) : The number of pixels to offset the label from the left of the inside of the boundary image on the output image
 * TextOffsetY [optional] (Default: ```2```) : The number of pixels to offset the label from the top of the inside of the boundary image on the output image
 * SaveOriginalSnapshot [optional] (Default: ```Off```): A mode determining whether to save the source snapshot that was captured from the API before it was sent to and processed by the AI:
-  * Off: Will never save the original snapshot
-  * Always: Will save every single snapshot every time motion is detected
-  * WithPredictions: Will save the snapshot if the AI makes one or more predictions (note that this will include predictions which aren't valid)
-  * WithValidPredictions: Will save the snapshot only if the AI makes one or more predictions which are deemed as valid, e.g. within size limits, boundaries and expected types
+  * `Off`: Will never save the original snapshot
+  * `Always`: Will save every single snapshot every time motion is detected
+  * `WithPredictions`: Will save the snapshot if the AI makes one or more predictions (note that this will include predictions which aren't valid)
+  * `WithValidPredictions`: Will save the snapshot only if the AI makes one or more predictions which are deemed as valid, e.g. within size limits, boundaries and expected types
 * DaysToKeepCaptures [optional] (Default: ```0```): The number of days to keep images for. Every time motion is detected, the captures directory will be processed and any images older than the specified number of days will be deleted. A value of ```0``` means that captures will be kept forever.
 
 ### Camera Config
@@ -127,8 +127,8 @@ An example appsettings.json configuration file can be found [here](#example-apps
     * X: The end X co-ordinate of the exclusion zone
     * Y: The end Y co-ordinate of the exclusion zone
   * Mode [optional] (Default: ```Contains```)
-    * Contains: The entire detected object must be contained within the exclusion zone for it to be ignored, i.e. if 1 or more pixel is outside of the boundary, then it will *not* be ignored
-    * Intersect: Any part of the detected object must overlap with the exclusion zone for it to be ignored, i.e. if 1 or more pixel is within the boundary, then it *will* be ignored
+    * `Contains`: The entire detected object must be contained within the exclusion zone for it to be ignored, i.e. if 1 or more pixel is outside of the boundary, then it will *not* be ignored
+    * `Intersect`: Any part of the detected object must overlap with the exclusion zone for it to be ignored, i.e. if 1 or more pixel is within the boundary, then it *will* be ignored
 
 ### Development Config
 
