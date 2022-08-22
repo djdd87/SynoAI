@@ -189,6 +189,7 @@ The webhook notification can be used to make web requests (e.g. API calls) eithe
 #### Configuration
 ```json
 {
+  "Type": "Webhook",
   "Url": "http://servername/resource",
   "Method": "POST",
   "Authentication": "Bearer",
