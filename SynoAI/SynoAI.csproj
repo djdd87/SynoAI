@@ -13,6 +13,7 @@
   <ItemGroup>
     <PackageReference Include="MailKit" Version="2.15.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.14.0" />
+    <PackageReference Include="MQTTnet" Version="4.1.0.247" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
     <PackageReference Include="SkiaSharp" Version="2.88.0-preview.155" />
     <PackageReference Include="SkiaSharp.NativeAssets.Linux" Version="2.88.0-preview.155" />
