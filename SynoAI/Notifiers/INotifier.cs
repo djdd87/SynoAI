@@ -17,8 +17,16 @@ namespace SynoAI.Notifiers
         /// </summary>
         IEnumerable<string> Types { get; set; }
         /// <summary>
+        /// Handles any initialization for the notifier (e.g. establishing a long-lived connection).
+        /// </summary>
+        Task InitializeAsync(ILogger logger);
+        /// <summary>
         /// Handles the send of the notification.
         /// </summary>
         Task SendAsync(Camera camera, Notification notification, ILogger logger);
+        /// <summary>
+        /// Handles any clean up for the notifier (e.g. closing a long-lived connection).
+        /// </summary>
+        Task CleanupAsync(ILogger logger);
     }
 }
