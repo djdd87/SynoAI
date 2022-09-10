@@ -8,6 +8,8 @@ using Microsoft.OpenApi.Models;
 using SynoAI.Services;
 using System.Threading.Tasks;
 using SynoAI.Hubs;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SynoAI
 {
@@ -32,7 +34,7 @@ namespace SynoAI
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration, ILogger<Startup> logger, ISynologyService synologyService)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration, IHostApplicationLifetime lifetime, ILogger<Startup> logger, ISynologyService synologyService)
         {
             Config.Generate(logger, configuration);
 
@@ -59,8 +61,20 @@ namespace SynoAI
                 endpoints.MapControllers();   
             });
 
-            Task task = synologyService.InitialiseAsync();
-            task.Wait();
+            lifetime.ApplicationStarted.Register(() =>
+            {
+                List<Task> initializationTasks = new List<Task>();
+                initializationTasks.Add(synologyService.InitialiseAsync());
+                initializationTasks.AddRange(Config.Notifiers.Select(n => n.InitializeAsync(logger)));
+                Task.WhenAll(initializationTasks).Wait();
+            });
+
+            lifetime.ApplicationStopping.Register(() =>
+            {
+                List<Task> cleanupTasks = new List<Task>();
+                cleanupTasks.AddRange(Config.Notifiers.Select(n => n.CleanupAsync(logger)));
+                Task.WhenAll(cleanupTasks).Wait();
+            });
         }
     }
 }
