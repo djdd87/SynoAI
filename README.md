@@ -37,6 +37,7 @@ For example, if you are using the docker image/version v1.1.0, then ensure you h
   * [HomeAssistant](#homeassistant)
   * [Pushover](#pushover)
   * [Discord](#discord)
+  * [MQTT](#mqtt)
 * [Caveats](#caveats)
 * [Configuration](#configuration)
   * [1) Configure Deepstack](#1-configure-deepstack)
@@ -358,6 +359,53 @@ Send notifications to a Discord server via Discord Webhooks. You can get a Disco
 ```
 * Url [required]: The URL of the Discord Webhook you want to send messages to. 
 
+### MQTT 
+Send notifications as MQTT messages. Messages are JSON-encoded and sent to the `{BaseTopic}\{CameraName}\notification` topic. You can optionally include the capture as a base64 encoded JPG, but this is disabled by default.
+
+#### Configuration
+```json
+{
+  "Type": "MQTT",
+  "Host": "mqtt.domain.com",
+  "Port": 1883,
+  "Username": "user",
+  "Password": "password",
+  "BaseTopic": "synoai",
+  "SendImage": "false"
+}
+```
+* Host [required]: The hostname or IP for the MQTT broker
+* Port [optional] (Default: `1883`): The port the MQTT broker is listening to
+* Username [optional]: The username to use
+* Password [optional]: The password to use
+* BaseTopic [optional] (Default: `"synoai"`): The base topic for messages
+* SendImage [optional] (Default: ```false```): Whether to send a base64-encoded JPG in the `image` field.
+
+#### Example payload data
+The following is example data for when ```SendImage``` is ```false```.
+
+```json
+{
+  "camera": "Driveway",
+  "foundTypes": [
+    "Car"
+  ],
+  "predictions": [
+    {
+      "Label": "car",
+      "Confidence": 67.89117,
+      "MinX": 1738,
+      "MinY": 420,
+      "MaxX": 2304,
+      "MaxY": 844,
+      "SizeX": 566,
+      "SizeY": 424
+    }
+  ],
+  "message": "Motion detected on Driveway\n\nDetected 1 objects:\nCar",
+  "image": null
+}
+```
 
 ## Caveats
 * SynoAI still relies on Surveillance Station triggering the motion alerts
