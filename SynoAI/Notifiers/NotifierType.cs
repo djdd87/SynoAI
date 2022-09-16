@@ -34,5 +34,9 @@ namespace SynoAI.Notifiers
         /// Calls a webhook with the image attached.
         /// </summary>
         Webhook,
+        /// <summary>
+        /// Sends an MQTT message optionally with the image attached.
+        /// </summary>
+        MQTT,
     }
 }

@@ -7,6 +7,7 @@ using SynoAI.Notifiers.SynologyChat;
 using SynoAI.Notifiers.Telegram;
 using SynoAI.Notifiers.Webhook;
 using SynoAI.Notifiers.Discord;
+using SynoAI.Notifiers.Mqtt;
 using System;
 using System.Collections.Generic;
 
@@ -44,6 +45,9 @@ namespace SynoAI.Notifiers
                     break;
                 case NotifierType.Discord:
                     factory = new DiscordFactory();
+                    break;
+                case NotifierType.MQTT:
+                    factory = new MqttFactory();
                     break;
                 default:
                     throw new NotImplementedException(type.ToString());
