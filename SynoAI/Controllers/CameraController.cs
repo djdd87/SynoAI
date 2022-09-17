@@ -260,7 +260,11 @@ namespace SynoAI.Controllers
                 Rectangle boundary = new(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY);
                 foreach (Zone exclusion in camera.Exclusions)
                 {
-                    Rectangle exclusionZoneBoundary = new(exclusion.Start.X, exclusion.Start.Y, exclusion.End.X - exclusion.Start.X, exclusion.End.Y - exclusion.Start.Y);
+                    int startX = Math.Min(exclusion.Start.X, exclusion.End.X);
+                    int startY = Math.Min(exclusion.Start.Y, exclusion.End.Y);
+                    int endX = Math.Max(exclusion.Start.X, exclusion.End.X);
+                    int endY = Math.Max(exclusion.Start.Y, exclusion.End.Y);
+                    Rectangle exclusionZoneBoundary = new(startX, startY, endX - startX, endY - startY);
                     bool exclude = exclusion.Mode == OverlapMode.Contains ? exclusionZoneBoundary.Contains(boundary) : exclusionZoneBoundary.IntersectsWith(boundary);
                     if (exclude)
                     {
