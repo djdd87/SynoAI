@@ -220,7 +220,7 @@ The webhook notification can be used to make web requests (e.g. API calls) eithe
 * SendImage [optional] (Default: ```true```): The image will be sent to the webhook when the method is POST, PATCH or PUT.
 
 #### Example POST data
-The following is example data for when ```SendImage``` is ```false```.
+The following is example data for when ```SendImage``` is ```false``` and ```SynoAIUrl``` is ```"http://192.168.1.2"```.
 
 ```json
 {
@@ -240,7 +240,8 @@ The following is example data for when ```SendImage``` is ```false```.
       "SizeY": 424
     }
   ],
-  "message": "Motion detected on Driveway\n\nDetected 1 objects:\nCar"
+  "message": "Motion detected on Driveway\n\nDetected 1 objects:\nCar",
+  "imageUrl": "http://192.168.1.2/CameraName/capture.jpeg"
 }
 ```
 ### Telegram
@@ -383,7 +384,7 @@ Send notifications as MQTT messages. Messages are JSON-encoded and sent to the `
 * SendImage [optional] (Default: ```false```): Whether to send a base64-encoded JPG in the `image` field.
 
 #### Example payload data
-The following is example data for when ```SendImage``` is ```false```.
+The following is example data for when ```SendImage``` is ```false``` and ```SynoAIUrl``` is ```"https://synoai.example.com"```.
 
 ```json
 {
@@ -404,6 +405,7 @@ The following is example data for when ```SendImage``` is ```false```.
     }
   ],
   "message": "Motion detected on Driveway\n\nDetected 1 objects:\nCar",
+  "imageUrl": "https://synoai.example.com/CameraName/capture.jpeg"
 }
 ```
 

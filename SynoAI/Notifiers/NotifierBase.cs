@@ -69,7 +69,7 @@ namespace SynoAI.Notifiers
             }
 
             UriBuilder builder = new UriBuilder(Config.SynoAIUrL);
-            builder.Path += $"/{camera.Name}/{notification.ProcessedImage.FileName}";
+            builder.Path += $"{camera.Name}/{notification.ProcessedImage.FileName}";
 
             return builder.Uri.ToString();
         }
@@ -89,6 +89,12 @@ namespace SynoAI.Notifiers
             if (sendImage)
             {
                 jsonObject.image = ToBase64String(notification.ProcessedImage.GetReadonlyStream());
+            }
+
+            string imageUrl = GetImageUrl(camera, notification);
+            if (imageUrl != null)
+            {
+                jsonObject.imageUrl = imageUrl;
             }
 
             return JsonConvert.SerializeObject(jsonObject);
