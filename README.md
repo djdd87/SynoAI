@@ -72,6 +72,7 @@ An example appsettings.json configuration file can be found [here](#example-apps
 * User [required]: The user that will be used to request API snapshots
 * Password [required]: The password of the user above
 * AllowInsecureUrl [optional] (Default ```false```): Whether to allow an insecure HTTPS connection to the Synology API
+* SynoAIUrl [optional]: The URL that SynoAI is reachable at. E.g. Used to provide URLs to captures in some notifications.
 * Cameras [required]: An array of camera objects - see [Camera Config](#camera-config)
 * Notifiers [required]: See [notifications](#notifications)
 * Quality [optional] (Default: ```Balanced```): The quality, aka "profile type" to use when taking a snapshot. This will be based upon the settings of the streams you have configured in Surveillance Station. i.e. if your low, balanced and high streams have the same settings in Surveillance Station, then this setting will make no difference. But if you have a high quality 4k stream, a balance 1080p stream and a low 720p stream, then setting to high will return and process a 4k image. Note that the higher quality the snapshot, the longer the notification will take. Additionally, the larger the image, the smaller your detected objects may be, so ensure you set the MinSizeX/MinSizeY values respectively.
