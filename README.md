@@ -403,7 +403,6 @@ The following is example data for when ```SendImage``` is ```false```.
     }
   ],
   "message": "Motion detected on Driveway\n\nDetected 1 objects:\nCar",
-  "image": null
 }
 ```
 

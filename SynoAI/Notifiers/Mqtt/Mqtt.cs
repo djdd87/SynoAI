@@ -5,9 +5,6 @@ using MQTTnet.Client;
 using MQTTnet;
 using System.Threading;
 using System;
-using System.Text;
-using Newtonsoft.Json;
-using System.IO;
 
 namespace SynoAI.Notifiers.Mqtt
 {
@@ -66,7 +63,7 @@ namespace SynoAI.Notifiers.Mqtt
 
             MqttApplicationMessageBuilder messageBuilder = new MqttApplicationMessageBuilder()
                 .WithTopic($"{BaseTopic}/{camera.Name}/notification")
-                .WithPayload(GeneratePayload(camera, notification));
+                .WithPayload(GenerateJSON(camera, notification, SendImage));
             
             await _client.PublishAsync(messageBuilder.Build());
         }
@@ -130,34 +127,6 @@ namespace SynoAI.Notifiers.Mqtt
                 logger.LogError("MQTT: disconnect failed.");
                 logger.LogError(ex, "An exception occurred");
             }
-        }
-
-        /// <summary>
-        /// Generates the message payload as a JSON string encoded as UTF-8
-        /// </summary>
-        private byte[] GeneratePayload(Camera camera, Notification notification)
-        {
-            var request = new
-            {
-                camera = camera.Name,
-                foundTypes = notification.FoundTypes,
-                predictions = notification.ValidPredictions,
-                message = GetMessage(camera, notification.FoundTypes),
-                image = SendImage ? ToBase64String(notification.ProcessedImage.GetReadonlyStream()) : null
-            };
-
-            return Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(request));
-        }
-
-        /// <summary>
-        /// Returns FileStream data as a base64-encoded string
-        /// </summary>
-        private string ToBase64String(FileStream fileStream)
-        {
-            byte[] buffer = new byte[fileStream.Length];
-            fileStream.Read(buffer, 0, (int)fileStream.Length);
-                
-            return Convert.ToBase64String(buffer);
         }
 
         public override Task CleanupAsync(ILogger logger)
