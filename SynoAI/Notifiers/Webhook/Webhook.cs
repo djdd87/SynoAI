@@ -85,6 +85,12 @@ namespace SynoAI.Notifiers.Webhook
                         { new StringContent(message), "\"message\"" }
                     };
 
+                    string imageUrl = GetImageUrl(camera, notification);
+                    if (imageUrl != null)
+                    {
+                        form.Add(new StringContent(imageUrl), "\"imageUrl\"");
+                    }
+
                     switch (Method)
                     {
                         case "PATCH":
