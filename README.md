@@ -72,6 +72,7 @@ An example appsettings.json configuration file can be found [here](#example-apps
 * User [required]: The user that will be used to request API snapshots
 * Password [required]: The password of the user above
 * AllowInsecureUrl [optional] (Default ```false```): Whether to allow an insecure HTTPS connection to the Synology API
+* SynoAIUrl [optional]: The URL that SynoAI is reachable at. E.g. Used to provide URLs to captures in some notifications.
 * Cameras [required]: An array of camera objects - see [Camera Config](#camera-config)
 * Notifiers [required]: See [notifications](#notifications)
 * Quality [optional] (Default: ```Balanced```): The quality, aka "profile type" to use when taking a snapshot. This will be based upon the settings of the streams you have configured in Surveillance Station. i.e. if your low, balanced and high streams have the same settings in Surveillance Station, then this setting will make no difference. But if you have a high quality 4k stream, a balance 1080p stream and a low 720p stream, then setting to high will return and process a 4k image. Note that the higher quality the snapshot, the longer the notification will take. Additionally, the larger the image, the smaller your detected objects may be, so ensure you set the MinSizeX/MinSizeY values respectively.
@@ -219,7 +220,7 @@ The webhook notification can be used to make web requests (e.g. API calls) eithe
 * SendImage [optional] (Default: ```true```): The image will be sent to the webhook when the method is POST, PATCH or PUT.
 
 #### Example POST data
-The following is example data for when ```SendImage``` is ```false```.
+The following is example data for when ```SendImage``` is ```false``` and ```SynoAIUrl``` is ```"http://192.168.1.2"```.
 
 ```json
 {
@@ -239,7 +240,8 @@ The following is example data for when ```SendImage``` is ```false```.
       "SizeY": 424
     }
   ],
-  "message": "Motion detected on Driveway\n\nDetected 1 objects:\nCar"
+  "message": "Motion detected on Driveway\n\nDetected 1 objects:\nCar",
+  "imageUrl": "http://192.168.1.2/CameraName/capture.jpeg"
 }
 ```
 ### Telegram
@@ -382,7 +384,7 @@ Send notifications as MQTT messages. Messages are JSON-encoded and sent to the `
 * SendImage [optional] (Default: ```false```): Whether to send a base64-encoded JPG in the `image` field.
 
 #### Example payload data
-The following is example data for when ```SendImage``` is ```false```.
+The following is example data for when ```SendImage``` is ```false``` and ```SynoAIUrl``` is ```"https://synoai.example.com"```.
 
 ```json
 {
@@ -403,7 +405,7 @@ The following is example data for when ```SendImage``` is ```false```.
     }
   ],
   "message": "Motion detected on Driveway\n\nDetected 1 objects:\nCar",
-  "image": null
+  "imageUrl": "https://synoai.example.com/CameraName/capture.jpeg"
 }
 ```
 

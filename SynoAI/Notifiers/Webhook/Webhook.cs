@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -86,6 +85,12 @@ namespace SynoAI.Notifiers.Webhook
                         { new StringContent(message), "\"message\"" }
                     };
 
+                    string imageUrl = GetImageUrl(camera, notification);
+                    if (imageUrl != null)
+                    {
+                        form.Add(new StringContent(imageUrl), "\"imageUrl\"");
+                    }
+
                     switch (Method)
                     {
                         case "PATCH":
@@ -102,16 +107,7 @@ namespace SynoAI.Notifiers.Webhook
                 else
                 {
                     // Otherwise we can just use a simple JSON object
-                    var request = new
-                    {
-                        camera = camera.Name,
-                        foundTypes = foundTypes,
-                        predictions = notification.ValidPredictions,
-                        message = message
-                    };
-
-                    string requestJson = JsonConvert.SerializeObject(request);
-                    content = new StringContent(requestJson, null, "application/json");
+                    content = new StringContent(GenerateJSON(camera, notification, false), null, "application/json");
                 }
 
                 logger.LogInformation($"{camera.Name}: Webhook: Calling {Method}.");

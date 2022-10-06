@@ -170,6 +170,11 @@ namespace SynoAI
         public static IEnumerable<INotifier> Notifiers { get; private set; }
 
         /// <summary>
+        /// The URL to use for the SynoAI web frontend.
+        /// </summary>
+        public static string SynoAIUrL { get; private set; }
+
+        /// <summary>
         /// Generates the configuration from the provided IConfiguration.
         /// </summary>
         /// <param name="configuration">The configuration from which to pull the values.</param>
@@ -227,6 +232,8 @@ namespace SynoAI
             AI = aiSection.GetValue<AIType>("Type", AIType.DeepStack);
             AIUrl = aiSection.GetValue<string>("Url");
             AIPath = aiSection.GetValue<string>("Path","v1/vision/detection");
+
+            SynoAIUrL = configuration.GetValue<string>("SynoAIUrl");
 
             Cameras = GenerateCameras(logger, configuration);
             Notifiers = GenerateNotifiers(logger, configuration);
