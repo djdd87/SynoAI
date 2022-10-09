@@ -131,6 +131,29 @@ An example appsettings.json configuration file can be found [here](#example-apps
   * Mode [optional] (Default: ```Contains```)
     * `Contains`: The entire detected object must be contained within the exclusion zone for it to be ignored, i.e. if 1 or more pixel is outside of the boundary, then it will *not* be ignored
     * `Intersect`: Any part of the detected object must overlap with the exclusion zone for it to be ignored, i.e. if 1 or more pixel is within the boundary, then it *will* be ignored
+    
+#### Camera API
+
+The following settings can be applied to the camera while SynoAI is running. All the following settings can be applied by performing a JSON POST to the respective Camera endpoint. Only the values that you wish to set need to be provided in the JSON body.
+
+* Enabled [optional]: Whether the camera should be enabled or disabled.
+
+
+As an example, to disable the camera with the name `Driveway` on the SynoAI URL `10.0.0.10` port `8080`, you `POST` to http://10.0.0.10:8080/Camera/Driveway with the following JSON body:
+
+```json
+{
+  "Enabled": false
+}
+```
+
+To re-enable the camera, just POST again with `Enabled` set to `true`.
+
+```json
+{
+  "Enabled": true
+}
+```
 
 ### Development Config
 

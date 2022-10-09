@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.SignalR;
 using SynoAI.Hubs;
 using System.Drawing;
 using System.Text;
+using SynoAI.Models.DTOs;
 
 namespace SynoAI.Controllers
 {
@@ -36,6 +37,8 @@ namespace SynoAI.Controllers
         private static ConcurrentDictionary<string, bool> _runningCameraChecks = new(StringComparer.OrdinalIgnoreCase);
         private static ConcurrentDictionary<string, DateTime> _delayedCameraChecks = new(StringComparer.OrdinalIgnoreCase);
 
+        private static ConcurrentDictionary<string, bool> _enabledCameras = new(StringComparer.OrdinalIgnoreCase);
+
         public CameraController(IAIService aiService, ISynologyService synologyService, ILogger<CameraController> logger, IHubContext<SynoAIHub> hubContext)
         {
             _hubContext = hubContext;
@@ -55,6 +58,16 @@ namespace SynoAI.Controllers
             if (string.IsNullOrWhiteSpace(id))
             {
                 throw new ArgumentNullException(nameof(id));
+            }
+
+            if (_enabledCameras.TryGetValue(id, out bool enabled))
+            {
+                if (!enabled)
+                {
+                    // The camera has been disabled, so don't process any requests
+                    _logger.LogInformation($"{id}: Requests for this camera will not be processed as it is currently disabled.");
+                    return;
+                }
             }
 
             // Fetch the camera
@@ -241,6 +254,16 @@ namespace SynoAI.Controllers
                     _logger.LogDebug($"{id}: Removing running camera block.");
                     _runningCameraChecks.Remove(id, out _);
                 }
+            }
+        }
+        
+        [HttpPost]
+        [Route("{id}")]
+        public void Post(string id, [FromBody]CameraOptionsDto options)
+        {
+            if (options.HasChanged(x=> x.Enabled))
+            {
+                _enabledCameras.AddOrUpdate(id, options.Enabled, (key, oldValue) => options.Enabled);
             }
         }
 
