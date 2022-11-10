@@ -29,6 +29,7 @@ For example, if you are using the docker image/version v1.1.0, then ensure you h
   * [Development](#development-config)
 * [Support AIs](#supported-ais)
   * [Deepstack](#deepstack)
+  * [CodeProject.AI-Server](#codeProject-ai-server)
 * [Notifications](#notifications)
   * [Pushbullet](#pushbullet)
   * [Webhook](#webhook)
@@ -163,6 +164,7 @@ Configs which should be changed for debugging (change at own risk):
 
 ## Supported AIs
 * [Deepstack](https://deepstack.cc/)
+* [CodeProject.AI-Server](https://github.com/codeproject/CodeProject.AI-Server/)
 
 In order to specify the AI to use, set the Type property against the AI section in the config:
 
@@ -179,6 +181,16 @@ The Deepstack API is a free to use AI that can identify objects, faces and more.
 ```json
 "AI": {
   "Type": "DeepStack",
+  "Url": "http://10.0.0.10:83"
+}
+```
+* Url [required]: The URL of the AI to POST the image to
+
+### CodeProject.AI-Server
+
+```json
+"AI": {
+  "Type": "CodeProjectAIServer",
   "Url": "http://10.0.0.10:83"
 }
 ```

@@ -13,6 +13,10 @@ namespace SynoAI.AIs
         /// <summary>
         /// DeepStackAI.
         /// </summary>
-        DeepStack
+        DeepStack,
+        /// <summary>
+        /// CodeProjectAIServer.
+        /// </summary>
+        CodeProjectAIServer
     }
 }

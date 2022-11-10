@@ -28,6 +28,7 @@ namespace SynoAI.Services
             switch (Config.AI)
             {
                 case AIType.DeepStack:
+                case AIType.CodeProjectAIServer: // Works the same as DeepStack
                     return new DeepStackAI();
                 default:
                     throw new NotImplementedException(Config.AI.ToString());
