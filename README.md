@@ -29,7 +29,7 @@ For example, if you are using the docker image/version v1.1.0, then ensure you h
   * [Development](#development-config)
 * [Support AIs](#supported-ais)
   * [Deepstack](#deepstack)
-  * [CodeProject.AI-Server](#codeProject-ai-server)
+  * [CodeProject.AI-Server](#codeprojectai-server)
 * [Notifications](#notifications)
   * [Pushbullet](#pushbullet)
   * [Webhook](#webhook)
