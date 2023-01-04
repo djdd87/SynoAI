@@ -2,7 +2,7 @@ using MailKit.Security;
 
 namespace SynoAI.Notifiers.Email
 {
-    public class EmailFactory : NotifierFactory
+    internal class EmailFactory : NotifierFactory
     {
         public override INotifier Create(ILogger logger, IConfigurationSection section)
         {
@@ -31,7 +31,7 @@ namespace SynoAI.Notifiers.Email
             }
         }
 
-        private SecureSocketOptions GetSecureSocketOptions(ILogger logger, IConfigurationSection section)
+        private static SecureSocketOptions GetSecureSocketOptions(ILogger logger, IConfigurationSection section)
         {
             string options = section.GetValue<string>("Encryption", "None").ToUpper();
 

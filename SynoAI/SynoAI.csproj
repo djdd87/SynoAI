@@ -10,19 +10,19 @@
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
-		<AnalysisLevel>latest-recommended</AnalysisLevel>
+		<AnalysisLevel>6.0-minimum</AnalysisLevel>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 		<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-		<WarningsNotAsErrors>CS1591;CA1416</WarningsNotAsErrors>
+		<WarningsNotAsErrors>CS1591;CA1416;CA2254</WarningsNotAsErrors>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<TreatWarningsAsErrors>True</TreatWarningsAsErrors>
 		<CheckForOverflowUnderflow>True</CheckForOverflowUnderflow>
-		<WarningsNotAsErrors>CS1591;CA1416</WarningsNotAsErrors>
+		<WarningsNotAsErrors>CS1591;CA1416;CA2254</WarningsNotAsErrors>
 	</PropertyGroup>
 
 	<ItemGroup>

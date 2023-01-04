@@ -1,6 +1,6 @@
 ﻿namespace SynoAI.Notifiers.Discord
 {
-    public class DiscordFactory : NotifierFactory
+    internal class DiscordFactory : NotifierFactory
     {
         public override INotifier Create(ILogger logger, IConfigurationSection section)
         {

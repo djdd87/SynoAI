@@ -1,6 +1,6 @@
 namespace SynoAI.Notifiers.Webhook
 {
-    public enum AuthorizationMethod
+    internal enum AuthorizationMethod
     {
         None,
         Basic,

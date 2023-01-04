@@ -182,8 +182,8 @@ namespace SynoAI.Controllers
 
                     // Save the original unprocessed image if required
                     if (Config.SaveOriginalSnapshot == SaveSnapshotMode.Always ||
-                        (Config.SaveOriginalSnapshot == SaveSnapshotMode.WithPredictions && predictions.Count() > 0) ||
-                        (Config.SaveOriginalSnapshot == SaveSnapshotMode.WithValidPredictions && validPredictions.Count() > 0))
+                        (Config.SaveOriginalSnapshot == SaveSnapshotMode.WithPredictions && predictions.Any()) ||
+                        (Config.SaveOriginalSnapshot == SaveSnapshotMode.WithValidPredictions && validPredictions.Any()))
                     {
                         _logger.LogInformation($"{id}: Saving original image");
                         SnapshotManager.SaveOriginalImage(_logger, camera, snapshot);
@@ -271,7 +271,7 @@ namespace SynoAI.Controllers
         private bool ShouldIncludePrediction(string id, Camera camera, Stopwatch overallStopwatch, AIPrediction prediction)
         {
             // Check if the prediction falls within the exclusion zones
-            if (camera.Exclusions != null && camera.Exclusions.Count() > 0)
+            if (camera.Exclusions != null && camera.Exclusions.Any())
             {
                 Rectangle boundary = new(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY);
                 foreach (Zone exclusion in camera.Exclusions)
@@ -390,7 +390,7 @@ namespace SynoAI.Controllers
         /// <param name="bitmap">The bitmap to rotate.</param>
         /// <param name="angle">The angle to rotate to.</param>
         /// <returns>The rotated bitmap.</returns>
-        private SKBitmap Rotate(SKBitmap bitmap, double angle)
+        private static SKBitmap Rotate(SKBitmap bitmap, double angle)
         {
             double radians = Math.PI * angle / 180;
             float sine = (float)Math.Abs(Math.Sin(radians));

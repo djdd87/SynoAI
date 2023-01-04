@@ -5,8 +5,7 @@ using SynoAI.Extensions;
 
 namespace SynoAI.Services
 {
-
-    public class SnapshotManager
+    internal class SnapshotManager
     {
         /// <summary>
         /// Dresses the source image by adding the boundary boxes and saves the file locally.

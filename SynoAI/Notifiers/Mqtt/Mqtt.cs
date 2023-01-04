@@ -7,7 +7,7 @@ namespace SynoAI.Notifiers.Mqtt
     /// <summary>
     /// Sends a message over MQTT.
     /// </summary>
-    public sealed class Mqtt : NotifierBase
+    internal sealed class Mqtt : NotifierBase
     {
         /// <summary>
         /// The username when using Basic authentication.

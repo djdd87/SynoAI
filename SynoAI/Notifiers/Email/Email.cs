@@ -8,7 +8,7 @@ namespace SynoAI.Notifiers.Email
     /// <summary>
     /// Calls a third party API.
     /// </summary>
-    public class Email : NotifierBase
+    internal class Email : NotifierBase
     {
         /// <summary>
         /// The email address to send the notification from.

@@ -2,7 +2,7 @@
 
 namespace SynoAI.Notifiers.Pushbullet
 {
-    public class PushbulletPush
+    internal class PushbulletPush
     {
         [JsonProperty("type")]
         public string Type { get; set; }

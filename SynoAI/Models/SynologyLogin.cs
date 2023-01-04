@@ -1,6 +1,6 @@
 ﻿namespace SynoAI.Models
 {
-    public class SynologyLogin
+    internal class SynologyLogin
     {
         public string SID { get; set; }
     }

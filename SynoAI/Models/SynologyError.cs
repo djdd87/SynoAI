@@ -1,6 +1,6 @@
 ﻿namespace SynoAI.Models
 {
-    public class SynologyError
+    internal class SynologyError
     {
         public string Code { get; set; }
     }

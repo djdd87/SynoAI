@@ -3,7 +3,7 @@ using SynoAI.Models;
 
 namespace SynoAI.Notifiers.Discord
 {
-    public class Discord : NotifierBase
+    internal class Discord : NotifierBase
     {
         /// <summary>
         /// Discord Webhook Url.
@@ -25,7 +25,7 @@ namespace SynoAI.Notifiers.Discord
             HttpResponseMessage responseMessage = await Shared.HttpClient.PostAsync(Url, formData);
             if (responseMessage.IsSuccessStatusCode)
             {
-                logger.LogInformation($"{camera.Name}: Discord: Notification sent successfully");
+                logger.LogInformation("{CameraName}: Discord: Notification sent successfully", camera.Name);
             }
             else
             {

@@ -8,7 +8,7 @@ namespace SynoAI.Notifiers.Pushbullet
     /// Configuration for sending a Pushbullet notification.
     /// https://docs.pushbullet.com/
     /// </summary>
-    public class Pushbullet : NotifierBase
+    internal class Pushbullet : NotifierBase
     {
         //private const int MAX_FILE_SIZE = 26214400;
 

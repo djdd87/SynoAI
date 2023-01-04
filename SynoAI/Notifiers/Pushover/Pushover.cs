@@ -4,7 +4,7 @@ using System.Net.Http.Headers;
 
 namespace SynoAI.Notifiers.Pushover
 {
-    public class Pushover : NotifierBase
+    internal class Pushover : NotifierBase
     {
         private readonly string URI_MESSAGE = "https://api.pushover.net/1/messages.json";
 

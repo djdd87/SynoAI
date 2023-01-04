@@ -12,7 +12,7 @@ namespace SynoAI.Notifiers
     /// <summary>
     /// Handles the construction of the notifiers.
     /// </summary>
-    public abstract class NotifierFactory
+    internal abstract class NotifierFactory
     {
         public abstract INotifier Create(ILogger logger, IConfigurationSection section);
 

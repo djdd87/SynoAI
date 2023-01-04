@@ -2,7 +2,7 @@
 
 namespace SynoAI.Models
 {
-    public class Notification
+    internal class Notification
     {
         /// <summary>
         /// Object for fetching the processed image

@@ -1,6 +1,6 @@
 namespace SynoAI.Notifiers.Webhook
 {
-    public class WebhookFactory : NotifierFactory
+    internal class WebhookFactory : NotifierFactory
     {
         public override INotifier Create(ILogger logger, IConfigurationSection section)
         {

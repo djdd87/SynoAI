@@ -6,7 +6,7 @@ namespace SynoAI.Notifiers.Telegram
     /// <summary>
     /// Calls a third party API.
     /// </summary>
-    public class Telegram : NotifierBase
+    internal class Telegram : NotifierBase
     {
         /// <summary>
         /// The ID of the chat to send notifications to

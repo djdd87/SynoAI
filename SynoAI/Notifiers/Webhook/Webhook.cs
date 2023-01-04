@@ -8,7 +8,7 @@ namespace SynoAI.Notifiers.Webhook
     /// <summary>
     /// Calls a third party API.
     /// </summary>
-    public class Webhook : NotifierBase
+    internal class Webhook : NotifierBase
     {
         /// <summary>
         /// The URL to send the request to.

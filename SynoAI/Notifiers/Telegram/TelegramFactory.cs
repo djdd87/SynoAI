@@ -1,6 +1,6 @@
 namespace SynoAI.Notifiers.Telegram
 {
-    public class TelegramFactory : NotifierFactory
+    internal class TelegramFactory : NotifierFactory
     {
         public override INotifier Create(ILogger logger, IConfigurationSection section)
         {

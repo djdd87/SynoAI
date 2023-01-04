@@ -14,6 +14,11 @@ namespace SynoAI.Models
         /// </summary>
         public readonly string FileName;
 
+        /// <summary>
+        /// Create a ProcessedImage
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <exception cref="ArgumentNullException">When filePath is null</exception>
         public ProcessedImage(string filePath)
         {
             if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentNullException(nameof(filePath));

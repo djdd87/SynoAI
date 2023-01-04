@@ -5,7 +5,7 @@ using System.Web;
 
 namespace SynoAI.Services
 {
-    public class SynologyService : ISynologyService
+    internal class SynologyService : ISynologyService
     {
         /// <summary>
         /// The current cookie with valid authentication.
@@ -251,7 +251,7 @@ namespace SynoAI.Services
         /// <typeparam name="T">The type of the return 'data'.</typeparam>
         /// <param name="message">The message to parse.</param>
         /// <returns>A Synology response object.</returns>
-        private async Task<SynologyResponse<T>> GetResponse<T>(HttpResponseMessage message)
+        private static async Task<SynologyResponse<T>> GetResponse<T>(HttpResponseMessage message)
         {
             string content = await message.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<SynologyResponse<T>>(content);
@@ -262,7 +262,7 @@ namespace SynoAI.Services
         /// </summary>
         /// <param name="message">The message to parse.</param>
         /// <returns>A Synology response object.</returns>
-        private async Task<SynologyResponse> GetErrorResponse(HttpResponseMessage message)
+        private static async Task<SynologyResponse> GetErrorResponse(HttpResponseMessage message)
         {
             string content = await message.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<SynologyResponse>(content);
@@ -346,7 +346,7 @@ namespace SynoAI.Services
         /// <param name="baseAddress">The base URI.</param>
         /// <param name="cookieContainer">The container for the cookies.</param>
         /// <returns>An HttpClient.</returns>
-        private HttpClient GetHttpClient(string baseAddress, CookieContainer cookieContainer = null)
+        private static HttpClient GetHttpClient(string baseAddress, CookieContainer cookieContainer = null)
         {           
             Uri uri = new Uri(baseAddress);
             return GetHttpClient(uri, cookieContainer);
@@ -358,7 +358,7 @@ namespace SynoAI.Services
         /// <param name="baseUri">The base URI.</param>
         /// <param name="cookieContainer">The container for the cookies.</param>
         /// <returns>An HttpClient.</returns>
-        private HttpClient GetHttpClient(Uri baseUri, CookieContainer cookieContainer = null)
+        private static HttpClient GetHttpClient(Uri baseUri, CookieContainer cookieContainer = null)
         {           
             HttpClientHandler httpClientHandler = new HttpClientHandler();
             if (cookieContainer != null)

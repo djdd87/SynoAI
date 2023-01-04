@@ -253,7 +253,7 @@ namespace SynoAI.Controllers
             if (index != -1)
             {
                 //try to extract the number of valid objects predicted inside this snapshot
-                if (!int.TryParse(name.Substring(index + 1), out objects))
+                if (!int.TryParse(name.AsSpan(index + 1), out objects))
                     objects = 0;
             }
             else

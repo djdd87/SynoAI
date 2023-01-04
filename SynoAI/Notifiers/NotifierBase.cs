@@ -4,7 +4,7 @@ using SynoAI.Models;
 
 namespace SynoAI.Notifiers
 {
-    public abstract class NotifierBase : INotifier
+    internal abstract class NotifierBase : INotifier
     {
         public IEnumerable<string> Cameras { get; set; } 
         public IEnumerable<string> Types { get; set; } 
@@ -16,7 +16,7 @@ namespace SynoAI.Notifiers
 
         public virtual Task CleanupAsync(ILogger logger) { return Task.CompletedTask; }
 
-        protected string GetMessage(Camera camera, IEnumerable<string> foundTypes, string errorMessage = null)
+        protected static string GetMessage(Camera camera, IEnumerable<string> foundTypes, string errorMessage = null)
         {
             string result ;
             if (Config.AlternativeLabelling && Config.DrawMode == DrawMode.Matches)
@@ -53,7 +53,7 @@ namespace SynoAI.Notifiers
             return result;
         }
 
-        protected string GetImageUrl(Camera camera, Notification notification)
+        protected static string GetImageUrl(Camera camera, Notification notification)
         {
             if (Config.SynoAIUrL == null)
             {
@@ -69,7 +69,7 @@ namespace SynoAI.Notifiers
         /// <summary>
         /// Generates a JSON representation of the notification.
         /// </summary>
-        protected string GenerateJSON(Camera camera, Notification notification, bool sendImage)
+        protected static string GenerateJSON(Camera camera, Notification notification, bool sendImage)
         {
             dynamic jsonObject = new ExpandoObject();
 
@@ -95,7 +95,7 @@ namespace SynoAI.Notifiers
         /// <summary>
         /// Returns FileStream data as a base64-encoded string
         /// </summary>
-        private string ToBase64String(FileStream fileStream)
+        private static string ToBase64String(FileStream fileStream)
         {
             byte[] buffer = new byte[fileStream.Length];
             fileStream.Read(buffer, 0, (int)fileStream.Length);
@@ -108,7 +108,7 @@ namespace SynoAI.Notifiers
         /// </summary>
         /// <param name="message">The message to parse.</param>
         /// <returns>A usable object.</returns>
-        protected async Task<T> GetResponse<T>(HttpResponseMessage message)
+        protected static async Task<T> GetResponse<T>(HttpResponseMessage message)
         {
             string content = await message.Content.ReadAsStringAsync();
             return JsonConvert.DeserializeObject<T>(content);

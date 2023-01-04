@@ -2,7 +2,7 @@
 
 namespace SynoAI.Notifiers
 {
-    public interface INotifier
+    internal interface INotifier
     {
         /// <summary>
         /// The list of camera names that the notifier is for.

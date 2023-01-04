@@ -1,13 +1,13 @@
 namespace SynoAI.Extensions
 {
-    public static class StringExtensions
+    internal static class StringExtensions
     {
         public static string FirstCharToUpper(this string input) =>
             input switch
             {
                 null => throw new ArgumentNullException(nameof(input)),
                 "" => throw new ArgumentException($"{nameof(input)} cannot be empty", nameof(input)),
-                _ => input.First().ToString().ToUpper() + input.Substring(1)
+                _ => string.Concat(input.First().ToString().ToUpper(), input.AsSpan(1))
             };
     }
 }

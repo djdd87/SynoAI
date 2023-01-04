@@ -8,7 +8,7 @@ namespace SynoAI
     /// <summary>
     /// Represents the system configuration.
     /// </summary>
-    public static class Config
+    internal static class Config
     {
         /// <summary>
         /// The URL to the synology API.

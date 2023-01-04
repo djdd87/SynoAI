@@ -6,7 +6,7 @@ namespace SynoAI.Notifiers.SynologyChat
     /// <summary>
     /// Calls a third party API.
     /// </summary>
-    public class SynologyChat : NotifierBase
+    internal class SynologyChat : NotifierBase
     {
         /// <summary>
         /// The URL to send the request to including the token.

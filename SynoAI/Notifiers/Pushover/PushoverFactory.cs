@@ -1,6 +1,6 @@
 ﻿namespace SynoAI.Notifiers.Pushover
 {
-    public class PushoverFactory : NotifierFactory
+    internal class PushoverFactory : NotifierFactory
     {
         public override INotifier Create(ILogger logger, IConfigurationSection section)
         {

@@ -5,9 +5,9 @@ using System.Diagnostics;
 
 namespace SynoAI.AIs.DeepStack
 {
-    public class DeepStackAI : AI
+    internal class DeepStackAI : AI
     {
-        public async override Task<IEnumerable<AIPrediction>> Process(ILogger logger, Camera camera, byte[] image)
+        public override async Task<IEnumerable<AIPrediction>> Process(ILogger logger, Camera camera, byte[] image)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
 
@@ -69,7 +69,7 @@ namespace SynoAI.AIs.DeepStack
         /// <param name="basePath"></param>
         /// <param name="resourcePath"></param>
         /// <returns>A <see cref="Uri"/> for the combined base and resource.</returns>
-        protected Uri GetUri(string basePath, string resourcePath)
+        protected static Uri GetUri(string basePath, string resourcePath)
         {
             Uri baseUri = new(basePath);
             return new Uri(baseUri, resourcePath);
@@ -82,7 +82,7 @@ namespace SynoAI.AIs.DeepStack
         /// <param name="message">The message to parse.</param>
         /// <param name="logger"></param>
         /// <returns>A usable object.</returns>
-        private async Task<DeepStackResponse> GetResponse(ILogger logger, Camera camera, HttpResponseMessage message)
+        private static async Task<DeepStackResponse> GetResponse(ILogger logger, Camera camera, HttpResponseMessage message)
         {
             string content = await message.Content.ReadAsStringAsync();                
             logger.LogDebug($"{camera.Name}: DeepStackAI: Responded with {content}.");

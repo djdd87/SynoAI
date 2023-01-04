@@ -1,6 +1,6 @@
 namespace SynoAI.Models
 {
-    public enum CameraQuality
+    internal enum CameraQuality
     {
         High = 0,
         Balanced = 1,

@@ -1,6 +1,6 @@
 namespace SynoAI.Models
 {
-    public class SynologyApiInfoResponse : Dictionary<string, SynologyApiInfo>
+    internal class SynologyApiInfoResponse : Dictionary<string, SynologyApiInfo>
     {
     }
 }

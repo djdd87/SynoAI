@@ -2,7 +2,7 @@
 
 namespace SynoAI.Notifiers.SynologyChat
 {
-    public class SynologyChatResponse
+    internal class SynologyChatResponse
     {
         [JsonProperty("success")]
         public bool Success { get; set; }

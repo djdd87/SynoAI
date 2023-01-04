@@ -1,6 +1,6 @@
 ﻿namespace SynoAI.Notifiers.Mqtt
 {
-    public class MqttFactory : NotifierFactory
+    internal class MqttFactory : NotifierFactory
     {
         public override INotifier Create(ILogger logger, IConfigurationSection section)
         {

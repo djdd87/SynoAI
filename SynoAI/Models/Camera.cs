@@ -115,6 +115,7 @@
             return DelayAfterSuccess ?? Config.DelayAfterSuccess ?? GetDelay();
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return Name;

@@ -4,7 +4,7 @@ using SynoAI.Models;
 
 namespace SynoAI.Services
 {
-    public class AIService : IAIService
+    internal class AIService : IAIService
     {
         private readonly ILogger<AIService> _logger;
 
@@ -19,7 +19,7 @@ namespace SynoAI.Services
             return await ai.Process(_logger, camera, image);
         }
 
-        private AI GetAI()
+        private static AI GetAI()
         {
             switch (Config.AI)
             {
