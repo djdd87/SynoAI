@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-
-
-namespace SynoAI.Models
+﻿namespace SynoAI.Models
 {
     /// <summary>
     /// Represents a camera object.

@@ -1,7 +1,5 @@
 ﻿using SynoAI.Models;
-using System.Collections.Generic;
 using System.Net;
-using System.Threading.Tasks;
 
 namespace SynoAI.Services
 {

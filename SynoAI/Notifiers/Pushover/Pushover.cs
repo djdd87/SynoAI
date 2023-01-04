@@ -1,16 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using SynoAI.App;
+﻿using SynoAI.App;
 using SynoAI.Models;
-using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
 
 namespace SynoAI.Notifiers.Pushover
 {

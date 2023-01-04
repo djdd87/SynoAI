@@ -1,8 +1,4 @@
-using System;
-using System.Net.Http;
 using MailKit.Security;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace SynoAI.Notifiers.Email
 {

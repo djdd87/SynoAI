@@ -1,14 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SynoAI.App;
 using SynoAI.Models;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace SynoAI.AIs.DeepStack
 {
@@ -85,7 +78,9 @@ namespace SynoAI.AIs.DeepStack
         /// <summary>
         /// Fetches the response content and parses it a DeepStack object.
         /// </summary>
+        /// <param name="camera"></param>
         /// <param name="message">The message to parse.</param>
+        /// <param name="logger"></param>
         /// <returns>A usable object.</returns>
         private async Task<DeepStackResponse> GetResponse(ILogger logger, Camera camera, HttpResponseMessage message)
         {

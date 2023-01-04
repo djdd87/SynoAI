@@ -1,13 +1,6 @@
-﻿using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SynoAI.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
-using System.Threading.Tasks;
 using System.Web;
 
 namespace SynoAI.Services
@@ -40,8 +33,8 @@ namespace SynoAI.Services
         /// </summary>
         private static string _cameraPath { get; set; }
 
-        private IHostApplicationLifetime _applicationLifetime;
-        private ILogger<SynologyService> _logger;
+        private readonly IHostApplicationLifetime _applicationLifetime;
+        private readonly ILogger<SynologyService> _logger;
 
         public SynologyService(IHostApplicationLifetime applicationLifetime, ILogger<SynologyService> logger)
         {

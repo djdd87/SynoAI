@@ -1,8 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using SynoAI.Models;
-using SynoAI.Services;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using SynoAI.Models;
 
 namespace SynoAI.Notifiers
 {

@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace SynoAI.AIs.DeepStack
+﻿namespace SynoAI.AIs.DeepStack
 {
     /// <summary>
     /// An object representing a response from DeepStack.

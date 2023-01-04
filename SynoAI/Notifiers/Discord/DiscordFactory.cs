@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-
-namespace SynoAI.Notifiers.Discord
+﻿namespace SynoAI.Notifiers.Discord
 {
     public class DiscordFactory : NotifierFactory
     {

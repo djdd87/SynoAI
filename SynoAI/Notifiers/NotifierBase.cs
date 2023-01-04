@@ -1,14 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SynoAI.Models;
-using SynoAI.Services;
 
 namespace SynoAI.Notifiers
 {

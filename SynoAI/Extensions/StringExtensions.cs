@@ -1,6 +1,3 @@
-using System;
-using System.Linq;
-
 namespace SynoAI.Extensions
 {
     public static class StringExtensions

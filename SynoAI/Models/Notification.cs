@@ -1,7 +1,4 @@
 ﻿using SynoAI.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace SynoAI.Models
 {
@@ -30,7 +27,6 @@ namespace SynoAI.Models
         /// <summary>
         /// Gets the labels from the predictions to use in the notifications.
         /// </summary>
-        /// <param name="validPredictions">The predictions to process.</param>
         /// <returns>A list of labels.</returns>
         private IEnumerable<string> GetLabels()
         {

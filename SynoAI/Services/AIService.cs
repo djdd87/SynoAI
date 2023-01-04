@@ -1,10 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using SynoAI.AIs;
+﻿using SynoAI.AIs;
 using SynoAI.AIs.DeepStack;
 using SynoAI.Models;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace SynoAI.Services
 {

@@ -1,18 +1,7 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using MimeKit;
-using MimeKit.Text;
-using Newtonsoft.Json;
 using SynoAI.Models;
-using SynoAI.Services;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace SynoAI.Notifiers.Email
 {

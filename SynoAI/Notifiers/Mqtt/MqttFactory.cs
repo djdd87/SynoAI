@@ -1,8 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using SynoAI.Notifiers.Webhook;
-
-namespace SynoAI.Notifiers.Mqtt
+﻿namespace SynoAI.Notifiers.Mqtt
 {
     public class MqttFactory : NotifierFactory
     {

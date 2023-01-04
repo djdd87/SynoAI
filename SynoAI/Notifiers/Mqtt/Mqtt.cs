@@ -1,10 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using SynoAI.Models;
-using System.Threading.Tasks;
+﻿using SynoAI.Models;
 using MQTTnet.Client;
 using MQTTnet;
-using System.Threading;
-using System;
 
 namespace SynoAI.Notifiers.Mqtt
 {
