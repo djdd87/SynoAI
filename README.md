@@ -188,6 +188,8 @@ The Deepstack API is a free to use AI that can identify objects, faces and more.
 
 ### CodeProject.AI-Server
 
+For a full list of supported types see the [CodeProject.AI documentation](https://www.codeproject.com/AI/docs/api/api_reference.html).
+
 ```json
 "AI": {
   "Type": "CodeProjectAIServer",
