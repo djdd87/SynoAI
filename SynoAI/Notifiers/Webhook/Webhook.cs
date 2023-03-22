@@ -5,6 +5,7 @@ using SynoAI.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -52,6 +53,10 @@ namespace SynoAI.Notifiers.Webhook
         /// content-type of multipart/form-data.
         /// </summary>
         public bool SendImage { get; set; }
+        /// <summary>
+        /// Allow insecure URL Access to the API.
+        /// </summary>
+        public bool AllowInsecureUrl { get; set; }
 
         /// <summary>
         /// Sends a notification to the Webhook.
@@ -62,7 +67,7 @@ namespace SynoAI.Notifiers.Webhook
         public override async Task SendAsync(Camera camera, Notification notification, ILogger logger)
         {
             logger.LogInformation($"{camera.Name}: Webhook: Processing");
-            using (HttpClient client = new())
+            using (HttpClient client = GetHttpClient())
             {
                 FileStream fileStream = null;
                 client.DefaultRequestHeaders.Authorization = GetAuthenticationHeader();
@@ -150,6 +155,24 @@ namespace SynoAI.Notifiers.Webhook
                     fileStream.Dispose();
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="HttpClient"/> object for the Webhook request.
+        /// </summary>
+        /// <returns>A <see cref="HttpClient"/>.</returns>
+        private HttpClient GetHttpClient()
+        {
+            if (!Config.AllowInsecureUrl)
+            {
+                return new();
+            }
+
+            HttpClientHandler httpClientHandler = new()
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true
+            };
+            return new(httpClientHandler);
         }
 
         /// <summary>

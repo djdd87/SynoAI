@@ -237,7 +237,8 @@ The webhook notification can be used to make web requests (e.g. API calls) eithe
   "Method": "POST",
   "Authentication": "Bearer",
   "Token": "XYZ.123456",
-  "SendImage": "false"
+  "SendImage": false,
+  "AllowInsecureUrl": false
 }
 ```
 * Url [required]: The URL to send the image to
@@ -254,7 +255,8 @@ The webhook notification can be used to make web requests (e.g. API calls) eithe
   * Bearer
     * Token [optional]: The token to use when using Basic Authorization
 * ImageField [optional] (Default: ```image```): The field name of the image in the POST data
-* SendImage [optional] (Default: ```true```): The image will be sent to the webhook when the method is POST, PATCH or PUT.
+* SendImage [optional] (Default: ```true```): The image will be sent to the webhook when the method is POST, PATCH or PUT
+* AllowInsecureUrl [optional] (Default: ```false```): Whether to allow an insecure HTTPS connection to the Webhook.
 
 #### Example POST data
 The following is example data for when ```SendImage``` is ```false``` and ```SynoAIUrl``` is ```"http://192.168.1.2"```.
