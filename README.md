@@ -1,3 +1,6 @@
+# UPDATE!
+I've begun working on a new version of SynoAI from the group up which has an administrative interface instead of a config based approach. I will also be taking the opportunity to implement a number of requested features that have been requested for a long time. 
+
 # SynoAI
 A Synology Surveillance Station notification system utilising DeepStack AI, inspired by Christopher Adams' [sssAI](https://github.com/Christofo/sssAI) implementation.
 
