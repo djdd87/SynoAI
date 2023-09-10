@@ -67,7 +67,9 @@ namespace SynoAI.Notifiers.Pushbullet
                     {
                         PushbulletErrorResponse error = await GetResponse<PushbulletErrorResponse>(uploadFileResponse);
                         uploadError = $"Pushbullet error uploading file ({error.Error})";
-                        logger.LogError($"{camera.Name}: {uploadError}");
+                        logger.LogError("{camera.Name}: {uploadError}",
+                            camera.Name,
+                            uploadError);
                     }
 
                     // The file was uploaded successfully, so we can now send the message
@@ -75,7 +77,8 @@ namespace SynoAI.Notifiers.Pushbullet
                     {
                         Type = uploadSuccess ? "file" : "note",
                         Title = $"{camera.Name}: Movement Detected",
-                        Body = GetMessage(camera, notification.FoundTypes, errorMessage: uploadError),
+                        //Body = GetMessage(camera, notification.FoundTypes, errorMessage: uploadError),
+                        Body = GetMessage(camera, notification.FoundTypes, new List<AIPrediction>(), errorMessage: uploadError),
                         FileName = uploadSuccess ? uploadRequestResult.FileName : null,
                         FileUrl = uploadSuccess ? uploadRequestResult.FileUrl : null,
                         FileType = uploadSuccess ? uploadRequestResult.FileType : null
@@ -87,19 +90,24 @@ namespace SynoAI.Notifiers.Pushbullet
                     HttpResponseMessage pushResponse = await Shared.HttpClient.PostAsync(new Uri(URI_PUSHES), push);
                     if (pushResponse.IsSuccessStatusCode)
                     {
-                        logger.LogInformation($"{camera.Name}: Pushbullet notification sent successfully");
+                        logger.LogInformation("{camera.Name}: Pushbullet notification sent successfully",
+                            camera.Name);
                     }
                     else
                     {
                         PushbulletErrorResponse error = await GetResponse<PushbulletErrorResponse>(pushResponse);
-                        logger.LogError($"{camera.Name}: Pushbullet error sending push ({error.Error})");
+                        logger.LogError("{camera.Name}: Pushbullet error sending push ({error.Error})",
+                            camera.Name,
+                            error.Error);
                     }
                 }
             }
             else
             {
                 PushbulletErrorResponse error = await GetResponse<PushbulletErrorResponse>(requestResponse);
-                logger.LogError($"{camera.Name}: Pushbullet error requesting upload ({error.Error})");
+                logger.LogError("{cameraName}: Pushbullet error requesting upload ({errorError})",
+                    camera.Name,
+                    error.Error);
             }
         }
 

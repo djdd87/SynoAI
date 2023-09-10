@@ -1,5 +1,5 @@
 ﻿using SynoAI.AIs;
-using SynoAI.AIs.DeepStack;
+using SynoAI.AIs.AIProcessor;
 using SynoAI.Models;
 
 namespace SynoAI.Services
@@ -25,7 +25,7 @@ namespace SynoAI.Services
             {
                 case AIType.DeepStack:
                 case AIType.CodeProjectAIServer: // Works the same as DeepStack
-                    return new DeepStackAI();
+                    return new AIProcessorAI();
                 default:
                     throw new NotImplementedException(Config.AI.ToString());
             }

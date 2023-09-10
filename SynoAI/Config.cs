@@ -1,4 +1,8 @@
-﻿using SkiaSharp;
+﻿using System;
+using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using SkiaSharp;
 using SynoAI.AIs;
 using SynoAI.Models;
 using SynoAI.Notifiers;
@@ -226,7 +230,7 @@ namespace SynoAI
             DaysToKeepCaptures = configuration.GetValue<int>("DaysToKeepCaptures", 0);
 
             IConfigurationSection aiSection = configuration.GetSection("AI");
-            AI = aiSection.GetValue<AIType>("Type", AIType.DeepStack);
+            AI = aiSection.GetValue<AIType>("Type", AIType.CodeProjectAIServer);
             AIUrl = aiSection.GetValue<string>("Url");
             AIPath = aiSection.GetValue<string>("Path","v1/vision/detection");
 
@@ -248,7 +252,7 @@ namespace SynoAI
         {
             logger.LogInformation("Processing notifier config.");
 
-            List<INotifier> notifiers = new List<INotifier>();
+            List<INotifier> notifiers = new();
 
             IConfigurationSection section = configuration.GetSection("Notifiers");
             foreach (IConfigurationSection child in section.GetChildren())
@@ -257,7 +261,8 @@ namespace SynoAI
 
                 if (!Enum.TryParse(type, out NotifierType notifier))
                 {
-                    logger.LogError($"Notifier Type '{ type }' is not supported.");
+                    logger.LogError("Notifier Type '{ type }' is not supported.",
+                        type);
                     throw new NotImplementedException(type);
                 }
 

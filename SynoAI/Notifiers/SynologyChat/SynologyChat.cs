@@ -21,11 +21,13 @@ namespace SynoAI.Notifiers.SynologyChat
         /// <param name="logger">A logger.</param>
         public override async Task SendAsync(Camera camera, Notification notification, ILogger logger)
         {
-            logger.LogInformation($"{camera.Name}: SynologyChat: Processing");
+            logger.LogInformation("{cameraName}: SynologyChat: Processing",
+                camera.Name);
             using (HttpClient client = new())
             {
                 IEnumerable<string> foundTypes = notification.FoundTypes;
-                string message = GetMessage(camera, foundTypes);
+                string message = GetMessage(camera, foundTypes, new List<AIPrediction>());
+
 
                 var request = new
                 {
@@ -44,7 +46,8 @@ namespace SynoAI.Notifiers.SynologyChat
                     content.Headers.Clear();
                     content.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
 
-                    logger.LogInformation($"{camera.Name}: SynologyChat: POSTing message.");
+                    logger.LogInformation("{camera.Name}: SynologyChat: POSTing message.",
+                        camera.Name);
 
                     HttpResponseMessage response = await client.PostAsync(Url, content);
                     if (response.IsSuccessStatusCode)
@@ -54,16 +57,22 @@ namespace SynoAI.Notifiers.SynologyChat
                         SynologyChatResponse actualResponse = JsonConvert.DeserializeObject<SynologyChatResponse>(responseString);
                         if (actualResponse.Success)
                         {
-                            logger.LogInformation($"{camera.Name}: SynologyChat: Success.");
+                            logger.LogInformation("{cameraName}: SynologyChat: Success.",
+                                camera.Name);
                         }
                         else
                         {
-                            logger.LogInformation($"{camera.Name}: SynologyChat: Failed with error '{actualResponse.Error.Code}': {actualResponse.Error.Errors}.");
+                            logger.LogInformation("{cameraName}: SynologyChat: Failed with error '{actualResponseErrorCode}': {actualResponseErrorErrors}.",
+                                camera.Name,
+                                actualResponse.Error.Code,
+                                actualResponse.Error.Errors);
                         }
                     }
                     else
                     {
-                        logger.LogWarning($"{camera.Name}: SynologyChat: The end point responded with HTTP status code '{response.StatusCode}'.");
+                        logger.LogWarning("{cameraName}: SynologyChat: The end point responded with HTTP status code '{responseStatusCode}'.",
+                            camera.Name,
+                            response.StatusCode);
                     }
                 }
             }

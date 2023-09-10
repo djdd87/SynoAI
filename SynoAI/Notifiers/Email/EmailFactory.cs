@@ -51,7 +51,8 @@ namespace SynoAI.Notifiers.Email
                 case "STARTTLSWHENAVAILABLE":
                     return SecureSocketOptions.StartTlsWhenAvailable;
                 default:
-                    logger.LogError($"The email encryption type '{options}' is not supported.", options);
+                    logger.LogError("The email encryption type '{options}' is not supported."
+                        , options);
                     throw new NotSupportedException($"The email SecureSocketOptions type '{options}' is not supported.");
             }
         }

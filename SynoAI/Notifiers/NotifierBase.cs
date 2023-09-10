@@ -16,7 +16,8 @@ namespace SynoAI.Notifiers
 
         public virtual Task CleanupAsync(ILogger logger) { return Task.CompletedTask; }
 
-        protected static string GetMessage(Camera camera, IEnumerable<string> foundTypes, string errorMessage = null)
+        protected static string GetMessage(Camera camera, IEnumerable<string> foundTypes, List<AIPrediction> predictions, string errorMessage = null)
+
         {
             string result ;
             if (Config.AlternativeLabelling && Config.DrawMode == DrawMode.Matches)
@@ -38,16 +39,33 @@ namespace SynoAI.Notifiers
                 {
                     // Just one object detected
                     result =  $"{camera.Name}: {foundTypes.First()}";    
-                }      
+                }
+                // Include prediction confidence
+                foreach (var prediction in predictions)
+                {
+                    result += $"\n{prediction.Label}: {prediction.Confidence}%";
+                }
+
             }
             else 
             {
                 // Standard (old) labelling
                 result =  $"Motion detected on {camera.Name}\n\nDetected {foundTypes.Count()} objects:\n{String.Join("\n", foundTypes.Select(x => x).ToArray())}";   
             }
+            // Include prediction confidence
+            foreach (var prediction in predictions)
+            {
+                result += $"\n{prediction.Label}: {prediction.Confidence}%";
+            }
+
 
             if (!string.IsNullOrWhiteSpace(errorMessage)){
                 result += $"\nAn error occurred during the creation of the notification: {errorMessage}";
+            }
+            if (predictions != null && predictions.Any())
+            {
+                result += "\nPredictions:\n";
+                result += string.Join("\n", predictions.Select(prediction => $"{prediction.Label} ({prediction.Confidence}%)"));
             }
 
             return result;
@@ -75,8 +93,16 @@ namespace SynoAI.Notifiers
 
             jsonObject.camera = camera.Name;
             jsonObject.foundTypes = notification.FoundTypes;
-            jsonObject.predictions = notification.ValidPredictions;
-            jsonObject.message = GetMessage(camera, notification.FoundTypes);
+
+            List<AIPrediction> validPredictions = notification.ValidPredictions.ToList();
+            jsonObject.predictions = validPredictions.Select(prediction => new
+            {
+                Confidence = prediction.Confidence,
+                Label = prediction.Label,
+                // Add other properties as needed
+            }).ToList();
+
+            jsonObject.message = GetMessage(camera, notification.FoundTypes, validPredictions);
 
             if (sendImage)
             {
@@ -91,6 +117,7 @@ namespace SynoAI.Notifiers
 
             return JsonConvert.SerializeObject(jsonObject);
         }
+
 
         /// <summary>
         /// Returns FileStream data as a base64-encoded string

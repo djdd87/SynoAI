@@ -6,6 +6,9 @@ using System.Drawing.Imaging;
 
 namespace SynoAI.Controllers
 {
+    /// <summary>
+    /// Controller for handling home-related HTTP requests.
+    /// </summary>
     public class HomeController : Controller
     {
         static readonly string[] byteSizes = { "bytes", "Kb", "Mb", "Gb", "Tb" };
@@ -128,7 +131,7 @@ namespace SynoAI.Controllers
         /// </summary>
         public static GraphData GetData(string cameraName, DateTime date, bool GraphHour = false) 
         {  
-            GraphData data = new GraphData();
+            GraphData data = new();
             string directory = Path.Combine(Constants.DIRECTORY_CAPTURES, cameraName);
 
             if (Directory.Exists(directory))
@@ -218,7 +221,7 @@ namespace SynoAI.Controllers
         /// </summary>
         public static List<String> GetSnapshots(string cameraName, DateTime date) 
         {
-            List<String> files = new List<String>();
+            List<String> files = new();
             string directory = Path.Combine(Constants.DIRECTORY_CAPTURES, cameraName);
 
             if (Directory.Exists(directory))
@@ -247,9 +250,9 @@ namespace SynoAI.Controllers
         /// </summary>
         private static int GetObjects(string filename)
         {
-            int objects = 0;
             string name = Path.GetFileNameWithoutExtension(filename);
             int index = name.IndexOf("-");
+            int objects;
             if (index != -1)
             {
                 //try to extract the number of valid objects predicted inside this snapshot

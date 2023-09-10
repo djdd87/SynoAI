@@ -54,14 +54,15 @@ namespace SynoAI.Notifiers.Webhook
         /// <param name="logger">A logger.</param>
         public override async Task SendAsync(Camera camera, Notification notification, ILogger logger)
         {
-            logger.LogInformation($"{camera.Name}: Webhook: Processing");
+            logger.LogInformation("{cameraName}: Webhook: Processing",
+                camera.Name);
             using (HttpClient client = new())
             {
                 FileStream fileStream = null;
                 client.DefaultRequestHeaders.Authorization = GetAuthenticationHeader();
 
                 IEnumerable<string> foundTypes = notification.FoundTypes;
-                string message = GetMessage(camera, foundTypes);
+                string message = GetMessage(camera, foundTypes, new List<AIPrediction>());
 
                 HttpContent content;
                 if (SendImage)
@@ -103,7 +104,9 @@ namespace SynoAI.Notifiers.Webhook
                     content = new StringContent(GenerateJSON(camera, notification, false), null, "application/json");
                 }
 
-                logger.LogInformation($"{camera.Name}: Webhook: Calling {Method}.");
+                logger.LogInformation("{cameraName}: Webhook: Calling {Method}.",
+                    camera.Name,
+                    Method);
 
                 HttpResponseMessage response;
                 switch (Method)
@@ -124,18 +127,25 @@ namespace SynoAI.Notifiers.Webhook
                         response = await client.PutAsync(Url, content);
                         break;
                     default:
-                        logger.LogError($"{camera.Name}: Webhook: The method type '{Method}' is not supported.");
+                        logger.LogError("{cameraName}: Webhook: The method type '{Method}' is not supported.",
+                            camera.Name,
+                            Method);
                         return;
                 }
 
                 if (response.IsSuccessStatusCode)
                 {
-                    logger.LogInformation($"{camera.Name}: Webhook: Success.");
-                    logger.LogDebug($"{camera.Name}: Webhook: Success with HTTP status code '{response.StatusCode}'.");
+                    logger.LogInformation("{cameraName}: Webhook: Success.",
+                        camera.Name);
+                    logger.LogDebug("{cameraName}: Webhook: Success with HTTP status code '{responseStatusCode}'.",
+                        camera.Name,
+                        response.StatusCode);
                 }
                 else
                 {
-                    logger.LogWarning($"{camera.Name}: Webhook: The end point responded with HTTP status code '{response.StatusCode}'.");
+                    logger.LogWarning("{cameraName}: Webhook: The end point responded with HTTP status code '{responseStatusCode}'.",
+                        camera.Name,
+                        response.StatusCode);
                 }
 
                 if (fileStream != null)

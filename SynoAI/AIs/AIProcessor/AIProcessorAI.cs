@@ -2,11 +2,13 @@
 using SynoAI.App;
 using SynoAI.Models;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
-namespace SynoAI.AIs.DeepStack
+namespace SynoAI.AIs.AIProcessor
 {
-    internal class DeepStackAI : AI
+    internal class AIProcessorAI : AI
     {
+        public override AIType AIType => Config.AI;
         public override async Task<IEnumerable<AIPrediction>> Process(ILogger logger, Camera camera, byte[] image)
         {
             Stopwatch stopwatch = Stopwatch.StartNew();
@@ -19,7 +21,12 @@ namespace SynoAI.AIs.DeepStack
                 { new StringContent(minConfidence.ToString()), "min_confidence" } // From face detection example - using JSON with MinConfidence didn't always work
             };
 
-            logger.LogDebug($"{camera.Name}: DeepStackAI: POSTing image with minimum confidence of {minConfidence} ({camera.Threshold}%) to {string.Join("/", Config.AIUrl, Config.AIPath)}.");
+            logger.LogDebug("{CameraName}: {AIType}: POSTing image with minimum confidence of {MinConfidence} ({CameraThreshold}%) to {Url}.",
+                camera.Name,
+                this.AIType,
+                minConfidence,
+                camera.Threshold,
+                string.Join("/", Config.AIUrl, Config.AIPath));
 
             Uri uri = GetUri(Config.AIUrl, Config.AIPath);
 
@@ -28,7 +35,7 @@ namespace SynoAI.AIs.DeepStack
                 HttpResponseMessage response = await Shared.HttpClient.PostAsync(uri, multipartContent);
                 if (response.IsSuccessStatusCode)
                 {
-                    DeepStackResponse deepStackResponse = await GetResponse(logger, camera, response);
+                    AIProcessorResponse deepStackResponse = await GetResponse(logger, camera, response, this.AIType);
                     if (deepStackResponse.Success)
                     {
                         IEnumerable<AIPrediction> predictions = deepStackResponse.Predictions.Where(x => x.Confidence >= minConfidence).Select(x => new AIPrediction()
@@ -42,22 +49,35 @@ namespace SynoAI.AIs.DeepStack
                         }).ToList();
 
                         stopwatch.Stop();
-                        logger.LogInformation($"{camera.Name}: DeepStackAI: Processed successfully ({stopwatch.ElapsedMilliseconds}ms).");
+                        logger.LogInformation("{CameraName}: {AIType}: Processed successfully ({ElapsedMilliseconds}ms).",
+                            camera.Name,
+                            this.AIType,
+                            stopwatch.ElapsedMilliseconds);
+
                         return predictions;
                     }
                     else
                     {
-                        logger.LogWarning($"{camera.Name}: DeepStackAI: Failed with unknown error.");
+                        logger.LogWarning("{cameraName}: {AIType}: Failed with unknown error.", 
+                            camera.Name,
+                            this.AIType);
                     }
                 }
                 else
                 {
-                    logger.LogWarning($"{camera.Name}: DeepStackAI: Failed to call API with HTTP status code '{response.StatusCode}'.");
+                    logger.LogWarning("{cameraName}: {AIType}: Failed to call API with HTTP status code '{responseStatusCode}'.",
+                        camera.Name,
+                        this.AIType,
+                        response.StatusCode);
                 }
             }
             catch (HttpRequestException ex)
             {
-                logger.LogError($"{camera.Name}: DeepStackAI: Failed to call API error '{ex}'.");
+                logger.LogError("{camera.Name}: {AIType}: Failed to call API error '{ex}'.",
+                    camera.Name,
+                    this.AIType,
+                    ex
+                    );
             }
 
             return null;
@@ -81,13 +101,17 @@ namespace SynoAI.AIs.DeepStack
         /// <param name="camera"></param>
         /// <param name="message">The message to parse.</param>
         /// <param name="logger"></param>
+        /// <param name="aiType"></param>
         /// <returns>A usable object.</returns>
-        private static async Task<DeepStackResponse> GetResponse(ILogger logger, Camera camera, HttpResponseMessage message)
+        private static async Task<AIProcessorResponse> GetResponse(ILogger logger, Camera camera, HttpResponseMessage message, AIType aiType)
         {
             string content = await message.Content.ReadAsStringAsync();                
-            logger.LogDebug($"{camera.Name}: DeepStackAI: Responded with {content}.");
+            logger.LogDebug("{cameraName}: {AIType}: Responded with {content}.",
+                camera.Name,
+                aiType,
+                content);
 
-            return JsonConvert.DeserializeObject<DeepStackResponse>(content);
+            return JsonConvert.DeserializeObject<AIProcessorResponse>(content);
         }
     }
 }
