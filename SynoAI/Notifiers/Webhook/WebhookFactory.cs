@@ -17,15 +17,17 @@ namespace SynoAI.Notifiers.Webhook
                 string method = section.GetValue<string>("Method", "POST");
                 bool sendImage = section.GetValue<bool>("SendImage", true);
                 bool sendTypes = section.GetValue<bool>("SendTypes", false);
+                bool allowInsecureUrl = section.GetValue("AllowInsecureUrl", false);
 
-                Webhook webhook = new Webhook()
+                Webhook webhook = new()
                 {
                     Url = url,
                     Authentication = authentication,
                     Username = username,
                     Password = password,
                     Token = token,
-                    SendImage = sendImage
+                    SendImage = sendImage,
+                    AllowInsecureUrl = allowInsecureUrl
                 };
 
                 if (!string.IsNullOrWhiteSpace(imageField))
