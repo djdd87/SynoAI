@@ -16,8 +16,8 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
-      run: docker build -t djdd87/synoai:latest SynoAI
+      run: docker build -t dewitauto/synoai-fork:latest SynoAI
     - name: Login to Docker Hub
       run: docker login -u="${{ secrets.DOCKERHUB_USERNAME }}" -p="${{ secrets.DOCKERHUB_PASSWORD }}"
     - name: Publish the Docker image
-      run: docker push djdd87/synoai:latest
+      run: docker push dewitauto/synoai-fork:latest
