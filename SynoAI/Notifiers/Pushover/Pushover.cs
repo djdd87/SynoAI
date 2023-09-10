@@ -55,8 +55,8 @@ namespace SynoAI.Notifiers.Pushover
             logger.LogInformation("{cameraName}: Pushover: Building message",
                 camera.Name);
 
-            //string message = GetMessage(camera, notification.FoundTypes);
-            string message = GetMessage(camera, notification.FoundTypes, new List<AIPrediction>());
+            //string message = GetMessage(camera, notification.FoundTypes, new List<AIPrediction>());
+            string message = GetMessage(camera, notification.FoundTypes, notification.ValidPredictions.ToList());
             string device = Devices == null || !Devices.Any() ? String.Empty : string.Join(',', Devices);
             string title = $"{camera.Name}: Movement Detected";
 
