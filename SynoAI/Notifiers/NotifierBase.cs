@@ -17,55 +17,40 @@ namespace SynoAI.Notifiers
         public virtual Task CleanupAsync(ILogger logger) { return Task.CompletedTask; }
 
         protected static string GetMessage(Camera camera, IEnumerable<string> foundTypes, List<AIPrediction> predictions, string errorMessage = null)
-
         {
-            string result ;
+            string result;
+
             if (Config.AlternativeLabelling && Config.DrawMode == DrawMode.Matches)
             {
-                // Defaulting into generic label type
-                String typeLabel = "object";
-
-                if (camera.Types.Count() == 1) {
-                    // Only one object type configured: use it instead of generic "object" label
-                    typeLabel = camera.Types.First();
-                }
+                // Defaulting into a generic label type
+                string typeLabel = foundTypes.Count() == 1 ? foundTypes.First() : "objects";
 
                 if (foundTypes.Count() > 1)
                 {
                     // Several objects detected
-                    result = $"{camera.Name}: {foundTypes.Count()} {typeLabel}s\n{String.Join("\n", foundTypes.Select(x => x).ToArray())}";
-                } 
-                else 
+                    result = $"{camera.Name}: {foundTypes.Count()} {typeLabel}s\n{string.Join("\n", foundTypes)}";
+                }
+                else
                 {
                     // Just one object detected
-                    result =  $"{camera.Name}: {foundTypes.First()}";    
+                    result = $"{camera.Name}: {foundTypes.First()}";
                 }
-                // Include prediction confidence
-                foreach (var prediction in predictions)
-                {
-                    result += $"\n{prediction.Label}: {prediction.Confidence}%";
-                }
-
             }
-            else 
+            else
             {
-                // Standard (old) labelling
-                result =  $"Motion detected on {camera.Name}\n\nDetected {foundTypes.Count()} objects:\n{String.Join("\n", foundTypes.Select(x => x).ToArray())}";   
+                // Standard (old) labeling
+                result = $"Motion detected on {camera.Name}\n\nDetected {foundTypes.Count()} objects:\n{string.Join("\n", foundTypes)}";
             }
-            // Include prediction confidence
+
+            // Include prediction confidence for each detected object
             foreach (var prediction in predictions)
             {
                 result += $"\n{prediction.Label}: {prediction.Confidence}%";
             }
 
-
-            if (!string.IsNullOrWhiteSpace(errorMessage)){
-                result += $"\nAn error occurred during the creation of the notification: {errorMessage}";
-            }
-            if (predictions != null && predictions.Any())
+            if (!string.IsNullOrWhiteSpace(errorMessage))
             {
-                result += "\nPredictions:\n";
-                result += string.Join("\n", predictions.Select(prediction => $"{prediction.Label} ({prediction.Confidence}%)"));
+                result += $"\nAn error occurred during the creation of the notification: {errorMessage}";
             }
 
             return result;
