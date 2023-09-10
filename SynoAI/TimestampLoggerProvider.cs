@@ -55,7 +55,7 @@
             var logMessage = $"{timestamp} [{logLevel}] {formatter(state, exception)}";
 
             // Write the log message to the console
-            _consoleLogger.Log(logLevel, eventId, state, exception, (_, _) => logMessage);
+            Console.WriteLine(logMessage);
         }
     }
 }
