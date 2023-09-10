@@ -22,7 +22,6 @@ namespace SynoAI
                 .ConfigureLogging((context, logging) =>
                 {
                     logging.ClearProviders(); // Remove any default log providers
-                    logging.AddConsole();    // Add the console logger
                 })
                 .Build()
                 .Run();
