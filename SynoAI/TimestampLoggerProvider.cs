@@ -32,6 +32,16 @@
 
     public class TimestampLogger : ILogger
     {
+        private readonly ILogger _consoleLogger; // Add a console logger
+
+        public TimestampLogger()
+        {
+            _consoleLogger = LoggerFactory.Create(builder =>
+            {
+                builder.AddConsole();
+            }).CreateLogger("Console");
+        }
+
         public IDisposable BeginScope<TState>(TState state) => null;
 
         public bool IsEnabled(LogLevel logLevel) => true;
@@ -44,9 +54,8 @@
             // Include the timestamp in the log message
             var logMessage = $"{timestamp} [{logLevel}] {formatter(state, exception)}";
 
-            // Write the log message to the console or any other log destination
-            Console.WriteLine(logMessage);
+            // Write the log message to the console
+            _consoleLogger.Log(logLevel, eventId, state, exception, (_, _) => logMessage);
         }
     }
-
 }
