@@ -1,5 +1,8 @@
 namespace SynoAI.Models
 {
+    /// <summary>
+    /// Defines the overlapMode for camera images
+    /// </summary>
     public enum OverlapMode
     {   
         /// <summary>

@@ -3,10 +3,15 @@ using SynoAI.Services;
 using SynoAI.Hubs;
 
 namespace SynoAI
-{
+{    
+    /// <summary>
+     /// Configures the services for the application.
+     /// </summary>
     public class Startup
     {
-        // This method gets called by the runtime. Use this method to add services to the container.
+        /// <summary>
+        /// Configures the services for the application.
+        /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IAIService, AIService>();
@@ -24,7 +29,9 @@ namespace SynoAI
             services.AddSignalR();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// <summary>
+        /// Configures the application.
+        /// </summary>
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IConfiguration configuration, IHostApplicationLifetime lifetime, ILogger<Startup> logger, ISynologyService synologyService)
         {
             Config.Generate(logger, configuration);
@@ -54,15 +61,17 @@ namespace SynoAI
 
             lifetime.ApplicationStarted.Register(() =>
             {
-                List<Task> initializationTasks = new List<Task>();
-                initializationTasks.Add(synologyService.InitialiseAsync());
+                List<Task> initializationTasks = new()
+                {
+                    synologyService.InitialiseAsync()
+                };
                 initializationTasks.AddRange(Config.Notifiers.Select(n => n.InitializeAsync(logger)));
                 Task.WhenAll(initializationTasks).Wait();
             });
 
             lifetime.ApplicationStopping.Register(() =>
             {
-                List<Task> cleanupTasks = new List<Task>();
+                List<Task> cleanupTasks = new();
                 cleanupTasks.AddRange(Config.Notifiers.Select(n => n.CleanupAsync(logger)));
                 Task.WhenAll(cleanupTasks).Wait();
             });

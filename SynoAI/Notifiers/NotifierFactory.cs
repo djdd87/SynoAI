@@ -18,37 +18,18 @@ namespace SynoAI.Notifiers
 
         public static INotifier Create(NotifierType type, ILogger logger, IConfigurationSection section)
         {
-            NotifierFactory factory;
-            switch (type)
+            NotifierFactory factory = type switch
             {
-                case NotifierType.Email:
-                    factory = new EmailFactory();
-                    break;
-                case NotifierType.Pushbullet:
-                    factory = new PushbulletFactory();
-                    break;
-                case NotifierType.Pushover:
-                    factory = new PushoverFactory();
-                    break;
-                case NotifierType.SynologyChat:
-                    factory = new SynologyChatFactory();
-                    break;
-                case NotifierType.Telegram:
-                    factory = new TelegramFactory();
-                    break;
-                case NotifierType.Webhook:
-                    factory = new WebhookFactory();
-                    break;
-                case NotifierType.Discord:
-                    factory = new DiscordFactory();
-                    break;
-                case NotifierType.MQTT:
-                    factory = new MqttFactory();
-                    break;
-                default:
-                    throw new NotImplementedException(type.ToString());
-            }
-
+                NotifierType.Email => new EmailFactory(),
+                NotifierType.Pushbullet => new PushbulletFactory(),
+                NotifierType.Pushover => new PushoverFactory(),
+                NotifierType.SynologyChat => new SynologyChatFactory(),
+                NotifierType.Telegram => new TelegramFactory(),
+                NotifierType.Webhook => new WebhookFactory(),
+                NotifierType.Discord => new DiscordFactory(),
+                NotifierType.MQTT => new MqttFactory(),
+                _ => throw new NotImplementedException(type.ToString()),
+            };
             INotifier notifier = factory.Create(logger, section);
             notifier.Cameras = section.GetSection("Cameras").Get<List<string>>();
             notifier.Types = section.GetSection("Types").Get<List<string>>();

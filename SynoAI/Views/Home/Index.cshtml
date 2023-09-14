@@ -41,14 +41,14 @@
                 <div class="axis-y">
                     @for (int y = 1; y <= @graphDraw.GraphYSteps; y++) 
                     {
-                        <div class="value-y">@graphDraw.yStepping(@data.yMax, y)</div>
+                        <div class="value-y">@graphDraw.YStepping(@data.YMax, y)</div>
                     }               
                 </div>
                 @foreach (SynoAI.Models.GraphPoint graphPoint in data.GraphPoints)
                 {
                     <a href="/@camera.Name/@graphPoint.Date.Year/@graphPoint.Date.Month/@graphPoint.Date.Day/@graphPoint.Date.Hour">
-                        <div class="p" title="@graphPoint.Predictions Snapshots @@ @graphPoint.Date.ToString(@"HH") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Predictions)px; width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
-                        <div class="o" title="@graphPoint.Objects Objects @@ @graphPoint.Date.ToString(@"HH") Hs." style="height:@graphDraw.GraphBarHeight(data.yMax, graphPoint.Objects)px;width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
+                        <div class="p" title="@graphPoint.Predictions Snapshots @@ @graphPoint.Date.ToString(@"HH") Hs." style="height:@graphDraw.GraphBarHeight(data.YMax, graphPoint.Predictions)px; width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
+                        <div class="o" title="@graphPoint.Objects Objects @@ @graphPoint.Date.ToString(@"HH") Hs." style="height:@graphDraw.GraphBarHeight(data.YMax, graphPoint.Objects)px;width:@graphDraw.GraphColsWidth(data.GraphPoints.Count())px"></div>
                     </a>
                 }
                 <div class="axis-x">

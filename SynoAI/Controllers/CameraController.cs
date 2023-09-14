@@ -81,6 +81,7 @@ namespace SynoAI.Controllers
                 return;
             }
 
+
             // Ensure the camera isn't under a delay
             lock (_delayedCameraChecks)
             {
@@ -114,6 +115,7 @@ namespace SynoAI.Controllers
             }
 
             try
+
             {
                 // Kick off the autocleanup
                 CleanupOldImages();
@@ -288,6 +290,7 @@ namespace SynoAI.Controllers
                             id,
                             overallStopwatch.ElapsedMilliseconds);
             }
+
                     else
                     {
                         // We didn't get any predictions whatsoever from the AI
@@ -329,13 +332,15 @@ namespace SynoAI.Controllers
                 }
             }
         }
-        
+        /// <summary>
+        /// POSTs camera options with the specified ID.
+        /// </summary>
+        /// <param name="id">The ID of the camera.</param>
+        /// <param name="options">The camera options to be posted.</param>
         [HttpPost]
         [Route("{id}")]
 
-
         public void Post(string id, [FromBody]CameraOptionsDto options)
-
         {
             if (options.HasChanged(x=> x.Enabled))
             {

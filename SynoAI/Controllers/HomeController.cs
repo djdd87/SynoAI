@@ -276,13 +276,13 @@ namespace SynoAI.Controllers
             data.GraphPoints.Add( new GraphPoint() { Date = date, Objects = objects, Predictions = predictions });
 
             //Adjust Max value for Y axis
-            if ( objects  > data.yMax)
+            if ( objects  > data.YMax)
             {
-               data.yMax = objects ;
+               data.YMax = objects ;
             } 
-            else if ( predictions  > data.yMax)
+            else if ( predictions  > data.YMax)
             {
-                data.yMax = predictions;
+                data.YMax = predictions;
             } 
             return data;
         }

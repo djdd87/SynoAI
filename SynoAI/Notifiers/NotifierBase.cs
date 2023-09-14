@@ -63,7 +63,7 @@ namespace SynoAI.Notifiers
                 return null;
             }
 
-            UriBuilder builder = new UriBuilder(Config.SynoAIUrL);
+            UriBuilder builder = new(Config.SynoAIUrL);
             builder.Path += $"{camera.Name}/{notification.ProcessedImage.FileName}";
 
             return builder.Uri.ToString();
@@ -82,8 +82,8 @@ namespace SynoAI.Notifiers
             List<AIPrediction> validPredictions = notification.ValidPredictions.ToList();
             jsonObject.predictions = validPredictions.Select(prediction => new
             {
-                Confidence = prediction.Confidence,
-                Label = prediction.Label,
+                prediction.Confidence,
+                prediction.Label,
                 // Add other properties as needed
             }).ToList();
 

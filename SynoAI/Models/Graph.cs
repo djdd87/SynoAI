@@ -36,7 +36,7 @@ namespace SynoAI.Models
         /// <summary>
         /// Highest count of objects / snapshots, used to build the y-Axis labels and graph scaling
         /// </summary>
-        public int yMax { get; set; }
+        public int YMax { get; set; }
 
         /// <summary>
         /// The amount of time in hours
@@ -64,13 +64,16 @@ namespace SynoAI.Models
         /// </summary>
         public List<GraphPoint> GraphPoints { get; set; }
 
+        /// <summary>
+        /// Represents a graph data structure.
+        /// </summary>
         public GraphData() {
             GraphPoints = new List<GraphPoint>();
             HoursCounter = 0;
             MinutesCounter = 0;
             Snapshots = 0;
             Storage =0;
-            yMax = 0;
+            YMax = 0;
         }
 
 
@@ -132,9 +135,9 @@ namespace SynoAI.Models
         public int GraphColsWidth(int graphpoints, bool half = true) 
         {   
             int width = GraphWidth - GraphYAxisWidth;        
-            width = width / graphpoints;
-            width = width / 2;
-            if (!half) width = width * 2;
+            width /= graphpoints;
+            width /= 2;
+            if (!half) width *= 2;
             return width;
         }
 
@@ -154,16 +157,16 @@ namespace SynoAI.Models
         /// <summary>
         /// Since Y axis shows 'NumberOfSteps' reference values, if there are less than GraphYSteps snapshots, we need to adjust way of displaying the y-axis ref
         /// </summary>
-        public String yStepping(int yMax, int Step) 
+        public String YStepping(int yMax, int Step) 
         {
             double yValue = yMax;
-            yValue = yValue / GraphYSteps;
+            yValue /= GraphYSteps;
             yValue = Math.Round(yValue); 
 
             //Y axis label results being a minimal reasonable number, or it is just the first step (top number, max value) so use it!
             if (yValue > 1 || Step == 1)
             {        
-                yValue = yValue * (Step -1);
+                yValue *= (Step -1);
                 yValue = yMax - yValue;
                 return yValue.ToString();
             }

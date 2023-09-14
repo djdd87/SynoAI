@@ -74,34 +74,32 @@ namespace SynoAI.Notifiers.Pushover
             };
 
             // Send the message
-            using (FileStream imageStream = notification.ProcessedImage.GetReadonlyStream())
-            using (StreamContent imageContent = new(imageStream))
+            using FileStream imageStream = notification.ProcessedImage.GetReadonlyStream();
+            using StreamContent imageContent = new(imageStream);
+            imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
+            form.Add(imageContent, "attachment", "image.png");
+
+            // Remove content type that is not in the docs
+            foreach (var param in form)
             {
-                imageContent.Headers.ContentType = MediaTypeHeaderValue.Parse("image/png");
-                form.Add(imageContent, "attachment", "image.png");
+                param.Headers.ContentType = null;
+            }
 
-                // Remove content type that is not in the docs
-                foreach (var param in form)
-                {
-                    param.Headers.ContentType = null;
-                }
-
-                logger.LogInformation("{cameraName}: Pushover: Sending message",
+            logger.LogInformation("{cameraName}: Pushover: Sending message",
+                camera.Name);
+            HttpResponseMessage responseMessage = await Shared.HttpClient.PostAsync(URI_MESSAGE, form);
+            if (responseMessage.IsSuccessStatusCode)
+            {
+                logger.LogInformation("{cameraName}: Pushover: Notification sent successfully",
                     camera.Name);
-                HttpResponseMessage responseMessage = await Shared.HttpClient.PostAsync(URI_MESSAGE, form);
-                if (responseMessage.IsSuccessStatusCode)
-                {
-                    logger.LogInformation("{cameraName}: Pushover: Notification sent successfully",
-                        camera.Name);
-                }
-                else
-                {
-                    string error = await responseMessage.Content.ReadAsStringAsync();
-                    logger.LogError("{cameraName}: Pushover: The end point responded with HTTP status code '{responseMessageStatusCode}' and error '{error}'.",
-                        camera.Name,
-                        responseMessage.StatusCode,
-                        error);
-                }
+            }
+            else
+            {
+                string error = await responseMessage.Content.ReadAsStringAsync();
+                logger.LogError("{cameraName}: Pushover: The end point responded with HTTP status code '{responseMessageStatusCode}' and error '{error}'.",
+                    camera.Name,
+                    responseMessage.StatusCode,
+                    error);
             }
         }
     }

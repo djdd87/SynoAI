@@ -2,6 +2,9 @@
 
 namespace SynoAI.Controllers
 {
+    /// <summary>
+    /// Image Controller to get the specific file
+    /// </summary>
     public class ImageController : Controller
     {
         /// <summary>
