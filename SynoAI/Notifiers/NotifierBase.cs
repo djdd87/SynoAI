@@ -39,7 +39,7 @@ namespace SynoAI.Notifiers
             else
             {
                 // Standard (old) labeling
-                result = $"Motion detected on {camera.Name}\n\nDetected {foundTypes.Count()} objects:\n{string.Join("\n", foundTypes)}";
+                result = $"Motion detected on {camera.Name}\n\nDetected {foundTypes.Count()} objects:\n";
             }
 
             // Include prediction confidence for each detected object
