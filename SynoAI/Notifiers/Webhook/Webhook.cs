@@ -1,5 +1,11 @@
 using Newtonsoft.Json;
 using SynoAI.Models;
+using SynoAI.Services;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net;
 using System.Text;
@@ -46,6 +52,10 @@ namespace SynoAI.Notifiers.Webhook
         /// content-type of multipart/form-data.
         /// </summary>
         public bool SendImage { get; set; }
+        /// <summary>
+        /// Allow insecure URL Access to the API.
+        /// </summary>
+        public bool AllowInsecureUrl { get; set; }
 
         /// <summary>
         /// Allow insecure URL Access to the API.
@@ -60,10 +70,9 @@ namespace SynoAI.Notifiers.Webhook
         /// <param name="logger">A logger.</param>
         public override async Task SendAsync(Camera camera, Notification notification, ILogger logger)
         {
-            logger.LogInformation("{cameraName}: Webhook: Processing",
-                camera.Name);
+            logger.LogInformation("{cameraName}: Webhook: Processing", camera.Name);
+            
             using (HttpClient client = GetHttpClient())
-
             {
                 FileStream fileStream = null;
                 client.DefaultRequestHeaders.Authorization = GetAuthenticationHeader();
@@ -144,11 +153,10 @@ namespace SynoAI.Notifiers.Webhook
                 }
                 catch (Exception ex)
                 { 
-                logger.LogError("{cameraName}: Webhook: Unhandled Exception occurred '{exMessage}'.",
-                    camera.Name,
-                    ex.Message);
-                return;
-
+                    logger.LogError("{cameraName}: Webhook: Unhandled Exception occurred '{exMessage}'.",
+                        camera.Name,
+                        ex.Message);
+                    return;
                 }
 
                 if (response.IsSuccessStatusCode)
@@ -190,7 +198,6 @@ namespace SynoAI.Notifiers.Webhook
             };
             return new(httpClientHandler);
         }
-
 
         /// <summary>
         /// Generates an authentication header for the client.
