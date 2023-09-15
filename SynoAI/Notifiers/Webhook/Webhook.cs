@@ -1,5 +1,11 @@
 using Newtonsoft.Json;
 using SynoAI.Models;
+using SynoAI.Services;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 
@@ -45,6 +51,10 @@ namespace SynoAI.Notifiers.Webhook
         /// content-type of multipart/form-data.
         /// </summary>
         public bool SendImage { get; set; }
+        /// <summary>
+        /// Allow insecure URL Access to the API.
+        /// </summary>
+        public bool AllowInsecureUrl { get; set; }
 
         /// <summary>
         /// Sends a notification to the Webhook.
@@ -55,7 +65,7 @@ namespace SynoAI.Notifiers.Webhook
         public override async Task SendAsync(Camera camera, Notification notification, ILogger logger)
         {
             logger.LogInformation($"{camera.Name}: Webhook: Processing");
-            using (HttpClient client = new())
+            using (HttpClient client = GetHttpClient())
             {
                 FileStream fileStream = null;
                 client.DefaultRequestHeaders.Authorization = GetAuthenticationHeader();
@@ -106,26 +116,34 @@ namespace SynoAI.Notifiers.Webhook
                 logger.LogInformation($"{camera.Name}: Webhook: Calling {Method}.");
 
                 HttpResponseMessage response;
-                switch (Method)
+                try
                 {
-                    case "DELETE":
-                        response = await client.DeleteAsync(Url);
-                        break;
-                    case "GET":
-                        response = await client.GetAsync(Url);
-                        break;
-                    case "PATCH":
-                        response = await client.PatchAsync(Url, content);
-                        break;
-                    case "POST":
-                        response = await client.PostAsync(Url, content);
-                        break;
-                    case "PUT":
-                        response = await client.PutAsync(Url, content);
-                        break;
-                    default:
-                        logger.LogError($"{camera.Name}: Webhook: The method type '{Method}' is not supported.");
-                        return;
+                    switch (Method)
+                    {
+                        case "DELETE":
+                            response = await client.DeleteAsync(Url);
+                            break;
+                        case "GET":
+                            response = await client.GetAsync(Url);
+                            break;
+                        case "PATCH":
+                            response = await client.PatchAsync(Url, content);
+                            break;
+                        case "POST":
+                            response = await client.PostAsync(Url, content);
+                            break;
+                        case "PUT":
+                            response = await client.PutAsync(Url, content);
+                            break;
+                        default:
+                            logger.LogError($"{camera.Name}: Webhook: The method type '{Method}' is not supported.");
+                            return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    logger.LogError($"{camera.Name}: Webhook: Unhandled Exception occurred '{ex.Message}'.");
+                    return;
                 }
 
                 if (response.IsSuccessStatusCode)
@@ -143,6 +161,24 @@ namespace SynoAI.Notifiers.Webhook
                     fileStream.Dispose();
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="HttpClient"/> object for the Webhook request.
+        /// </summary>
+        /// <returns>A <see cref="HttpClient"/>.</returns>
+        private HttpClient GetHttpClient()
+        {
+            if (!Config.AllowInsecureUrl)
+            {
+                return new();
+            }
+
+            HttpClientHandler httpClientHandler = new()
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, sslPolicyErrors) => true
+            };
+            return new(httpClientHandler);
         }
 
         /// <summary>
