@@ -1,12 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
-using SynoAI.Models;
-using SynoAI.Services;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using SynoAI.Models;
 
 namespace SynoAI.Notifiers
 {
-    public interface INotifier
+    internal interface INotifier
     {
         /// <summary>
         /// The list of camera names that the notifier is for.

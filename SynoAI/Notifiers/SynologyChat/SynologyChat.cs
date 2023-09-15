@@ -1,23 +1,12 @@
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SynoAI.Models;
-using SynoAI.Services;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SynoAI.Notifiers.SynologyChat
 {
     /// <summary>
     /// Calls a third party API.
     /// </summary>
-    public class SynologyChat : NotifierBase
+    internal class SynologyChat : NotifierBase
     {
         /// <summary>
         /// The URL to send the request to including the token.

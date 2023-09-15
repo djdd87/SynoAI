@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using SynoAI.Notifiers.Email;
+﻿using SynoAI.Notifiers.Email;
 using SynoAI.Notifiers.Pushbullet;
 using SynoAI.Notifiers.Pushover;
 using SynoAI.Notifiers.SynologyChat;
@@ -8,15 +6,13 @@ using SynoAI.Notifiers.Telegram;
 using SynoAI.Notifiers.Webhook;
 using SynoAI.Notifiers.Discord;
 using SynoAI.Notifiers.Mqtt;
-using System;
-using System.Collections.Generic;
 
 namespace SynoAI.Notifiers
 {
     /// <summary>
     /// Handles the construction of the notifiers.
     /// </summary>
-    public abstract class NotifierFactory
+    internal abstract class NotifierFactory
     {
         public abstract INotifier Create(ILogger logger, IConfigurationSection section);
 

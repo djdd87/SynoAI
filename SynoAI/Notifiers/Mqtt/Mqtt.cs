@@ -1,17 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-using SynoAI.Models;
-using System.Threading.Tasks;
+﻿using SynoAI.Models;
 using MQTTnet.Client;
 using MQTTnet;
-using System.Threading;
-using System;
 
 namespace SynoAI.Notifiers.Mqtt
 {
     /// <summary>
     /// Sends a message over MQTT.
     /// </summary>
-    public sealed class Mqtt : NotifierBase
+    internal sealed class Mqtt : NotifierBase
     {
         /// <summary>
         /// The username when using Basic authentication.

@@ -1,9 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-
-namespace SynoAI.Notifiers.Pushbullet
+﻿namespace SynoAI.Notifiers.Pushbullet
 {
-    public class PushbulletFactory : NotifierFactory
+    internal class PushbulletFactory : NotifierFactory
     {
         public override INotifier Create(ILogger logger, IConfigurationSection section)
         {

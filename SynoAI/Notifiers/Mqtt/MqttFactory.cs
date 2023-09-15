@@ -1,10 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using SynoAI.Notifiers.Webhook;
-
-namespace SynoAI.Notifiers.Mqtt
+﻿namespace SynoAI.Notifiers.Mqtt
 {
-    public class MqttFactory : NotifierFactory
+    internal class MqttFactory : NotifierFactory
     {
         public override INotifier Create(ILogger logger, IConfigurationSection section)
         {

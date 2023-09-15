@@ -1,17 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using System.IO;
 using SynoAI.Models;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 
-using System.Linq;
-
 namespace SynoAI.Controllers
 {
-
     public class HomeController : Controller
     {
         static readonly string[] byteSizes = { "bytes", "Kb", "Mb", "Gb", "Tb" };
@@ -63,7 +57,7 @@ namespace SynoAI.Controllers
   
             try 
             {
-                ViewData["date"] = new DateTime(Int16.Parse(year),Int16.Parse(month),Int16.Parse(day),Int16.Parse(hour),Int16.Parse(minute),59,999);;
+                ViewData["date"] = new DateTime(Int16.Parse(year),Int16.Parse(month),Int16.Parse(day),Int16.Parse(hour),Int16.Parse(minute),59,999);
             }
             catch (Exception) 
             {
@@ -75,8 +69,8 @@ namespace SynoAI.Controllers
 
         /// <summary>
         /// Return snapshot image as JPEG, either in original size or a scaled down version, if asked.
-        //// In order to use System.Drawing.Common
-        //// In Terminal, issue: dotnet add SynoAI package System.Drawing.Common
+        /// In order to use System.Drawing.Common
+        /// In Terminal, issue: dotnet add SynoAI package System.Drawing.Common
         /// </summary>
         [Route("{cameraName}/{filename}/{width}")]
         [Route("{cameraName}/{filename}")]
@@ -149,7 +143,7 @@ namespace SynoAI.Controllers
 
                 //User is asking for global 24 hours report, so I also meter the general storage / snapshots / hours counters.
                 if (!GraphHour)
-                    data.Snapshots = snapshots.Count();
+                    data.Snapshots = snapshots.Length;
 
                 foreach (FileInfo snapshot in snapshots) 
                 {
@@ -259,7 +253,7 @@ namespace SynoAI.Controllers
             if (index != -1)
             {
                 //try to extract the number of valid objects predicted inside this snapshot
-                if (!int.TryParse(name.Substring(index + 1), out objects))
+                if (!int.TryParse(name.AsSpan(index + 1), out objects))
                     objects = 0;
             }
             else
@@ -315,7 +309,7 @@ namespace SynoAI.Controllers
         /// </summary>
         public static string GetTypes(Camera camera) 
         {
-            if (camera.Types.Count() == 0) 
+            if (!camera.Types.Any()) 
             {
                  return "Any";
             }

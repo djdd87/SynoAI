@@ -1,8 +1,6 @@
-﻿using System.Net.Http;
-
-namespace SynoAI.App
+﻿namespace SynoAI.App
 {
-    public class HttpClientWrapper : HttpClient, IHttpClient
+    internal class HttpClientWrapper : HttpClient, IHttpClient
     {
     }
 }

@@ -1,17 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using SkiaSharp;
 using SynoAI.Models;
 using SynoAI.Notifiers;
 using SynoAI.Services;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
-using SynoAI.Extensions;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using SynoAI.Hubs;
 using System.Drawing;
@@ -34,10 +27,10 @@ namespace SynoAI.Controllers
         private readonly ISynologyService _synologyService;
         private readonly ILogger<CameraController> _logger;
 
-        private static ConcurrentDictionary<string, bool> _runningCameraChecks = new(StringComparer.OrdinalIgnoreCase);
-        private static ConcurrentDictionary<string, DateTime> _delayedCameraChecks = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly ConcurrentDictionary<string, bool> _runningCameraChecks = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly ConcurrentDictionary<string, DateTime> _delayedCameraChecks = new(StringComparer.OrdinalIgnoreCase);
 
-        private static ConcurrentDictionary<string, bool> _enabledCameras = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly ConcurrentDictionary<string, bool> _enabledCameras = new(StringComparer.OrdinalIgnoreCase);
 
         public CameraController(IAIService aiService, ISynologyService synologyService, ILogger<CameraController> logger, IHubContext<SynoAIHub> hubContext)
         {
@@ -189,8 +182,8 @@ namespace SynoAI.Controllers
 
                     // Save the original unprocessed image if required
                     if (Config.SaveOriginalSnapshot == SaveSnapshotMode.Always ||
-                        (Config.SaveOriginalSnapshot == SaveSnapshotMode.WithPredictions && predictions.Count() > 0) ||
-                        (Config.SaveOriginalSnapshot == SaveSnapshotMode.WithValidPredictions && validPredictions.Count() > 0))
+                        (Config.SaveOriginalSnapshot == SaveSnapshotMode.WithPredictions && predictions.Any()) ||
+                        (Config.SaveOriginalSnapshot == SaveSnapshotMode.WithValidPredictions && validPredictions.Any()))
                     {
                         _logger.LogInformation($"{id}: Saving original image");
                         SnapshotManager.SaveOriginalImage(_logger, camera, snapshot);
@@ -278,7 +271,7 @@ namespace SynoAI.Controllers
         private bool ShouldIncludePrediction(string id, Camera camera, Stopwatch overallStopwatch, AIPrediction prediction)
         {
             // Check if the prediction falls within the exclusion zones
-            if (camera.Exclusions != null && camera.Exclusions.Count() > 0)
+            if (camera.Exclusions != null && camera.Exclusions.Any())
             {
                 Rectangle boundary = new(prediction.MinX, prediction.MinY, prediction.SizeX, prediction.SizeY);
                 foreach (Zone exclusion in camera.Exclusions)
@@ -397,7 +390,7 @@ namespace SynoAI.Controllers
         /// <param name="bitmap">The bitmap to rotate.</param>
         /// <param name="angle">The angle to rotate to.</param>
         /// <returns>The rotated bitmap.</returns>
-        private SKBitmap Rotate(SKBitmap bitmap, double angle)
+        private static SKBitmap Rotate(SKBitmap bitmap, double angle)
         {
             double radians = Math.PI * angle / 180;
             float sine = (float)Math.Abs(Math.Sin(radians));

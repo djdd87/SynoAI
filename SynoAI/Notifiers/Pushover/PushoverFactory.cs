@@ -1,10 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-
-namespace SynoAI.Notifiers.Pushover
+﻿namespace SynoAI.Notifiers.Pushover
 {
-    public class PushoverFactory : NotifierFactory
+    internal class PushoverFactory : NotifierFactory
     {
         public override INotifier Create(ILogger logger, IConfigurationSection section)
         {

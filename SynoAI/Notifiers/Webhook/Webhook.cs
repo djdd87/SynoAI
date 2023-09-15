@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using SynoAI.Models;
 using SynoAI.Services;
@@ -9,14 +8,13 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace SynoAI.Notifiers.Webhook
 {
     /// <summary>
     /// Calls a third party API.
     /// </summary>
-    public class Webhook : NotifierBase
+    internal class Webhook : NotifierBase
     {
         /// <summary>
         /// The URL to send the request to.

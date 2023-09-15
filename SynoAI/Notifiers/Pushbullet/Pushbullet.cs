@@ -1,14 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SynoAI.App;
 using SynoAI.Models;
-using SynoAI.Services;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
 
 namespace SynoAI.Notifiers.Pushbullet
 {
@@ -16,7 +8,7 @@ namespace SynoAI.Notifiers.Pushbullet
     /// Configuration for sending a Pushbullet notification.
     /// https://docs.pushbullet.com/
     /// </summary>
-    public class Pushbullet : NotifierBase
+    internal class Pushbullet : NotifierBase
     {
         //private const int MAX_FILE_SIZE = 26214400;
 
@@ -32,6 +24,7 @@ namespace SynoAI.Notifiers.Pushbullet
         /// Sends a message and an image using the Pushbullet API.
         /// </summary>
         /// <param name="camera">The camera that triggered the notification.</param>
+        /// <param name="notification"></param>
         /// <param name="logger">A logger.</param>
         public override async Task SendAsync(Camera camera, Notification notification, ILogger logger)
         {

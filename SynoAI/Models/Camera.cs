@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-
-
-namespace SynoAI.Models
+﻿namespace SynoAI.Models
 {
     /// <summary>
     /// Represents a camera object.
@@ -118,6 +115,7 @@ namespace SynoAI.Models
             return DelayAfterSuccess ?? Config.DelayAfterSuccess ?? GetDelay();
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return Name;

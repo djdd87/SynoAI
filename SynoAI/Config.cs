@@ -1,18 +1,14 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using SkiaSharp;
+﻿using SkiaSharp;
 using SynoAI.AIs;
 using SynoAI.Models;
 using SynoAI.Notifiers;
-using System;
-using System.Collections.Generic;
 
 namespace SynoAI
 {
     /// <summary>
     /// Represents the system configuration.
     /// </summary>
-    public static class Config
+    internal static class Config
     {
         /// <summary>
         /// The URL to the synology API.
@@ -177,6 +173,7 @@ namespace SynoAI
         /// <summary>
         /// Generates the configuration from the provided IConfiguration.
         /// </summary>
+        /// <param name="logger"></param>
         /// <param name="configuration">The configuration from which to pull the values.</param>
         public static void Generate(ILogger logger, IConfiguration configuration)
         {

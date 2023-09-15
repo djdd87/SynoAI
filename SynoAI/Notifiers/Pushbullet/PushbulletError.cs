@@ -1,11 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace SynoAI.Notifiers.Pushbullet
+﻿namespace SynoAI.Notifiers.Pushbullet
 {
-    public class PushbulletError
+    internal class PushbulletError
     {
         public string Code { get; set; }
         public string Type { get; set; }

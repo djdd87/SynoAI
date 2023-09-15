@@ -1,12 +1,8 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SynoAI.Notifiers.Pushbullet
 {
-    public class PushbulletPush
+    internal class PushbulletPush
     {
         [JsonProperty("type")]
         public string Type { get; set; }

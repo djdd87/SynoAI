@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace SynoAI.Models
 {
     /// <summary>
@@ -155,7 +152,7 @@ namespace SynoAI.Models
 
 
         /// <summary>
-        /// Since Y axis shows <NumberOfSteps> reference values, if there are less than GraphYSteps snapshots, we need to adjust way of displaying the y-axis ref
+        /// Since Y axis shows 'NumberOfSteps' reference values, if there are less than GraphYSteps snapshots, we need to adjust way of displaying the y-axis ref
         /// </summary>
         public String yStepping(int yMax, int Step) 
         {

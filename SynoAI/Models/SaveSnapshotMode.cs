@@ -1,6 +1,6 @@
 namespace SynoAI.Models
 {
-    public enum SaveSnapshotMode
+    internal enum SaveSnapshotMode
     {
         /// <summary>
         /// The snapshots are never saved.

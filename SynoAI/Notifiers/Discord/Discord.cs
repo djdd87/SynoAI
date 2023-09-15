@@ -1,19 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
-using SynoAI.App;
+﻿using SynoAI.App;
 using SynoAI.Models;
 
 namespace SynoAI.Notifiers.Discord
 {
-    public class Discord : NotifierBase
+    internal class Discord : NotifierBase
     {
         /// <summary>
         /// Discord Webhook Url.
@@ -35,7 +25,7 @@ namespace SynoAI.Notifiers.Discord
             HttpResponseMessage responseMessage = await Shared.HttpClient.PostAsync(Url, formData);
             if (responseMessage.IsSuccessStatusCode)
             {
-                logger.LogInformation($"{camera.Name}: Discord: Notification sent successfully");
+                logger.LogInformation("{CameraName}: Discord: Notification sent successfully", camera.Name);
             }
             else
             {
