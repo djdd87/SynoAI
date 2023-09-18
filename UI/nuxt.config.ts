@@ -1,7 +1,9 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  devtools: { enabled: false },
+  
   css: ['~/assets/css/main.css'],
-  devtools: { enabled: true },
+
   modules: [
     '@nuxtjs/tailwindcss',
     '@nuxtjs/google-fonts'
@@ -15,19 +17,23 @@ export default defineNuxtConfig({
   },
 
   googleFonts: {
-    display: 'swap',
+    display: 'block',
 
     families: {
-      Montserrat: true
+      Montserrat: {
+        wght: [100, 200, 300, 400, 500, 600, 700, 800, 900]
+      }
     },
 
     prefetch: false,
-    preload: true,
+    preload: false,
 
-    download: true,
+    download: false,
     base64: false,
     inject: false,
     overwriting: false,
-    outputDir: '~/assets/fonts'
+    outputDir: 'assets/fonts',
+    stylePath: 'css/google-fonts.css',
+    fontsPath: '../'
   }
 })

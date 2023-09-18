@@ -6,12 +6,13 @@ export default {
     "./pages/**/*.vue",
     "./plugins/**/*.{js,ts}",
     "./nuxt.config.{js,ts}",
-    "./app.vue",
-    "./assets/**/*.{css}",
+    "./app.vue"
   ],
   plugins: [],
   darkMode: 'media', // or 'false' or 'true' or 'class'
   theme: {
+    extend: {
+    }
   },
 }
 
