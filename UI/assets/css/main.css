@@ -1,0 +1,10 @@
+@import url('~/assets/fonts/css/nuxt-google-fonts.css');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html {
+    font-family: Montserrat;
+}
