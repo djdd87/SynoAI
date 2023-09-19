@@ -20,17 +20,15 @@ export default defineNuxtConfig({
     display: 'block',
 
     families: {
-      Montserrat: {
-        wght: [100, 200, 300, 400, 500, 600, 700, 800, 900]
-      }
+      Montserrat: true
     },
 
     prefetch: false,
     preload: false,
 
-    download: false,
+    download: true,
     base64: false,
-    inject: false,
+    inject: true,
     overwriting: false,
     outputDir: 'assets/fonts',
     stylePath: 'css/google-fonts.css',

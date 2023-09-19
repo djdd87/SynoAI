@@ -12,7 +12,7 @@
   <div class="flex p-4">
     <div class="hidden w-64 md:block">
       <nav>
-        <ul>
+        <ul class="uppercase text-xs">
           <li class="p-1 mb-2">
             <NuxtLink to="/" class="flex items-center">
               <svg class="w-6 mr-2" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -28,7 +28,7 @@
               </svg>
               Cameras
             </NuxtLink>
-            <ul class="pl-10 text-sm">
+            <ul class="pl-10">
               <li class="mt-3">
                 <NuxtLink to="/cameras/1">
                   Driveway
@@ -65,7 +65,7 @@
               Configuration
             </NuxtLink>
           </li>
-        </ul>
+        </ul> 
       </nav>
     </div>
 

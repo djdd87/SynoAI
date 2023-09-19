@@ -1,0 +1,21 @@
+Dashboard  
+    General
+        Grid of notifications
+            Camera
+            DateTime
+            Matches
+            Link to screenshot
+            [x] Delete button
+            Paged - last x number of records
+            Filters?
+
+    Graphs
+        Detections vs actual matches
+        Notifications Sent
+        Activity by hour (last 24 hrs)
+        Last months worse of activity
+        Match types
+    
+
+Features
+    Cleaning Reminder/Cobweb Detections
