@@ -6,6 +6,9 @@
 SynoAI.sln
 *.md
 
+# Nuxt
+.nuxt/
+
 # User-specific files
 *.rsuser
 *.suo
