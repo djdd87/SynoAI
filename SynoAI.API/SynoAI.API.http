@@ -1,0 +1,6 @@
+@SynoAI.API_HostAddress = http://localhost:5291
+
+GET {{SynoAI.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
