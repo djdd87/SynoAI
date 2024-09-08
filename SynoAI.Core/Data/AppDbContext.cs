@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using SynoAI.API.Models.Data;
+using SynoAI.Core.Data;
 
 public interface IAppDbContext
 {
@@ -11,6 +11,8 @@ public interface IAppDbContext
 public class AppDbContext : DbContext, IAppDbContext
 {
     public DbSet<Camera> Cameras { get; set; }
+    public DbSet<Notifier> Notifiers { get; set; }
+    public DbSet<Setting> Settings { get; set; }
     public DbSet<Zone> Zones { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options)
@@ -20,6 +22,6 @@ public class AppDbContext : DbContext, IAppDbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Camera>().HasKey(c => c.Id);
+    
     }
 }

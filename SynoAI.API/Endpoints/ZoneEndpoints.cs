@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
-using SynoAI.API.Models.Data;
+using SynoAI.Core.Data;
+using SynoAI.Core.Interfaces;
 
 namespace SynoAI.Api.Endpoints;
 

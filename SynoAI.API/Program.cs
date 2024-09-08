@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SynoAI.API.EndPoints;
+using SynoAI.Core.Interfaces;
+using SynoAI.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Configure the database
+// AddDbContext ensures that the context is scoped per request
 string dbPath = Path.Join(builder.Environment.ContentRootPath, "app.db");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
@@ -16,6 +18,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 // Register implicit services
 builder.Services.AddScoped<ICameraService, CameraService>();
+builder.Services.AddScoped<IDetectionService, DetectionService>();
+builder.Services.AddScoped<ISettingService, SettingService>();
 builder.Services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>()!);
 
 var app = builder.Build();

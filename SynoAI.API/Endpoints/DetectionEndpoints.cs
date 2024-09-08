@@ -1,16 +1,19 @@
+using SynoAI.Core.Interfaces;
+
 namespace SynoAI.API.EndPoints;
 
 public static class DetectionEndpoints
 {
     public static void MapDetectionEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("/detection", HandleAsync)
+        app.MapGet("/detection/{cameraName}", async (string cameraName, IDetectionService detectionService) =>
+        {
+            await detectionService.RunAsync(cameraName);
+            return TypedResults.Ok();
+        })
         .WithName("TriggerDetection")
-        .WithOpenApi();
-    }
-
-    public static async Task<IResult> HandleAsync()
-    {
-        throw new NotImplementedException();
+        .WithTags("Detection")
+        .WithOpenApi()
+        .WithDescription("Triggers a detection operation for the specified camera by it's name.");
     }
 }

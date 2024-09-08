@@ -1,32 +1,10 @@
+
 using Microsoft.EntityFrameworkCore;
-using SynoAI.API.Models.Data;
+using Microsoft.Extensions.Logging;
+using SynoAI.Core.Data;
+using SynoAI.Core.Interfaces;
 
-public interface ICameraService
-{
-    Task AddZoneToCameraAsync(Guid cameraId, Zone zone);
-
-    /// <summary>
-    /// Gets a specific camera record by it's ID.
-    /// </summary>
-    /// <param name="id">The unique ID of the camera.</param>
-    /// <returns>The specified <see cref="Camera"/>.</returns>
-    Task<Camera?> GetAsync(Guid id);
-
-    /// <summary>
-    /// Gets a specific camera record by it's name.
-    /// </summary>
-    /// <param name="name">The unique name of the camera.</param>
-    /// <returns>The specified <see cref="Camera"/>.</returns>
-    Task<Camera?> GetAsync(string name);
-
-    /// <summary>
-    /// Gets the list of cameras stored in the system.
-    /// </summary>
-    /// <returns>A list of <see cref="Camera"/>.</returns>
-    Task<IEnumerable<Camera>> GetListAsync();
-    Task<object> GetZoneByIdAsync(Guid zoneId);
-    Task<object> GetZonesForCameraAsync(Guid cameraId);
-}
+namespace SynoAI.Core.Services;
 
 public class CameraService : ICameraService
 {
@@ -64,5 +42,25 @@ public class CameraService : ICameraService
         _logger.LogInformation($"Adding camera to database: {camera.Name}");
         await _context.Cameras.AddAsync(camera);
         await _context.SaveChangesAsync();
+    }
+
+    public Task AddZoneToCameraAsync(Guid cameraId, Zone zone)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Zone> GetZoneByIdAsync(Guid zoneId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<IEnumerable<Zone>> GetZonesForCameraAsync(Guid cameraId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<object> DeleteZoneAsync(Guid zoneId)
+    {
+        throw new NotImplementedException();
     }
 }

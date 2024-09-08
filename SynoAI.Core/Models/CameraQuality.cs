@@ -1,4 +1,4 @@
-namespace SynoAI.API.Models;
+namespace SynoAI.Core.Models;
 
 /// <summary>
 /// Represents the camera quality options in SSS.

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
-using SynoAI.API.Models.Data;
+using SynoAI.Core.Data;
+using SynoAI.Core.Interfaces;
 
 namespace SynoAI.API.EndPoints;
 
