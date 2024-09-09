@@ -5,7 +5,6 @@ namespace SynoAI.Core.Models;
 /// </summary>
 public enum CameraQuality
 {
-    High = 0,
-    Balanced = 1,
-    Low = 2
+    HighQuality = 0,
+    Balanced = 1
 }
