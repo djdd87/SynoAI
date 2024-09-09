@@ -5,7 +5,6 @@ namespace SynoAI.Core.Data;
 
 public class Zone
 {
-
     [Key]
     public required Guid Id { get; set; }
 

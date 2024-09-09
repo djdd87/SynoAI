@@ -11,7 +11,7 @@ public class CameraService : ICameraService
     private readonly IAppDbContext _context;
     private readonly ILogger<CameraService> _logger;
 
-    public CameraService(IAppDbContext context, ILogger<CameraService> logger)
+    public CameraService(ILogger<CameraService> logger, IAppDbContext context)
     {
         _context = context;
         _logger = logger;

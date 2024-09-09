@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using SynoAI.API.EndPoints;
 using SynoAI.Core.Interfaces;
+using SynoAI.Core.Notifiers;
+using SynoAI.Core.Processors;
 using SynoAI.Core.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +23,10 @@ builder.Services.AddScoped<ICameraService, CameraService>();
 builder.Services.AddScoped<IDetectionService, DetectionService>();
 builder.Services.AddScoped<ISettingService, SettingService>();
 builder.Services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>()!);
+
+// Register the notifiers and processors
+builder.Services.RegisterNotifiers();
+builder.Services.RegisterProcessors();
 
 var app = builder.Build();
 
