@@ -1,5 +1,6 @@
 # Secrets/Privacy
 *.[Dd]evelopment.json
+app.db
 
 # Visual Studio files
 .vs/

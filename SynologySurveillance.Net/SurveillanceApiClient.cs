@@ -1,14 +1,22 @@
-﻿using System;
+﻿using SynologySurveillance.Net.Exceptions;
+using SynologySurveillance.Net.Models;
+using System;
+using System.Data;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-public partial class SurveillanceApiClient
+public partial class SurveillanceApiClient : ISurveillanceApiClient, IDisposable
 {
     private readonly HttpClient _httpClient;
     private readonly string _baseUrl;
-    private string _sid;
+    private string? _sid;
+
+    private readonly JsonSerializerOptions _serializerOptions = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     public SurveillanceApiClient(string baseUrl)
     {
@@ -34,20 +42,19 @@ public partial class SurveillanceApiClient
         response.EnsureSuccessStatusCode();
 
         var content = await response.Content.ReadAsStringAsync();
-        var result = JsonSerializer.Deserialize<ApiResponse<T>>(content, new JsonSerializerOptions
+        var result = JsonSerializer.Deserialize<ApiResponse<T>>(content, _serializerOptions);
+        if (result == null)
         {
-            PropertyNameCaseInsensitive = true
-        });
-
-        if (!result.Success)
+            throw new NotSupportedException($"Failed to deserialize content {content}");
+        }
+        else if (!result.Success)
         {
             throw new ApiException(result.Error?.Code ?? 0, result.Error?.Message ?? "Unknown error");
         }
 
-        return result.Data;
+        return result.Data!;
     }
 
-    // Authentication methods
     public async Task<string> LoginAsync(string account, string password)
     {
         var data = new { account, passwd = password };
@@ -61,32 +68,10 @@ public partial class SurveillanceApiClient
         await SendRequestAsync<object>("/webapi/SurveillanceStation/ThirdParty/Auth/Logout/v1", HttpMethod.Get);
         _sid = null;
     }
-}
 
-public class ApiResponse<T>
-{
-    public bool Success { get; set; }
-    public T Data { get; set; }
-    public ErrorInfo Error { get; set; }
-}
-
-public class ErrorInfo
-{
-    public int Code { get; set; }
-    public string Message { get; set; }
-}
-
-public class ApiException : Exception
-{
-    public int ErrorCode { get; }
-
-    public ApiException(int errorCode, string message) : base(message)
+    public void Dispose()
     {
-        ErrorCode = errorCode;
+        _httpClient?.Dispose();
+        _sid = null;
     }
-}
-
-public class LoginResponse
-{
-    public string Sid { get; set; }
 }
