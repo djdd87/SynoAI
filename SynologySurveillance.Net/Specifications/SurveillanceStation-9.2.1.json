@@ -1,0 +1,3195 @@
+{
+    "openapi": "3.0.3",
+    "info": {
+        "title": "Surveillance Station",
+        "version": "9.2.1",
+        "description": "Surveillance Station Web API provides a set of API interfaces allowing 3rd party applications to interact with Surveillance Station via HTTP Requests and Responses. All APIs on this site require Surveillance Station 9.1.2 or above. If you are using an older version, refer to the [Legacy API Document](https://global.download.synology.com/download/Document/Software/DeveloperGuide/Package/SurveillanceStation/All/enu/Surveillance_Station_Web_API.pdf). All APIs require a token in **_sid** query is required for authentication for all APIs. Your **_sid** can be found using the [Sign in API](https://surveillance-api.synology.com/#get-/webapi/SurveillanceStation/ThirdParty/Auth/Login/v1)."
+    },
+    "paths": {
+        "/webapi/SurveillanceStation/ThirdParty/Auth/Login/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "sid": {
+                                                            "type": "string",
+                                                            "description": "The sid"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "sid": "pyB_v5VUlL0ZBqrynTRJnxjofHduooWjfR2I8gLjlQoN0MFV7NumIBLa9h4xouXPmuw_9XowClOVvCsigwxDPE"
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Sign in",
+                "description": "Sign in with your account and password to retrieve your sid.",
+                "parameters": [
+                    {
+                        "name": "account",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Account",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "example": "admin"
+                    },
+                    {
+                        "name": "passwd",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Password",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "example": "password"
+                    }
+                ],
+                "security": []
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Auth/Logout/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Common.Response"
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Sign out",
+                "description": "Manually sign out.",
+                "parameters": [
+                    {
+                        "name": "_sid",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Fill in your _sid. To retrieve your sid, [sign in](#get-/webapi/SurveillanceStation/ThirdParty/Auth/Login/v1) first.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "example": "pyB_v5VUlL0ZBqrynTRJnxjofHduooWjfR2I8gLjlQoN0MFV7NumIBLa9h4xouXPmuw_9XowClOVvCsigwxDPE"
+                    }
+                ],
+                "security": []
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Camera/List/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "description": "Total number of cameras to be listed"
+                                                        },
+                                                        "cameras": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Camera.camInfoBasic"
+                                                            },
+                                                            "description": "The list of cameras"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "total": 1,
+                                                "cameras": [
+                                                    {
+                                                        "statusId": 1,
+                                                        "status": "Normal",
+                                                        "dsName": "Local host",
+                                                        "model": "TC500",
+                                                        "vendor": "Synology",
+                                                        "dsId": 0,
+                                                        "name": "CamName01",
+                                                        "mac": "90:09:D0:3B:7A:1A",
+                                                        "ip": "10.17.52.41",
+                                                        "camId": 3
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Camera"
+                ],
+                "summary": "List cameras",
+                "description": "Retrieve a list of available cameras.",
+                "parameters": [
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Search for cameras using keywords, including the following: partial camera name, vendor name, model name, IP address, server name.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"CamName\"",
+                            "\"Synology\"",
+                            "\"TC500\"",
+                            "\"10.17.52.41\""
+                        ]
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Camera/Edit/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "camera": {
+                                                            "allOf": [
+                                                                {
+                                                                    "$ref": "#/components/schemas/Camera.camInfo"
+                                                                }
+                                                            ],
+                                                            "description": "Camera information which been saved"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "camera": {
+                                                    "streamHigh": {
+                                                        "resolution": "1280x720",
+                                                        "quality": "5",
+                                                        "fps": 15,
+                                                        "constantBitrate": "1000",
+                                                        "bitrateCtrl": 2
+                                                    },
+                                                    "streamMedium": {
+                                                        "resolution": "1280x720",
+                                                        "quality": "5",
+                                                        "fps": 15,
+                                                        "constantBitrate": "1000",
+                                                        "bitrateCtrl": 2
+                                                    },
+                                                    "streamLow": {
+                                                        "resolution": "1280x720",
+                                                        "quality": "5",
+                                                        "fps": 15,
+                                                        "constantBitrate": "1000",
+                                                        "bitrateCtrl": 2
+                                                    },
+                                                    "recStatus": 1,
+                                                    "userName": "NVR",
+                                                    "audioCodec": "G711",
+                                                    "audioOut": false,
+                                                    "videoCodec": "H.264",
+                                                    "recordPrefix": "TC500",
+                                                    "recordSchedule": "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+                                                    "dsId": 1,
+                                                    "mac": "90:09:D0:3B:7A:1A",
+                                                    "camId": 2,
+                                                    "vendor": "Synology",
+                                                    "rotationBySpace": "10",
+                                                    "rotationByDay": 30,
+                                                    "model": "TC500",
+                                                    "dsName": "1517p",
+                                                    "name": "CamName01",
+                                                    "port": 80,
+                                                    "ip": "10.17.52.41",
+                                                    "statusId": 1,
+                                                    "status": "Normal",
+                                                    "ptzCapability": "Pan,Tilt,Zoom,Home,Focus,PTZ_Diretion_4,Iris,Auto Focus",
+                                                    "DINumber": 2,
+                                                    "DIList": [
+                                                        {
+                                                            "index": 0,
+                                                            "name": "DI 1",
+                                                            "normalState": 0,
+                                                            "triggerState": false
+                                                        },
+                                                        {
+                                                            "index": 1,
+                                                            "name": "DI 2",
+                                                            "normalState": 0,
+                                                            "triggerState": false
+                                                        }
+                                                    ],
+                                                    "DONumber": 1,
+                                                    "DOList": [
+                                                        {
+                                                            "index": 0,
+                                                            "name": "DO 1",
+                                                            "normalState": 0,
+                                                            "triggerState": true
+                                                        }
+                                                    ]
+                                                }
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Camera"
+                ],
+                "summary": "Edit camera",
+                "description": "Edit existing camera settings.",
+                "parameters": [
+                    {
+                        "name": "camId",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify one of the following: [camera id](#get-/webapi/SurveillanceStation/ThirdParty/Camera/List/v1), camera name, and MAC address.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2\"",
+                            "\"CamName01\"",
+                            "\"90:09:D0:3B:7A:1A\""
+                        ]
+                    },
+                    {
+                        "name": "newName",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a new camera name.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": "\"CamName01\""
+                    },
+                    {
+                        "name": "recordPrefix",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a new archive folder name.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": "\"TC500\""
+                    },
+                    {
+                        "name": "recordSchedule",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a recording schedule in the following format: a string consisting of `48*7` digits (each digit represents a half-hour recording type).\n| Value | Description                |\n| ----- | -------------------------- |\n| 0     | No scheduled plan          |\n| 1     | Continuous Recording       |\n| 2     | Motion Detection Recording |\n| 3     | Custom Detection 1         |\n| 4     | Custom Detection 2         |",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": "\"111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111\""
+                    },
+                    {
+                        "name": "rotationByDay",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Specify a rotation condition by day.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": 30
+                    },
+                    {
+                        "name": "rotationBySpace",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Specify a rotation condition by space (GB).",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": 10
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Camera/Get/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "cameras": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Camera.camInfo"
+                                                            },
+                                                            "description": "The returning list of selected cameras"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "cameras": [
+                                                    {
+                                                        "streamHigh": {
+                                                            "resolution": "1280x720",
+                                                            "quality": "5",
+                                                            "fps": 15,
+                                                            "constantBitrate": "1000",
+                                                            "bitrateCtrl": 2
+                                                        },
+                                                        "streamMedium": {
+                                                            "resolution": "1280x720",
+                                                            "quality": "5",
+                                                            "fps": 15,
+                                                            "constantBitrate": "1000",
+                                                            "bitrateCtrl": 2
+                                                        },
+                                                        "streamLow": {
+                                                            "resolution": "1280x720",
+                                                            "quality": "5",
+                                                            "fps": 15,
+                                                            "constantBitrate": "1000",
+                                                            "bitrateCtrl": 2
+                                                        },
+                                                        "recStatus": 1,
+                                                        "userName": "NVR",
+                                                        "audioCodec": "G711",
+                                                        "audioOut": false,
+                                                        "videoCodec": "H.264",
+                                                        "recordPrefix": "TC500",
+                                                        "recordSchedule": "111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111",
+                                                        "dsId": 1,
+                                                        "mac": "90:09:D0:3B:7A:1A",
+                                                        "camId": 2,
+                                                        "vendor": "Synology",
+                                                        "rotationBySpace": "10",
+                                                        "rotationByDay": 30,
+                                                        "model": "TC500",
+                                                        "dsName": "1517p",
+                                                        "name": "SynoCam001",
+                                                        "port": 80,
+                                                        "ip": "10.17.52.41",
+                                                        "statusId": 1,
+                                                        "status": "Normal",
+                                                        "ptzCapability": "Pan,Tilt,Zoom,Home,Focus,PTZ_Diretion_4,Iris,Auto Focus",
+                                                        "DINumber": 2,
+                                                        "DIList": [
+                                                            {
+                                                                "index": 0,
+                                                                "name": "DI 1",
+                                                                "normalState": 0,
+                                                                "triggerState": false
+                                                            },
+                                                            {
+                                                                "index": 1,
+                                                                "name": "DI 2",
+                                                                "normalState": 0,
+                                                                "triggerState": false
+                                                            }
+                                                        ],
+                                                        "DONumber": 1,
+                                                        "DOList": [
+                                                            {
+                                                                "index": 0,
+                                                                "name": "DO 1",
+                                                                "normalState": 0,
+                                                                "triggerState": true
+                                                            }
+                                                        ]
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Camera"
+                ],
+                "summary": "Get camera information",
+                "description": "Get detailed information for specified cameras.",
+                "parameters": [
+                    {
+                        "name": "camIds",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify one or more cameras in any of the following formats: [camera id](#get-/webapi/SurveillanceStation/ThirdParty/Camera/List/v1), camera name, and MAC address.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2,3,4\"",
+                            "\"CamName1,CamName2\"",
+                            "\"90:09:D0:3B:7A:1A,30:A4:74:9B:4C:75\"",
+                            "\"2,CamName01,90:09:D0:3B:7A:1A\""
+                        ]
+                    },
+                    {
+                        "name": "DIDOs",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "description": "Specify true: to get digital input and digital output list. Specify false: do not get digital input and digital output list.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            true,
+                            false
+                        ]
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Camera/PTZControl/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "success": {
+                                                            "type": "boolean",
+                                                            "description": "PTZ action result"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Camera"
+                ],
+                "summary": "Perform PTZ operations",
+                "description": "Quickly perform PTZ operations.",
+                "parameters": [
+                    {
+                        "name": "action",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify one of the PTZ actions listed in the below examples that you want to execute. Note that cameras must have corresponsing capabilities to performance specified actions. ([Get camera information](#get-/webapi/SurveillanceStation/ThirdParty/Camera/Get/v1) to confirm camera capabilities.) \n **Note**: For the eight-direction move operation API, it is recommended to have a 0.5 second interval between two API calls. \n | PTZ Capability | Support Actions                |\n| ----- | -------------------------- |\n| Auto Focus     | autoFocus          |\n| Focus     | focusIn, focusOut       |\n| Home     | moveHome |\n| Iris     | irisIn, irisOut         |\n| PTZ_Diretion_2     | moveLeft, moveRight or moveUp, moveDown         |\n| PTZ_Diretion_4     | moveLeft, moveRight, moveUp, moveDown         |\n| PTZ_Diretion_8     | all move action         |\n| Zoom     | zoomIn, zoomOut         |",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"zoomIn\"",
+                            "\"zoomOut\"",
+                            "\"moveHome\"",
+                            "\"moveUp\"",
+                            "\"moveDown\"",
+                            "\"moveLeft\"",
+                            "\"moveRight\"",
+                            "\"moveUpLeft\"",
+                            "\"moveUpRight\"",
+                            "\"moveDownLeft\"",
+                            "\"moveDownRight\"",
+                            "\"focusIn\"",
+                            "\"focusOut\"",
+                            "\"autoFocus\"",
+                            "\"irisIn\"",
+                            "\"irisOut\""
+                        ]
+                    },
+                    {
+                        "name": "camId",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify one camera in any of the following formats: [camera id](#get-/webapi/SurveillanceStation/ThirdParty/Camera/List/v1), camera name, and MAC address.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2\"",
+                            "\"CamName01\"",
+                            "\"90:09:D0:3B:7A:1A\""
+                        ]
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Camera/DOControl/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "DOIndex": {
+                                                            "type": "integer",
+                                                            "description": "Identifies the digital output port on the camera."
+                                                        },
+                                                        "name": {
+                                                            "type": "string"
+                                                        },
+                                                        "normalState": {
+                                                            "type": "integer",
+                                                            "description": "Sets the digital output to ON (true) or OFF (false)."
+                                                        },
+                                                        "triggerState": {
+                                                            "type": "boolean",
+                                                            "description": "Sets the digital output to ON (true) or OFF (false)."
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "DOIndex": 0,
+                                                "name": "DO 1",
+                                                "normalState": 0,
+                                                "triggerState": false
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Camera"
+                ],
+                "summary": "Perform digital output operations",
+                "description": "Quickly perform digital output operations.",
+                "parameters": [
+                    {
+                        "name": "camId",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify one camera in any of the following formats: [camera id](#get-/webapi/SurveillanceStation/ThirdParty/Camera/List/v1), camera name, and MAC address.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2\"",
+                            "\"CamName01\"",
+                            "\"90:09:D0:3B:7A:1A\""
+                        ]
+                    },
+                    {
+                        "name": "DOIndex",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Identifies the digital output port on the camera.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            0,
+                            1
+                        ]
+                    },
+                    {
+                        "name": "triggerState",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "description": "Sets the digital output to ON (true) or OFF (false).",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            true,
+                            false
+                        ]
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Recording/Download/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/zip": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary",
+                                    "description": "Binary data with MIME type application/zip."
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "description": "Binary data with MIME type application/zip.",
+                                        "value": "BINARY"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Common.Response"
+                                },
+                                "examples": {
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Recording"
+                ],
+                "summary": "Download recordings",
+                "description": "Download recordings from a specific camera.",
+                "parameters": [
+                    {
+                        "name": "camId",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify one camera in any of the following formats: [camera id](#get-/webapi/SurveillanceStation/ThirdParty/Camera/List/v1), camera name, and MAC address.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2\"",
+                            "\"CamName01\"",
+                            "\"90:09:D0:3B:7A:1A\""
+                        ]
+                    },
+                    {
+                        "name": "startTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a start time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T16:42:00\"",
+                            "\"2023-05-08T16:42:00Z\"",
+                            "\"2023-05-09T00:42:00+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "endTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify an end time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T17:00:00\"",
+                            "\"2023-05-08T17:00:00Z\"",
+                            "\"2023-05-09T01:00:00+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "fileName",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a file name.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": "\"RecFile\""
+                    },
+                    {
+                        "name": "concate",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        },
+                        "description": "Do you want to merge recording segments into one?",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": true
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Recording/DownloadSnapshot/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/zip": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary",
+                                    "description": "Binary data with MIME type application/zip."
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "description": "Binary data with MIME type application/zip.",
+                                        "value": "BINARY"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Common.Response"
+                                },
+                                "examples": {
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Recording"
+                ],
+                "summary": "Download recording snapshots",
+                "description": "Download snapshots taken in a specified time interval as a zip file. Downloaded snapshots will not be kept on Surveillance Station.",
+                "parameters": [
+                    {
+                        "name": "startTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a start time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T16:42:00\"",
+                            "\"2023-05-08T16:42:00Z\"",
+                            "\"2023-05-09T00:42:00+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "endTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify an end time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T17:00:00\"",
+                            "\"2023-05-08T17:00:00Z\"",
+                            "\"2023-05-09T01:00:00+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "camId",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a camera in any of the following formats: [camera id](#get-/webapi/SurveillanceStation/ThirdParty/Camera/List/v1), camera name, and MAC address.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2\"",
+                            "\"CamName01\"",
+                            "\"90:09:D0:3B:7A:1A\""
+                        ]
+                    },
+                    {
+                        "name": "interval",
+                        "in": "query",
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        },
+                        "description": "Specify a time interval (in seconds) for taking snapshots.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            0.5,
+                            1.0,
+                            1.5
+                        ]
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Bookmark/Create/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "bookmark": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Bookmark.bookmarkInfo"
+                                                            },
+                                                            "description": "Bookmark information be created"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "bookmark": [
+                                                    {
+                                                        "camName": "CamName01",
+                                                        "camId": 2,
+                                                        "dsId": 0,
+                                                        "endTime": "2023-05-08T17:00:00",
+                                                        "startTime": "2023-05-08T16:42:00",
+                                                        "bookmarkId": 14,
+                                                        "comment": "Some people coming",
+                                                        "name": "MD Alert"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Bookmark"
+                ],
+                "summary": "Create bookmark",
+                "description": "Create a new bookmark.",
+                "parameters": [
+                    {
+                        "name": "camId",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a camera in any of the following formats: [camera id](#get-/webapi/SurveillanceStation/ThirdParty/Camera/List/v1), camera name, and MAC address.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2\"",
+                            "\"CamName01\"",
+                            "\"90:09:D0:3B:7A:1A\""
+                        ]
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify bookmark name.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "example": "\"MD alert\""
+                    },
+                    {
+                        "name": "startTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify bookmark start time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T16:42:00\"",
+                            "\"2023-05-08T16:42:00Z\"",
+                            "\"2023-05-09T00:42:00+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "endTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify bookmark end time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T16:42:10\"",
+                            "\"2023-05-08T16:42:10Z\"",
+                            "\"2023-05-09T00:42:10+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "comment",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a comment for the bookmark.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": "\"Some people coming\""
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Bookmark/List/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "bookmarks": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Bookmark.bookmarkInfo"
+                                                            },
+                                                            "description": "Bookmark list"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "bookmarks": [
+                                                    {
+                                                        "camName": "CamName01",
+                                                        "camId": 7,
+                                                        "dsId": 0,
+                                                        "endTime": "2023-05-08T17:00:10",
+                                                        "startTime": "2023-05-08T17:00:00",
+                                                        "bookmarkId": 15,
+                                                        "comment": "Some people coming",
+                                                        "name": "MD Alert"
+                                                    },
+                                                    {
+                                                        "camName": "CamName02",
+                                                        "camId": 7,
+                                                        "dsId": 0,
+                                                        "endTime": "2023-05-08T17:00:00",
+                                                        "startTime": "2023-05-08T16:42:00",
+                                                        "bookmarkId": 14,
+                                                        "comment": "Some people coming",
+                                                        "name": "MD Alert"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Bookmark"
+                ],
+                "summary": "List bookmark",
+                "description": "List bookmarks that match specified information.",
+                "parameters": [
+                    {
+                        "name": "camIds",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify one or more cameras in any of the following formats: [camera id](#get-/webapi/SurveillanceStation/ThirdParty/Camera/List/v1), camera name, and MAC address.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2,3,4\"",
+                            "\"CamName01,CamName02\"",
+                            "\"90:09:D0:3B:7A:1A,30:A4:74:9B:4C:75\""
+                        ]
+                    },
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify keywords to filter bookmarks by name or comment.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"apple\"",
+                            "\"ball,car\"",
+                            "\"people\""
+                        ]
+                    },
+                    {
+                        "name": "startTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a time to filter bookmarks using its start time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T16:00:00\"",
+                            "\"2023-05-08T16:00:00Z\"",
+                            "\"2023-05-09T00:00:00+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "endTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a time to filter bookmarks using its end time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T17:00:00\"",
+                            "\"2023-05-08T17:00:00Z\"",
+                            "\"2023-05-09T01:00:00+08:00\""
+                        ]
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Bookmark/DownloadRecording/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/zip": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary",
+                                    "description": "Binary data with MIME type application/zip."
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "description": "Binary data with MIME type application/zip.",
+                                        "value": "BINARY"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Common.Response"
+                                },
+                                "examples": {
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Bookmark"
+                ],
+                "summary": "Download bookmark",
+                "description": "Download a recording using the bookmark's time range.",
+                "parameters": [
+                    {
+                        "name": "bookmarkId",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Specify the [bookmark's ID](#get-/webapi/SurveillanceStation/ThirdParty/Bookmark/List/v1).",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "example": 15
+                    },
+                    {
+                        "name": "dsId",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify the NAS server's ID.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": "\"0\""
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Bookmark/Edit/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "bookmark": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Bookmark.bookmarkInfo"
+                                                            },
+                                                            "description": "bookmark infomation"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "bookmark": [
+                                                    {
+                                                        "camName": "CamName01",
+                                                        "camId": 2,
+                                                        "dsId": 0,
+                                                        "endTime": "2023-05-08T17:00:10",
+                                                        "startTime": "2023-05-08T17:00:00",
+                                                        "bookmarkId": 15,
+                                                        "comment": "Some people coming",
+                                                        "name": "new bookmark name"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Bookmark"
+                ],
+                "summary": "Edit bookmark",
+                "description": "Edit bookmark details.",
+                "parameters": [
+                    {
+                        "name": "bookmarkId",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Specify the [bookmark's ID](#get-/webapi/SurveillanceStation/ThirdParty/Bookmark/List/v1).",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "example": 15
+                    },
+                    {
+                        "name": "name",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Edit the bookmark's name.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": "\"new bookmark name\""
+                    },
+                    {
+                        "name": "comment",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Edit the bookmark's comment.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": "\"Some people coming\""
+                    },
+                    {
+                        "name": "startTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Edit the bookmark's start time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T17:00:00\"",
+                            "\"2023-05-08T17:00:00Z\"",
+                            "\"2023-05-09T01:00:00+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "endTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Edit the bookmark's end time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T17:00:10\"",
+                            "\"2023-05-08T17:00:10Z\"",
+                            "\"2023-05-09T01:00:10+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "dsId",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        },
+                        "description": "Specify the NAS server's ID.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": 0
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Bookmark/Delete/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Common.Response"
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Bookmark"
+                ],
+                "summary": "Delete bookmarks",
+                "description": "Delete specific bookmarks.",
+                "parameters": [
+                    {
+                        "name": "bookmarkIds",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify one or more [bookmark ID](#get-/webapi/SurveillanceStation/ThirdParty/Bookmark/List/v1).",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "example": "\"15,16\""
+                    },
+                    {
+                        "name": "dsId",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        },
+                        "description": "Specify the NAS server's ID.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": 0
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/SnapShot/Download/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/zip": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary",
+                                    "description": "Binary data with MIME type application/zip."
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "description": "Binary data with MIME type application/zip.",
+                                        "value": "BINARY"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Common.Response"
+                                },
+                                "examples": {
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Snapshot"
+                ],
+                "summary": "Download snapshots",
+                "description": "Download snapshots from a specific time range.",
+                "parameters": [
+                    {
+                        "name": "startTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a start time for the snapshot in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T16:42:00\"",
+                            "\"2023-05-08T16:42:00Z\"",
+                            "\"2023-05-09T00:42:00+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "endTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify an end time for the snapshot in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T17:00:00\"",
+                            "\"2023-05-08T17:00:00Z\"",
+                            "\"2023-05-09T01:00:00+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "camName",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify the camera name for the snapshot.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": "\"CamName01\""
+                    },
+                    {
+                        "name": "dsId",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        },
+                        "description": "Specify the NAS server's ID.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": 0
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/SnapShot/Take/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "image/jpeg": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary",
+                                    "description": "Binary data with MIME type image/jpeg."
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "description": "Binary data with MIME type image/jpeg.",
+                                        "value": "BINARY"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "dsId": {
+                                                            "type": "integer",
+                                                            "description": "NAS server Id"
+                                                        },
+                                                        "snapshotId": {
+                                                            "type": "integer",
+                                                            "description": "Snapshot id"
+                                                        },
+                                                        "camName": {
+                                                            "type": "string",
+                                                            "description": "Snapshot's camera name"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "dsId": 0,
+                                                "snapshotId": 15,
+                                                "camName": "CamName01"
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Snapshot"
+                ],
+                "summary": "Take camera snapshot",
+                "description": "Take a snapshot from a specific camera.",
+                "parameters": [
+                    {
+                        "name": "camId",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a camera to take a snapshop in any of the following formats: [camera id](#get-/webapi/SurveillanceStation/ThirdParty/Camera/List/v1), camera name, and MAC address.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2\"",
+                            "\"CamName01\"",
+                            "\"90:09:D0:3B:7A:1A\""
+                        ]
+                    },
+                    {
+                        "name": "profileType",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": "Camera live profile"
+                        },
+                        "description": "Specify the stream profile to take the snapshot.\n|               |   |\n| ------------- | - |\n| High quality  | 0 |\n| Balanced      | 1 |\n",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": 0
+                    },
+                    {
+                        "name": "download",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        },
+                        "description": "Specify true: download the snapshot directly.\nSpecify false: do not download the snapshot.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": false
+                    },
+                    {
+                        "name": "save",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean",
+                            "default": true
+                        },
+                        "description": "Specify true: save the snapshot to the Surveillance Station database.\nSpecify false: do not save the snapshot.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": true
+                    },
+                    {
+                        "name": "time",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a time to take the snapshot in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T16:42:00\"",
+                            "\"2023-05-08T16:42:00Z\"",
+                            "\"2023-05-09T00:42:00+08:00\""
+                        ]
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/Emap/ChangeLocation/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "geoMapItem": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/Maps.geoMapItem"
+                                                            },
+                                                            "description": "GeoMapItem information which been saved."
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "geoMapItem": [
+                                                    {
+                                                        "deviceId": "1",
+                                                        "latitude": -23.5566,
+                                                        "longitude": -120.0112,
+                                                        "direction": 180,
+                                                        "viewAngle": 90,
+                                                        "radius": 40
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "Maps"
+                ],
+                "summary": "Update device location",
+                "description": "Update the location data of devices on map services (OpenStreetMap, Google Maps, or custom tile server) to show the real-time positions of mobile devices such as drones and wearable cameras.",
+                "parameters": [
+                    {
+                        "name": "deviceId",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a device in any of the following formats: [camera id](#get-/webapi/SurveillanceStation/ThirdParty/Camera/List/v1), camera name, and MAC address.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"1\"",
+                            "\"CamName01\"",
+                            "\"90:09:D0:3B:7A:1A\""
+                        ]
+                    },
+                    {
+                        "name": "longitude",
+                        "in": "query",
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        },
+                        "description": "Represents the longitude coordinate of the device's location, expressed as a double. Valid ranges are from -180.0 to 180.0.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            120.551,
+                            -120.0112
+                        ]
+                    },
+                    {
+                        "name": "latitude",
+                        "in": "query",
+                        "schema": {
+                            "type": "number",
+                            "format": "float"
+                        },
+                        "description": "Represents the latitude coordinate of the device's location, expressed as a double. Valid ranges are from -90.0 to 90.0.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            90.11786,
+                            -23.5566
+                        ]
+                    },
+                    {
+                        "name": "radius",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        },
+                        "description": "Indicates the radius around the device, measured in meters. Valid ranges are from 5 meters to 50 meters.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            20,
+                            40
+                        ]
+                    },
+                    {
+                        "name": "viewAngle",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 100
+                        },
+                        "description": "Specifies the device's view angle in degrees. Valid ranges are from 0 degrees to 180 degrees. ",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            100,
+                            90
+                        ]
+                    },
+                    {
+                        "name": "direction",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        },
+                        "description": "Specifies the device's direction, measured in degrees from north in a clockwise direction. Valid ranges are from 0 degrees to 360 degrees.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            0,
+                            180
+                        ]
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/LicensePlate/Database/Create/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "licensePlate": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/License Plate.licensePlateDatabaseInfo"
+                                                            },
+                                                            "description": "License plate information be created"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "licensePlate": [
+                                                    {
+                                                        "plateNumber": "3556ZS",
+                                                        "type": 1,
+                                                        "description": "Toyota"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "License Plate"
+                ],
+                "summary": "Create license plate",
+                "description": "Add a license plate to the license plate database.",
+                "parameters": [
+                    {
+                        "name": "plateNumber",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a license plate number. License plates cannot contain spaces or dashes (-).",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "example": "\"3556ZS\""
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        },
+                        "description": "Specify whether the license plate should be added to the allow list or the block list. 1 for allowed and 2 for blocked.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": 1
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a description of the license plate.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": "\"Toyota\""
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/LicensePlate/Database/List/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "description": "Total number of license plates to be listed"
+                                                        },
+                                                        "licensePlates": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/License Plate.licensePlateDatabaseInfo"
+                                                            },
+                                                            "description": "License plate list"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "total": 2,
+                                                "licensePlates": [
+                                                    {
+                                                        "plateNumber": "3556ZS",
+                                                        "type": 1,
+                                                        "description": "Toyota"
+                                                    },
+                                                    {
+                                                        "plateNumber": "ABC1234",
+                                                        "type": 2,
+                                                        "description": "Benz"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "License Plate"
+                ],
+                "summary": "List license plates",
+                "description": "List all license plates from license plate database that match specified information.",
+                "parameters": [
+                    {
+                        "name": "keyword",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify keywords to filter license plates by license plate number or description.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"3556ZS\"",
+                            "\"3556ZS,Toyota\"",
+                            "\"Benz\""
+                        ]
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/LicensePlate/Database/Edit/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "licensePlate": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/License Plate.licensePlateDatabaseInfo"
+                                                            },
+                                                            "description": "License plate information be edited"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "licensePlate": [
+                                                    {
+                                                        "plateNumber": "7556ZS",
+                                                        "type": 1,
+                                                        "description": "Benz"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "License Plate"
+                ],
+                "summary": "Edit license plate",
+                "description": "Edit existing license plate information in license plate database.",
+                "parameters": [
+                    {
+                        "name": "plateNumber",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify the license plate number you want to edit.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "example": "\"3556ZS\""
+                    },
+                    {
+                        "name": "newPlateNumber",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Edit the license plate number. The license plate cannot contains spaces or dashes (-). ",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": "\"7556ZS\""
+                    },
+                    {
+                        "name": "type",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        },
+                        "description": "Edit the type of the license plate. 1 for allowed and 2 for blocked.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": 1
+                    },
+                    {
+                        "name": "description",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Edit the description of the license plate.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": "\"Benz\""
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/LicensePlate/Database/Delete/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Common.Response"
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "License Plate"
+                ],
+                "summary": "Delete license plates",
+                "description": "Delete specific license plates from license plate database.",
+                "parameters": [
+                    {
+                        "name": "plateNumbers",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify one or more license plates.",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "example": "\"3556ZS,AB1234\""
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/LicensePlate/Event/ListEvent/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "allOf": [
+                                        {
+                                            "$ref": "#/components/schemas/Common.Response"
+                                        },
+                                        {
+                                            "type": "object",
+                                            "properties": {
+                                                "data": {
+                                                    "type": "object",
+                                                    "properties": {
+                                                        "total": {
+                                                            "type": "integer",
+                                                            "description": "Total number of license plate events to be listed"
+                                                        },
+                                                        "events": {
+                                                            "type": "array",
+                                                            "items": {
+                                                                "$ref": "#/components/schemas/License Plate.licensePlateEventInfo"
+                                                            },
+                                                            "description": "License plate event list"
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    ]
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true,
+                                            "data": {
+                                                "total": 1,
+                                                "events": [
+                                                    {
+                                                        "plateNumber": "3556ZS",
+                                                        "type": 1,
+                                                        "description": "Toyota",
+                                                        "comment": "",
+                                                        "startTime": "2023-05-08T16:00:00",
+                                                        "endTime": "2023-05-08T16:00:00",
+                                                        "eventId": 15,
+                                                        "locked": false,
+                                                        "licensePlateThumbnail": "",
+                                                        "vehicleThumbnail": "",
+                                                        "camId": 2,
+                                                        "dsId": 0,
+                                                        "camName": "CamName01"
+                                                    }
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "License Plate"
+                ],
+                "summary": "List license plate events",
+                "description": "List license plate events that match specified information.",
+                "parameters": [
+                    {
+                        "name": "camIds",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify one or more cameras in any of the following formats: [camera id](#get-/webapi/SurveillanceStation/ThirdParty/Camera/List/v1), camera name, and MAC address.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2,3,4\"",
+                            "\"CamName01,CamName02\"",
+                            "\"90:09:D0:3B:7A:1A,30:A4:74:9B:4C:75\""
+                        ]
+                    },
+                    {
+                        "name": "plateNumbers",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify one or more license plates.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"3556ZS\"",
+                            "\"3556ZS,AB1234\""
+                        ]
+                    },
+                    {
+                        "name": "startTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a start time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T16:00:00\"",
+                            "\"2023-05-08T16:00:00Z\"",
+                            "\"2023-05-09T00:00:00+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "endTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify an end time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T16:00:00\"",
+                            "\"2023-05-08T16:00:00Z\"",
+                            "\"2023-05-09T00:00:00+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "withThumbnail",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "description": "Choose whether to append event thumbnails.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            false
+                        ]
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 100
+                        },
+                        "description": "Limit the number of events that will be returned from each NAS server. Events with later timestamps will not be included if the total number of events exceeds the specified limit.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": 50
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/LicensePlate/Event/DownloadRecording/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/zip": {
+                                "schema": {
+                                    "type": "string",
+                                    "format": "binary",
+                                    "description": "Binary data with MIME type application/zip."
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "description": "Binary data with MIME type application/zip.",
+                                        "value": "BINARY"
+                                    }
+                                }
+                            },
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Common.Response"
+                                },
+                                "examples": {
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "License Plate"
+                ],
+                "summary": "Download license plate event",
+                "description": "Download a recording using the event's ID.",
+                "parameters": [
+                    {
+                        "name": "eventId",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Specify the [event ID](#get-/webapi/SurveillanceStation/ThirdParty/LicensePlate/Event/ListEvent/v1).",
+                        "required": true,
+                        "allowEmptyValue": false,
+                        "example": 15
+                    },
+                    {
+                        "name": "dsId",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        },
+                        "description": "Specify the [NAS server ID](#get-/webapi/SurveillanceStation/ThirdParty/LicensePlate/Event/ListEvent/v1).",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": 0
+                    }
+                ]
+            }
+        },
+        "/webapi/SurveillanceStation/ThirdParty/LicensePlate/Event/DownloadReport/v1": {
+            "get": {
+                "responses": {
+                    "200": {
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Common.Response"
+                                },
+                                "examples": {
+                                    "Success": {
+                                        "value": {
+                                            "success": true
+                                        }
+                                    },
+                                    "Failed": {
+                                        "value": {
+                                            "success": false,
+                                            "error": {
+                                                "code": 400
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "tags": [
+                    "License Plate"
+                ],
+                "summary": "Download license plate report",
+                "description": "Download license plate report that match specified information.",
+                "parameters": [
+                    {
+                        "name": "camIds",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify one or more cameras in any of the following formats: [camera id](#get-/webapi/SurveillanceStation/ThirdParty/Camera/List/v1), camera name, and MAC address.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2,3,4\"",
+                            "\"CamName01,CamName02\"",
+                            "\"90:09:D0:3B:7A:1A,30:A4:74:9B:4C:75\""
+                        ]
+                    },
+                    {
+                        "name": "startTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify a start time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T16:42:00\"",
+                            "\"2023-05-08T16:42:00Z\"",
+                            "\"2023-05-09T00:42:00+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "endTime",
+                        "in": "query",
+                        "schema": {
+                            "$ref": "#/components/schemas/Common.DoubleQuotedString"
+                        },
+                        "description": "Specify an end time in ISO 8601 format: `YYYY-MM-DDTHH:MM:SS` (If no timezone is specified the default timezone of your NAS will be used).",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "examples": [
+                            "\"2023-05-08T16:42:10\"",
+                            "\"2023-05-08T16:42:10Z\"",
+                            "\"2023-05-09T00:42:10+08:00\""
+                        ]
+                    },
+                    {
+                        "name": "downloadFormat",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        },
+                        "description": "Specify the download format. 0 for html and 1 for .xlsx.",
+                        "required": false,
+                        "allowEmptyValue": false,
+                        "example": 0
+                    }
+                ]
+            }
+        }
+    },
+    "servers": [
+        {
+            "url": "{protocol}://{nas_address:port}",
+            "variables": {
+                "protocol": {
+                    "default": "https",
+                    "enum": [
+                        "http",
+                        "https"
+                    ]
+                },
+                "nas_address:port": {
+                    "default": "{nas_address:port}",
+                    "description": "NAS IP:port"
+                }
+            }
+        }
+    ],
+    "components": {
+        "schemas": {
+            "Common.Response": {
+                "type": "object",
+                "required": [
+                    "success"
+                ],
+                "properties": {
+                    "success": {
+                        "type": "boolean",
+                        "example": true,
+                        "description": "Value of `true` or `false`, indicated whether was successful"
+                    },
+                    "error": {
+                        "type": "object",
+                        "required": [
+                            "code"
+                        ],
+                        "properties": {
+                            "code": {
+                                "$ref": "#/components/schemas/Common.ErrorCode"
+                            }
+                        }
+                    }
+                }
+            },
+            "Common.ErrorCode": {
+                "type": "integer",
+                "enum": [
+                    105,
+                    117,
+                    119,
+                    400,
+                    401,
+                    403,
+                    406,
+                    407,
+                    416,
+                    418,
+                    424,
+                    440,
+                    441,
+                    448,
+                    450,
+                    457
+                ],
+                "description": "Error code table:\n| Code | Description                          |\n| ---- | ------------------------------------ |\n| 105  | No permission                        |\n| 117  | Internal error                       |\n| 119  | Sid not found                        |\n| 400  | Execute failed                       |\n| 401  | Param invalid                        |\n| 403  | Insufficient license                 |\n| 406  | Related server conn failed           |\n| 407  | CMS closed reload                    |\n| 416  | Msg connect host failed              |\n| 418  | Object not exist                     |\n| 424  | Upgrade dp                           |\n| 440  | License conn server failed           |\n| 441  | License activation failed            |\n| 448  | License activation ssl verify failed |\n| 450  | Not apply on migrating cam           |\n| 457  | Camcap error default                 |"
+            },
+            "Common.DoubleQuotedString": {
+                "type": "string",
+                "format": "double-quoted-string",
+                "description": "String enclosed by double quotes. e.g. \"1\", \"Synology\", \"90:09:D0:3B:7A:1A,TC500\""
+            },
+            "Camera.camInfoBasic": {
+                "type": "object",
+                "properties": {
+                    "statusId": {
+                        "type": "integer",
+                        "description": "Indicating the camera status code.\n| Value | Description         |\n| ----- | ------------------- |\n| 0     | EMPTY               |\n| 1     | NORMAL              |\n| 2     | DELETED             |\n| 3     | DISCONNECTED        |\n| 4     | UNAVAILABLE         |\n| 5     | READY               |\n| 6     | INACCESSIBLE        |\n| 7     | DISABLED            |\n| 8     | UNRECOGNIZED        |\n| 9     | SETTING             |\n| 10    | SERVER_DISCONN      |\n| 11    | MIGRATING           |\n| 12    | OTHERS              |\n| 13    | REC_STORAGE_REMOVED |\n| 14    | STOPPING            |\n| 15    | HOST_FAILED         |\n| 16    | UNAUTHORIZED        |\n| 17    | RTSP_ERROR          |\n| 18    | GET_NO_VIDEO        |\n| 19    | DIFF_CAP            |\n| 20    | NO_CAP              |\n| 21    | INACTIVATED         |"
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "Indicating the camera status string."
+                    },
+                    "dsName": {
+                        "type": "string",
+                        "description": "DS server name"
+                    },
+                    "model": {
+                        "type": "string",
+                        "description": "Camera model name"
+                    },
+                    "vendor": {
+                        "type": "string",
+                        "description": "Camera vendor name"
+                    },
+                    "dsId": {
+                        "type": "integer",
+                        "description": "NAS server Id"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Camera name"
+                    },
+                    "mac": {
+                        "type": "string",
+                        "description": "Camera mac address"
+                    },
+                    "ip": {
+                        "type": "string",
+                        "description": "Camera ip address"
+                    },
+                    "camId": {
+                        "type": "integer",
+                        "description": "Camera id"
+                    }
+                }
+            },
+            "Camera.streamInfo": {
+                "type": "object",
+                "properties": {
+                    "resolution": {
+                        "type": "string",
+                        "description": "Streaming resolution"
+                    },
+                    "quality": {
+                        "type": "string",
+                        "description": "Streaming quality"
+                    },
+                    "fps": {
+                        "type": "integer",
+                        "description": "Frames per second"
+                    },
+                    "constantBitrate": {
+                        "type": "string",
+                        "description": "Constant bitrate (CBR)"
+                    },
+                    "bitrateCtrl": {
+                        "type": "integer",
+                        "description": "Bitrate control"
+                    }
+                }
+            },
+            "Camera.DIDOItem": {
+                "type": "object",
+                "properties": {
+                    "index": {
+                        "type": "integer",
+                        "description": "Digital input/output index"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Digital input/output name"
+                    },
+                    "normalState": {
+                        "type": "integer",
+                        "description": "Normal state"
+                    },
+                    "triggerState": {
+                        "type": "boolean",
+                        "description": "Trigger state"
+                    }
+                }
+            },
+            "Camera.camInfo": {
+                "type": "object",
+                "properties": {
+                    "streamHigh": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Camera.streamInfo"
+                            }
+                        ],
+                        "description": "High streaming information"
+                    },
+                    "streamMedium": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Camera.streamInfo"
+                            }
+                        ],
+                        "description": "Medium streaming information"
+                    },
+                    "streamLow": {
+                        "allOf": [
+                            {
+                                "$ref": "#/components/schemas/Camera.streamInfo"
+                            }
+                        ],
+                        "description": "Low streaming information"
+                    },
+                    "recStatus": {
+                        "type": "integer",
+                        "description": "The recording status of a camera.\n| Value | Type              |\n| ----- | ----------------- |\n| 0     | SCHE_NONE         |\n| 1     | SCHE_CONT         |\n| 2     | SCHE_MD           |\n| 3     | SCHE_CUSTOM_1     |\n| 4     | SCHE_CUSTOM_2     |\n| 5     | MANUAL            |\n| 6     | -        |\n| 7     | ANALYTICS         |\n| 8     | EDGE              |\n| 9     | BY_ACTIONRULE     |\n| 10    | SCHE_CONT_ADV     |\n| 11    | BY_POS_EVT        |\n| 12    | -        |\n| 13    | -        |\n| 14    | BY_PEOPLE_VEHICLE |"
+                    },
+                    "userName": {
+                        "type": "string",
+                        "description": "Camera login user name"
+                    },
+                    "audioCodec": {
+                        "type": "string",
+                        "description": "Audio codec"
+                    },
+                    "audioOut": {
+                        "type": "boolean",
+                        "description": "Support audio out"
+                    },
+                    "videoCodec": {
+                        "type": "string",
+                        "description": "Video codec"
+                    },
+                    "recordPrefix": {
+                        "type": "string",
+                        "description": "Customize archive folder name"
+                    },
+                    "recordSchedule": {
+                        "type": "string",
+                        "description": "Recording schedule `48*7` string"
+                    },
+                    "dsId": {
+                        "type": "integer",
+                        "description": "The server name"
+                    },
+                    "mac": {
+                        "type": "string",
+                        "description": "MAC address. Format: 90:09:D0:3B:7A:1A"
+                    },
+                    "camId": {
+                        "type": "integer",
+                        "description": "Camera unique id"
+                    },
+                    "vendor": {
+                        "type": "string",
+                        "description": "Camera vendor name"
+                    },
+                    "rotationBySpace": {
+                        "type": "string",
+                        "description": "Rotation rule for space"
+                    },
+                    "rotationByDay": {
+                        "type": "integer",
+                        "description": "Rotation rule by day"
+                    },
+                    "model": {
+                        "type": "string",
+                        "description": "Camera model name"
+                    },
+                    "dsName": {
+                        "type": "string",
+                        "description": "DS server name"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Camera name"
+                    },
+                    "port": {
+                        "type": "integer",
+                        "description": "Camera Port"
+                    },
+                    "ip": {
+                        "type": "string",
+                        "description": "Camera IP address"
+                    },
+                    "statusId": {
+                        "type": "integer",
+                        "description": "Indicating the camera status code.\n| Value | Description         |\n| ----- | ------------------- |\n| 0     | EMPTY               |\n| 1     | NORMAL              |\n| 2     | DELETED             |\n| 3     | DISCONNECTED        |\n| 4     | UNAVAILABLE         |\n| 5     | READY               |\n| 6     | INACCESSIBLE        |\n| 7     | DISABLED            |\n| 8     | UNRECOGNIZED        |\n| 9     | SETTING             |\n| 10    | SERVER_DISCONN      |\n| 11    | MIGRATING           |\n| 12    | OTHERS              |\n| 13    | REC_STORAGE_REMOVED |\n| 14    | STOPPING            |\n| 15    | HOST_FAILED         |\n| 16    | UNAUTHORIZED        |\n| 17    | RTSP_ERROR          |\n| 18    | GET_NO_VIDEO        |\n| 19    | DIFF_CAP            |\n| 20    | NO_CAP              |\n| 21    | INACTIVATED         |"
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "Indicating the camera status."
+                    },
+                    "ptzCapability": {
+                        "type": "string",
+                        "description": "Indicating the camera ptz capability."
+                    },
+                    "DINumber": {
+                        "type": "integer",
+                        "description": "Number of digital inputs"
+                    },
+                    "DIList": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Camera.DIDOItem"
+                        },
+                        "description": "Digital input list"
+                    },
+                    "DONumber": {
+                        "type": "integer",
+                        "description": "Number of digital outputs"
+                    },
+                    "DOList": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Camera.DIDOItem"
+                        },
+                        "description": "Digital output list"
+                    }
+                }
+            },
+            "Bookmark.bookmarkInfo": {
+                "type": "object",
+                "properties": {
+                    "camName": {
+                        "type": "string",
+                        "description": "Camera name"
+                    },
+                    "camId": {
+                        "type": "integer",
+                        "description": "Camera id"
+                    },
+                    "dsId": {
+                        "type": "integer",
+                        "description": "NAS server Id"
+                    },
+                    "endTime": {
+                        "type": "string",
+                        "description": "Bookmark end time. ISO 8601, Format example: `YYYY-MM-DDTHH:MM:SS`, 2023-02-23T14:30:00"
+                    },
+                    "startTime": {
+                        "type": "string",
+                        "description": "Bookmark start time. ISO 8601, Format example: `YYYY-MM-DDTHH:MM:SS`, 2023-02-23T14:30:00"
+                    },
+                    "bookmarkId": {
+                        "type": "integer",
+                        "description": "Bookmark id"
+                    },
+                    "comment": {
+                        "type": "string",
+                        "description": "Bookmark comment"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Bookmark name"
+                    }
+                }
+            },
+            "Maps.geoMapItem": {
+                "type": "object",
+                "properties": {
+                    "deviceId": {
+                        "type": "string",
+                        "description": "Specify a device in any of the following formats: id, name, and MAC address."
+                    },
+                    "latitude": {
+                        "type": "number",
+                        "format": "float",
+                        "description": "Latitude"
+                    },
+                    "longitude": {
+                        "type": "number",
+                        "format": "float",
+                        "description": "Longitude"
+                    },
+                    "direction": {
+                        "type": "integer",
+                        "example": 0,
+                        "description": "Device direction"
+                    },
+                    "viewAngle": {
+                        "type": "integer",
+                        "example": 100,
+                        "description": "Device view angle"
+                    },
+                    "radius": {
+                        "type": "integer",
+                        "example": 20,
+                        "description": "Device radius"
+                    }
+                }
+            },
+            "License Plate.licensePlateDatabaseInfo": {
+                "type": "object",
+                "properties": {
+                    "plateNumber": {
+                        "type": "string",
+                        "description": "License plate number"
+                    },
+                    "type": {
+                        "type": "integer",
+                        "description": "Type of license plate"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Description of license plate"
+                    }
+                }
+            },
+            "License Plate.licensePlateEventInfo": {
+                "type": "object",
+                "properties": {
+                    "plateNumber": {
+                        "type": "string",
+                        "description": "License plate number"
+                    },
+                    "type": {
+                        "type": "integer",
+                        "description": "Type of license plate"
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Description of license plate"
+                    },
+                    "comment": {
+                        "type": "string",
+                        "description": "Comment of license plate event"
+                    },
+                    "startTime": {
+                        "type": "string",
+                        "description": "Start time of license plate event"
+                    },
+                    "endTime": {
+                        "type": "string",
+                        "description": "End time of license plate event"
+                    },
+                    "eventId": {
+                        "type": "integer",
+                        "description": "Id of license plate event"
+                    },
+                    "locked": {
+                        "type": "boolean",
+                        "description": "Locked type of license plate event"
+                    },
+                    "licensePlateThumbnail": {
+                        "type": "string",
+                        "description": "Thumbnail of license plate"
+                    },
+                    "vehicleThumbnail": {
+                        "type": "string",
+                        "description": "Thumbnail of vehicle"
+                    },
+                    "camId": {
+                        "type": "integer",
+                        "description": "Camera id"
+                    },
+                    "dsId": {
+                        "type": "integer",
+                        "description": "NAS server id"
+                    },
+                    "camName": {
+                        "type": "string",
+                        "description": "Camera name"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "sid": {
+                "name": "_sid",
+                "in": "query",
+                "type": "apiKey"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "x-tag-expanded": true
+        },
+        {
+            "name": "Camera",
+            "x-tag-expanded": true
+        },
+        {
+            "name": "Recording",
+            "x-tag-expanded": true
+        },
+        {
+            "name": "Stream",
+            "x-tag-expanded": false
+        },
+        {
+            "name": "Bookmark",
+            "x-tag-expanded": false
+        },
+        {
+            "name": "Snapshot",
+            "x-tag-expanded": false
+        },
+        {
+            "name": "Maps",
+            "x-tag-expanded": false
+        },
+        {
+            "name": "License Plate",
+            "x-tag-expanded": false
+        }
+    ],
+    "security": [
+        {
+            "sid": []
+        }
+    ],
+    "x-internalDocs": {
+        "/Stream/LiveviewPlayback": {
+            "tags": [
+                "Stream"
+            ],
+            "summary": "Liveview / Playback",
+            "description": "# How to get camera video stream from Synology Surveillance Station?\n\nSurveillance Station offers two methods for accessing the camera video stream: RTSP and WebSocket.  \nRTSP is a streaming method often used for third-party integration; WebSocket can be embedded in the browser for playing video through MSE (Media Source Extensions).  \nThe respective formats are as follows:\n\n## RTSP\n\n* `rtsp://{nas_address}:554/camId={cam_id}&_sid={sid}`\n* `rtsp://{nas_address}:554/camId={cam_id}&_sid={sid}&time={YYYY-MM-DDTHH:MM:SS}`\n\n<video src=\"https://surveillance-api.synology.com/resource/videos/Stream/LiveviewPlayback/synology_surveillancestation_stream_rtsp_demo.mp4\" controls></video>\n\n## Websocket\n\n* `wss://{nas_address:port}/ss_webstream_task/?camId={cam_id}&_sid={sid}`\n* `wss://{nas_address:port}/ss_webstream_task/?camId={cam_id}&_sid={sid}&time={YYYY-MM-DDTHH:MM:SS}`\n\nSynology also provides sample code for playing WebSocket through MSE in the browser, follow these steps to embed video into your webpage:\n\n1. Copy the \"js\" folder from the <a href=\"https://github.com/SynologyOpenSource/Synology-Surveillance-API-Samples/tree/master/ws-player\" target=\"_blank\" rel=\"noreferrer noopener\">GitHub</a> repository to your working directory.\n2. Include the following script tag in your webpage:\n\n   ```html\n   <script src=\"js/ws-player.js\"></script>\n   ```\n\n3. Inside the div where you want to embed the video, insert the following code:\n\n   ```js\n   const config = {\n       ip: '192.168.1.5',\n       port: '5000',\n       usr: 'josh',\n       pwd: 'Syno1234',\n       camId: '10B',\n   };\n   \n   new WsPlayer().play({\n       url: await this.getWssUrl(config),\n       renderTo: div,\n   });\n   ```\n\n**Note**: If you input the time parameter, the corresponding recording file is required for that period. If you do not include the time parameter, it will play real-time video."
+        },
+        "/Support/Community": {
+            "tags": [
+                "Support"
+            ],
+            "summary": "Synology community",
+            "externalDocs": {
+                "description": "The URL pointing to Surveillance 3rd-party development community.",
+                "url": "https://community.synology.com/enu/forum/3?tags=10"
+            }
+        },
+        "/Support/GPTs": {
+            "tags": [
+                "Support"
+            ],
+            "summary": "GPTs (ChatGPT)",
+            "description": "# How do I Chat with Synology Surveillance API GPTs on ChatGPT?\n\n## Purpose\n\nSurveillance Station is capable of seamlessly integrating with custom applications, enabling them to do tasks such as downloading recordings within a specified time range using the Synology Surveillance Station API. To save you time and effort, you can enable the Synology Surveillance API GPTs in ChatGPT. It can then search through the Synology Surveillance Station API documentation, extract relevant parameter formats, and generate sample code for you.\n\nThis article provides a guide on getting started with Synology Surveillance API GPTs on ChatGPT.\n\n**Note**:\n* Currently, only ChatGPT Plus users have access to GPTs. Check  <a href=\"https://openai.com/blog/chatgpt-plus\" target=\"_blank\" rel=\"noreferrer noopener\">this OpenAI article</a> for information regarding the ChatGPT Plus subscription plan.\n\n## Environment\n\n* Surveillance Station 9.1.2 or above\n\n## Resolution\n\n### Start Chat\n\n1. Sign in to the <a href=\"https://chat.openai.com/auth/login\" target=\"_blank\" rel=\"noreferrer noopener\">ChatGPT website</a>, and click on **Explore GPTs** in the upper left corner.  \n   <img src=\"https://surveillance-api.synology.com/resource/images/Support/GPTs/explore_GPTs.png\" title=\"Click on Explore GPTs\" alt=\"Click on Explore GPTs\"></img>\n2. In the search box, type in **Synology Surveillance API**.  \n   <img src=\"https://surveillance-api.synology.com/resource/images/Support/GPTs/search_box.png\" title=\"Type in search box\" alt=\"Type in search box\"></img>\n3. Select and hit **Start Chat**.  \n   <img src=\"https://surveillance-api.synology.com/resource/images/Support/GPTs/start_chat.png\" title=\"Start chat\" alt=\"Start chat\"></img>\n4. You can now interact with Synology Surveillance API GPTs. Select **Keep in sidebar** to save the GPTs on top.\n   <img src=\"https://surveillance-api.synology.com/resource/images/Support/GPTs/keep_in_sidebar.png\" title=\"Keep in sidebar\" alt=\"Keep in sidebar\"></img>\n\n### Example Prompts\n\nHere are some example prompts that illustrate how to interact with the Synology Surveillance API GPTs.\n\n* **Rename a Camera on Surveillance Station Using Python**  \n  I would like to use the Synology Surveillance API to rename the “old_name” camera to “new_name” on my Surveillance Station. Please provide the required APIs in Python.\n* **Download the Recording Within a Specified Time Range Using Python**  \n  I would like to use the Synology Surveillance API to download recordings from a camera named “cam_name” within the time range of YYYY/MM/DD HH:MM to HH:MM. Please provide the required APIs in Python."
+        }
+    },
+    "x-servers-description": "Specify the connection to your Synology NAS.",
+    "x-security-description": "Fill in your _sid to apply your API key with your sid. To retrieve your sid, [Sign in](#get-/webapi/SurveillanceStation/ThirdParty/Auth/Login/v1) first.",
+    "x-ui-sticky-tags": [
+        "Support"
+    ],
+    "x-server-security-section": {
+        "title": "Pre-fill information for all APIs",
+        "titleAppendix": "(Optional)",
+        "description": "To make the development process easier, you can fill in your **nas_address** and **_sid** below. The key will be applied to the APIs automatically."
+    }
+}
