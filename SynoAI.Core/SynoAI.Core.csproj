@@ -18,6 +18,5 @@
   <ItemGroup>
     <ProjectReference Include="..\SynoAI.Core.Processors\SynoAI.Core.Processors.csproj" />
     <ProjectReference Include="..\SynoAI.Core.Notifiers\SynoAI.Core.Notifiers.csproj" />
-    <ProjectReference Include="..\SynologySurveillance.Net\SynologySurveillance.Net.csproj" />
   </ItemGroup>
 </Project>

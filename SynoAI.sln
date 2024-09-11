@@ -11,9 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SynoAI.Core.Notifiers", "Sy
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SynoAI.Core.Processors", "SynoAI.Core.Processors\SynoAI.Core.Processors.csproj", "{A14E4C3A-AF3B-44C0-8076-FC4B20BD2E31}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SynologySurveillance.Net", "SynologySurveillance.Net\SynologySurveillance.Net.csproj", "{5FFBCF60-E267-4200-87B5-1FE175288A79}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SynoAI.Tests", "SynoAI.Tests\SynoAI.Tests.csproj", "{F4CA53E9-91C7-4A32-A647-F0FA2475C69F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SynoAI.Tests", "SynoAI.Tests\SynoAI.Tests.csproj", "{F4CA53E9-91C7-4A32-A647-F0FA2475C69F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +35,6 @@ Global
 		{A14E4C3A-AF3B-44C0-8076-FC4B20BD2E31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A14E4C3A-AF3B-44C0-8076-FC4B20BD2E31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A14E4C3A-AF3B-44C0-8076-FC4B20BD2E31}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5FFBCF60-E267-4200-87B5-1FE175288A79}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5FFBCF60-E267-4200-87B5-1FE175288A79}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5FFBCF60-E267-4200-87B5-1FE175288A79}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5FFBCF60-E267-4200-87B5-1FE175288A79}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F4CA53E9-91C7-4A32-A647-F0FA2475C69F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F4CA53E9-91C7-4A32-A647-F0FA2475C69F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4CA53E9-91C7-4A32-A647-F0FA2475C69F}.Release|Any CPU.ActiveCfg = Release|Any CPU
