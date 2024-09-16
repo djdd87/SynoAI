@@ -1,7 +1,7 @@
 
 namespace SynoAI.Core.Processors.CodeProject;
 
-public class CodeProjectProcessor : IProcessor
+public class CodeProjectProcessor : IProcessorEngine
 {
     public ProcessorType Type => ProcessorType.CodeProject;
 

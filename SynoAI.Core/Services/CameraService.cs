@@ -8,10 +8,10 @@ namespace SynoAI.Core.Services;
 
 public class CameraService : ICameraService
 {
-    private readonly IAppDbContext _context;
+    private readonly AppDbContext _context;
     private readonly ILogger<CameraService> _logger;
 
-    public CameraService(ILogger<CameraService> logger, IAppDbContext context)
+    public CameraService(ILogger<CameraService> logger, AppDbContext context)
     {
         _context = context;
         _logger = logger;
@@ -44,17 +44,17 @@ public class CameraService : ICameraService
         await _context.SaveChangesAsync();
     }
 
-    public Task AddZoneToCameraAsync(Guid cameraId, Zone zone)
+    public Task AddZoneToCameraAsync(Guid cameraId, DetectionArea zone)
     {
         throw new NotImplementedException();
     }
 
-    public Task<Zone> GetZoneByIdAsync(Guid zoneId)
+    public Task<DetectionArea> GetZoneByIdAsync(Guid zoneId)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<Zone>> GetZonesForCameraAsync(Guid cameraId)
+    public Task<IEnumerable<DetectionArea>> GetZonesForCameraAsync(Guid cameraId)
     {
         throw new NotImplementedException();
     }

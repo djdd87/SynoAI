@@ -22,7 +22,6 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<ICameraService, CameraService>();
 builder.Services.AddScoped<IDetectionService, DetectionService>();
 builder.Services.AddScoped<ISettingService, SettingService>();
-builder.Services.AddScoped<IAppDbContext>(provider => provider.GetService<AppDbContext>()!);
 
 // Register the notifiers and processors
 builder.Services.RegisterNotifiers();

@@ -1,6 +1,6 @@
 namespace SynoAI.Core.Processors;
 
-public interface IProcessor
+public interface IProcessorEngine
 {
     ProcessorType Type {get;}
     Task RunAsync();

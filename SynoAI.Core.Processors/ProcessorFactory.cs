@@ -4,22 +4,22 @@ namespace SynoAI.Core.Processors;
 
 public interface IProcessorFactory
 {
-    public IProcessor Build(ProcessorType processorType);
+    public IProcessorEngine Build(ProcessorType processorType);
 }
 
 public class ProcessorFactory : IProcessorFactory
 {
     private readonly ILogger<ProcessorFactory> _logger;
-    private readonly Dictionary<ProcessorType, IProcessor> _processors;
+    private readonly Dictionary<ProcessorType, IProcessorEngine> _processors;
 
-    public ProcessorFactory(ILogger<ProcessorFactory> logger, IEnumerable<IProcessor> processors)
+    public ProcessorFactory(ILogger<ProcessorFactory> logger, IEnumerable<IProcessorEngine> processors)
     {
         _logger = logger;
         _processors = processors.ToDictionary(x => x.Type);
         _logger.LogInformation("ProcessorFactory initialized with {Count} processors", _processors.Count);
     }
 
-    public IProcessor Build(ProcessorType type)
+    public IProcessorEngine Build(ProcessorType type)
     {
         if (_processors.TryGetValue(type, out var processor))
         {

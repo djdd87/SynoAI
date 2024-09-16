@@ -1,14 +1,15 @@
-using System.ComponentModel.DataAnnotations;
+using SynoAI.Core.Models;
 
 namespace SynoAI.Core.Data;
+
+/// <summary>
+/// Represents a camera configuration.
+/// </summary>
 public class Camera
 {
-    [Key]
     public required Guid Id { get; set; }
-
-    [Required]
-    [StringLength(100)]
     public required string Name { get; set; }
+    public required CameraQuality QualityProfile { get; set; }
 
-    public virtual ICollection<Zone> Zones { get; set; } = new HashSet<Zone>();
+    public ICollection<DetectionArea> DetectionAreas { get; set; } = new List<DetectionArea>();
 }
