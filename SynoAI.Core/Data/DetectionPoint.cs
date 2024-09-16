@@ -9,7 +9,7 @@ public class DetectionPoint
     public required int X { get; set; }
     public required int Y { get; set; }
     public required int Order { get; set; }
-    public required int DetectionAreaId { get; set; }
+    public required Guid DetectionAreaId { get; set; }
 
     public DetectionArea? DetectionArea { get; set; }
 }
