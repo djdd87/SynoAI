@@ -44,17 +44,17 @@ public class CameraService : ICameraService
         await _context.SaveChangesAsync();
     }
 
-    public Task AddZoneToCameraAsync(Guid cameraId, DetectionArea zone)
+    public Task AddZoneToCameraAsync(Guid cameraId, Zone zone)
     {
         throw new NotImplementedException();
     }
 
-    public Task<DetectionArea> GetZoneByIdAsync(Guid zoneId)
+    public Task<Zone> GetZoneByIdAsync(Guid zoneId)
     {
         throw new NotImplementedException();
     }
 
-    public Task<IEnumerable<DetectionArea>> GetZonesForCameraAsync(Guid cameraId)
+    public Task<IEnumerable<Zone>> GetZonesForCameraAsync(Guid cameraId)
     {
         throw new NotImplementedException();
     }

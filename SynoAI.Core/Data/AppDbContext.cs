@@ -4,9 +4,9 @@ using SynoAI.Core.Data;
 public class AppDbContext : DbContext
 {
     public DbSet<Camera> Cameras { get; set; }
-    public DbSet<DetectionArea> DetectionAreas { get; set; }
-    public DbSet<DetectionPoint> DetectionPoints { get; set; }
-    public DbSet<DetectionTimeRange> DetectionTimeRanges { get; set; }
+    public DbSet<Zone> Zones { get; set; }
+    public DbSet<ZonePoint> ZonePoints { get; set; }
+    public DbSet<ZoneTimeRange> ZoneTimeRanges { get; set; }
     public DbSet<Notifier> Notifiers { get; set; }
     public DbSet<Setting> Settings { get; set; }
 

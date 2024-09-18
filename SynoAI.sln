@@ -11,11 +11,18 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SynoAI.Core.Notifiers", "Sy
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SynoAI.Core.Processors", "SynoAI.Core.Processors\SynoAI.Core.Processors.csproj", "{A14E4C3A-AF3B-44C0-8076-FC4B20BD2E31}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SynoAI.Tests", "SynoAI.Tests\SynoAI.Tests.csproj", "{F4CA53E9-91C7-4A32-A647-F0FA2475C69F}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SurveillanceStation.Net", "..\SurveillanceStation.Net\SurveillanceStation.Net\SurveillanceStation.Net.csproj", "{3327ED44-E424-4308-BE9F-C7ED40D9FB51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SynoAI.Core.Templating", "SynoAI.Core.Templating\SynoAI.Core.Templating.csproj", "{853F8EE6-14F9-412D-8353-C99691A1477B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SynoAI.Core.Templating", "SynoAI.Core.Templating\SynoAI.Core.Templating.csproj", "{853F8EE6-14F9-412D-8353-C99691A1477B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SynoAI.Core.Tests", "SynoAI.Core.Tests\SynoAI.Core.Tests.csproj", "{8165CFB6-1DCD-4BE2-AEAD-22BFF68D704F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SynoAI.API.Tests", "SynoAI.API.Tests\SynoAI.API.Tests.csproj", "{CC9949FD-A8D7-421D-B272-FC041501DC11}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0E95E385-310C-470F-8B01-670AD696951C}"
+	ProjectSection(SolutionItems) = preProject
+		TODO.md = TODO.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,10 +46,6 @@ Global
 		{A14E4C3A-AF3B-44C0-8076-FC4B20BD2E31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A14E4C3A-AF3B-44C0-8076-FC4B20BD2E31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A14E4C3A-AF3B-44C0-8076-FC4B20BD2E31}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F4CA53E9-91C7-4A32-A647-F0FA2475C69F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F4CA53E9-91C7-4A32-A647-F0FA2475C69F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F4CA53E9-91C7-4A32-A647-F0FA2475C69F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F4CA53E9-91C7-4A32-A647-F0FA2475C69F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3327ED44-E424-4308-BE9F-C7ED40D9FB51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3327ED44-E424-4308-BE9F-C7ED40D9FB51}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3327ED44-E424-4308-BE9F-C7ED40D9FB51}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,6 +54,14 @@ Global
 		{853F8EE6-14F9-412D-8353-C99691A1477B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{853F8EE6-14F9-412D-8353-C99691A1477B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{853F8EE6-14F9-412D-8353-C99691A1477B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8165CFB6-1DCD-4BE2-AEAD-22BFF68D704F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8165CFB6-1DCD-4BE2-AEAD-22BFF68D704F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8165CFB6-1DCD-4BE2-AEAD-22BFF68D704F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8165CFB6-1DCD-4BE2-AEAD-22BFF68D704F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC9949FD-A8D7-421D-B272-FC041501DC11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC9949FD-A8D7-421D-B272-FC041501DC11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC9949FD-A8D7-421D-B272-FC041501DC11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC9949FD-A8D7-421D-B272-FC041501DC11}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

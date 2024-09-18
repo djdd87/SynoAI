@@ -4,7 +4,7 @@ namespace SynoAI.Core.Interfaces;
 
 public interface ICameraService
 {
-    Task AddZoneToCameraAsync(Guid cameraId, DetectionArea zone);
+    Task AddZoneToCameraAsync(Guid cameraId, Zone zone);
 
     /// <summary>
     /// Gets a specific camera record by it's ID.
@@ -25,7 +25,7 @@ public interface ICameraService
     /// </summary>
     /// <returns>A list of <see cref="Camera"/>.</returns>
     Task<IEnumerable<Camera>> GetListAsync();
-    Task<DetectionArea> GetZoneByIdAsync(Guid zoneId);
-    Task<IEnumerable<DetectionArea>> GetZonesForCameraAsync(Guid cameraId);
+    Task<Zone> GetZoneByIdAsync(Guid zoneId);
+    Task<IEnumerable<Zone>> GetZonesForCameraAsync(Guid cameraId);
     Task<object> DeleteZoneAsync(Guid zoneId);
 }

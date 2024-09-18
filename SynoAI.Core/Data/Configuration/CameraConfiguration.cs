@@ -11,7 +11,7 @@ public class CameraConfiguration : IEntityTypeConfiguration<Camera>
             .HasKey(x => x.Id);
 
         builder
-            .HasMany(x => x.DetectionAreas)
+            .HasMany(x => x.Zones)
             .WithOne(x => x.Camera)
             .HasForeignKey(x => x.CameraId);
 

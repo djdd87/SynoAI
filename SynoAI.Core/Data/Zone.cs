@@ -5,7 +5,7 @@ namespace SynoAI.Core.Data;
 /// <summary>
 /// Represents a detection area within a camera feed.
 /// </summary>
-public class DetectionArea
+public class Zone
 {
     public required Guid Id { get; set; }
     public required string Name { get; set; }
@@ -15,6 +15,6 @@ public class DetectionArea
 
     public Camera? Camera { get; set; }
 
-    public ICollection<DetectionPoint> DetectionPoints { get; set; } = new List<DetectionPoint>();
-    public ICollection<DetectionTimeRange> DetectionTimeRanges { get; set; } = new List<DetectionTimeRange>();
+    public ICollection<ZonePoint> ZonePoints { get; set; } = new List<ZonePoint>();
+    public ICollection<ZoneTimeRange> ZoneTimeRanges { get; set; } = new List<ZoneTimeRange>();
 }

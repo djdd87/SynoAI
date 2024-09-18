@@ -1,0 +1,1 @@
+Use .Net Aspire for running frontend & API.

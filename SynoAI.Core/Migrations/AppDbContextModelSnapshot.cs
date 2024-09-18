@@ -35,85 +35,6 @@ namespace SynoAI.Core.Migrations
                     b.ToTable("Cameras");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.DetectionArea", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("CameraId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<bool>("Enabled")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("ProcessorType")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CameraId");
-
-                    b.ToTable("DetectionAreas");
-                });
-
-            modelBuilder.Entity("SynoAI.Core.Data.DetectionPoint", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("DetectionAreaId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("Order")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("X")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Y")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DetectionAreaId");
-
-                    b.ToTable("DetectionPoints");
-                });
-
-            modelBuilder.Entity("SynoAI.Core.Data.DetectionTimeRange", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("DetectionAreaId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<TimeSpan>("End")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("TEXT");
-
-                    b.Property<TimeSpan>("Start")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DetectionAreaId");
-
-                    b.ToTable("DetectionTimeRanges");
-                });
-
             modelBuilder.Entity("SynoAI.Core.Data.Notifier", b =>
                 {
                     b.Property<Guid>("Id")
@@ -154,10 +75,89 @@ namespace SynoAI.Core.Migrations
                     b.ToTable("Settings");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.DetectionArea", b =>
+            modelBuilder.Entity("SynoAI.Core.Data.Zone", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("CameraId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<bool>("Enabled")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("ProcessorType")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CameraId");
+
+                    b.ToTable("Zones");
+                });
+
+            modelBuilder.Entity("SynoAI.Core.Data.ZonePoint", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Order")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("X")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Y")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("ZoneId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ZoneId");
+
+                    b.ToTable("ZonePoints");
+                });
+
+            modelBuilder.Entity("SynoAI.Core.Data.ZoneTimeRange", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeSpan>("End")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<TimeSpan>("Start")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ZoneId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ZoneId");
+
+                    b.ToTable("ZoneTimeRanges");
+                });
+
+            modelBuilder.Entity("SynoAI.Core.Data.Zone", b =>
                 {
                     b.HasOne("SynoAI.Core.Data.Camera", "Camera")
-                        .WithMany("DetectionAreas")
+                        .WithMany("Zones")
                         .HasForeignKey("CameraId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -165,38 +165,38 @@ namespace SynoAI.Core.Migrations
                     b.Navigation("Camera");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.DetectionPoint", b =>
+            modelBuilder.Entity("SynoAI.Core.Data.ZonePoint", b =>
                 {
-                    b.HasOne("SynoAI.Core.Data.DetectionArea", "DetectionArea")
-                        .WithMany("DetectionPoints")
-                        .HasForeignKey("DetectionAreaId")
+                    b.HasOne("SynoAI.Core.Data.Zone", "Zone")
+                        .WithMany("ZonePoints")
+                        .HasForeignKey("ZoneId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("DetectionArea");
+                    b.Navigation("Zone");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.DetectionTimeRange", b =>
+            modelBuilder.Entity("SynoAI.Core.Data.ZoneTimeRange", b =>
                 {
-                    b.HasOne("SynoAI.Core.Data.DetectionArea", "DetectionArea")
-                        .WithMany("DetectionTimeRanges")
-                        .HasForeignKey("DetectionAreaId")
+                    b.HasOne("SynoAI.Core.Data.Zone", "Zone")
+                        .WithMany("ZoneTimeRanges")
+                        .HasForeignKey("ZoneId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("DetectionArea");
+                    b.Navigation("Zone");
                 });
 
             modelBuilder.Entity("SynoAI.Core.Data.Camera", b =>
                 {
-                    b.Navigation("DetectionAreas");
+                    b.Navigation("Zones");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.DetectionArea", b =>
+            modelBuilder.Entity("SynoAI.Core.Data.Zone", b =>
                 {
-                    b.Navigation("DetectionPoints");
+                    b.Navigation("ZonePoints");
 
-                    b.Navigation("DetectionTimeRanges");
+                    b.Navigation("ZoneTimeRanges");
                 });
 #pragma warning restore 612, 618
         }

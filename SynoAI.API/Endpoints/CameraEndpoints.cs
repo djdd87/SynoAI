@@ -67,7 +67,7 @@ public static class CameraEndpoints
         .WithName("GetZonesForCamera");
 
         // Adds a zone to the specified camera
-        zoneGroup.MapPost("/", async (Guid cameraId, DetectionArea zone, ICameraService cameraService) =>
+        zoneGroup.MapPost("/", async (Guid cameraId, Zone zone, ICameraService cameraService) =>
         {
             await cameraService.AddZoneToCameraAsync(cameraId, zone);
             return TypedResults.Created($"/cameras/{cameraId}/zones", zone);

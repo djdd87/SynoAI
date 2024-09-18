@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace SynoAI.Core.Data.Configuration;
 
-public class DetectionTimeRangeConfiguration : IEntityTypeConfiguration<DetectionTimeRange>
+public class ZoneTimeRangeConfiguration : IEntityTypeConfiguration<ZoneTimeRange>
 {
-    public void Configure(EntityTypeBuilder<DetectionTimeRange> builder)
+    public void Configure(EntityTypeBuilder<ZoneTimeRange> builder)
     {
         builder
             .HasKey(x => x.Id);

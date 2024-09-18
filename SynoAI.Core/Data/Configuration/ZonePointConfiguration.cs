@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace SynoAI.Core.Data.Configuration;
 
-public class DetectionPointConfiguration : IEntityTypeConfiguration<DetectionPoint>
+public class ZonePointConfiguration : IEntityTypeConfiguration<ZonePoint>
 {
-    public void Configure(EntityTypeBuilder<DetectionPoint> builder)
+    public void Configure(EntityTypeBuilder<ZonePoint> builder)
     {
         builder
             .HasKey(x => x.Id);

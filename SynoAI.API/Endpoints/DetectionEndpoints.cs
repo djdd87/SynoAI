@@ -10,7 +10,7 @@ public static class DetectionEndpoints
             .WithTags("Detection")
             .WithOpenApi();
 
-        group.MapGet("/detection/{cameraName}", async (string cameraName, IDetectionService detectionService) =>
+        group.MapGet("/{cameraName}", async (string cameraName, IDetectionService detectionService) =>
         {
             await detectionService.RunAsync(cameraName);
             return TypedResults.Ok();

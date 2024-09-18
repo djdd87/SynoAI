@@ -51,7 +51,7 @@ namespace SynoAI.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DetectionAreas",
+                name: "Zones",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -62,9 +62,9 @@ namespace SynoAI.Core.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DetectionAreas", x => x.Id);
+                    table.PrimaryKey("PK_Zones", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DetectionAreas_Cameras_CameraId",
+                        name: "FK_Zones_Cameras_CameraId",
                         column: x => x.CameraId,
                         principalTable: "Cameras",
                         principalColumn: "Id",
@@ -72,72 +72,66 @@ namespace SynoAI.Core.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "DetectionPoints",
+                name: "ZonePoints",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     X = table.Column<int>(type: "INTEGER", nullable: false),
                     Y = table.Column<int>(type: "INTEGER", nullable: false),
                     Order = table.Column<int>(type: "INTEGER", nullable: false),
-                    DetectionAreaId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    ZoneId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DetectionPoints", x => x.Id);
+                    table.PrimaryKey("PK_ZonePoints", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DetectionPoints_DetectionAreas_DetectionAreaId",
-                        column: x => x.DetectionAreaId,
-                        principalTable: "DetectionAreas",
+                        name: "FK_ZonePoints_Zones_ZoneId",
+                        column: x => x.ZoneId,
+                        principalTable: "Zones",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "DetectionTimeRanges",
+                name: "ZoneTimeRanges",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Start = table.Column<TimeSpan>(type: "TEXT", nullable: false),
                     End = table.Column<TimeSpan>(type: "TEXT", nullable: false),
-                    DetectionAreaId = table.Column<Guid>(type: "TEXT", nullable: false)
+                    ZoneId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_DetectionTimeRanges", x => x.Id);
+                    table.PrimaryKey("PK_ZoneTimeRanges", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_DetectionTimeRanges_DetectionAreas_DetectionAreaId",
-                        column: x => x.DetectionAreaId,
-                        principalTable: "DetectionAreas",
+                        name: "FK_ZoneTimeRanges_Zones_ZoneId",
+                        column: x => x.ZoneId,
+                        principalTable: "Zones",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_DetectionAreas_CameraId",
-                table: "DetectionAreas",
+                name: "IX_ZonePoints_ZoneId",
+                table: "ZonePoints",
+                column: "ZoneId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Zones_CameraId",
+                table: "Zones",
                 column: "CameraId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DetectionPoints_DetectionAreaId",
-                table: "DetectionPoints",
-                column: "DetectionAreaId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_DetectionTimeRanges_DetectionAreaId",
-                table: "DetectionTimeRanges",
-                column: "DetectionAreaId");
+                name: "IX_ZoneTimeRanges_ZoneId",
+                table: "ZoneTimeRanges",
+                column: "ZoneId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "DetectionPoints");
-
-            migrationBuilder.DropTable(
-                name: "DetectionTimeRanges");
-
             migrationBuilder.DropTable(
                 name: "Notifiers");
 
@@ -145,7 +139,13 @@ namespace SynoAI.Core.Migrations
                 name: "Settings");
 
             migrationBuilder.DropTable(
-                name: "DetectionAreas");
+                name: "ZonePoints");
+
+            migrationBuilder.DropTable(
+                name: "ZoneTimeRanges");
+
+            migrationBuilder.DropTable(
+                name: "Zones");
 
             migrationBuilder.DropTable(
                 name: "Cameras");

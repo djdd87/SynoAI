@@ -11,5 +11,5 @@ public class Camera
     public required string Name { get; set; }
     public required CameraQuality QualityProfile { get; set; }
 
-    public ICollection<DetectionArea> DetectionAreas { get; set; } = new List<DetectionArea>();
+    public ICollection<Zone> Zones { get; set; } = new List<Zone>();
 }

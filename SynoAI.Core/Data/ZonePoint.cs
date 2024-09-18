@@ -1,15 +1,15 @@
 ﻿namespace SynoAI.Core.Data;
 
 /// <summary>
-/// Represents a point to generate a defined zone for a <see cref="DetectionArea"/>.
+/// Represents a point to generate a defined area for a <see cref="Zone"/>.
 /// </summary>
-public class DetectionPoint
+public class ZonePoint
 {
     public required Guid Id { get; set; }
     public required int X { get; set; }
     public required int Y { get; set; }
     public required int Order { get; set; }
-    public required Guid DetectionAreaId { get; set; }
+    public required Guid ZoneId { get; set; }
 
-    public DetectionArea? DetectionArea { get; set; }
+    public Zone? Zone { get; set; }
 }
