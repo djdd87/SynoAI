@@ -374,3 +374,5 @@ $RECYCLE.BIN/
 *.bak
 *.swp
 *.~*
+/SynoAI.API/app.db-shm
+/SynoAI.API/app.db-wal

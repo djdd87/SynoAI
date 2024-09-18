@@ -1,11 +1,12 @@
 using SynoAI.Core.Data;
+using SynoAI.Core.Models;
+using SynoAI.Core.Models.Requests;
+using SynoAI.Core.Models.Results;
 
 namespace SynoAI.Core.Interfaces;
 
 public interface ICameraService
 {
-    Task AddZoneToCameraAsync(Guid cameraId, Zone zone);
-
     /// <summary>
     /// Gets a specific camera record by it's ID.
     /// </summary>
@@ -25,6 +26,21 @@ public interface ICameraService
     /// </summary>
     /// <returns>A list of <see cref="Camera"/>.</returns>
     Task<IEnumerable<Camera>> GetListAsync();
+
+    /// <summary>
+    /// Creates a new camera.
+    /// </summary>
+    /// <param name="create">The data of the camera to create.</param>
+    /// <returns>A <see cref="CreateResult<Camera>"/> result.</returns>
+    Task<CreateResult<Camera>> CreateAsync(CreateCamera create);
+
+    /// <summary>
+    /// Deletes a camera.
+    /// </summary>
+    /// <param name="cameraId">The data of the camera to create.</param>
+    /// <returns>A <see cref="CreateResult<Camera>"/> result.</returns>
+    Task<DeleteResult> DeleteAsync(Guid id);
+
     Task<Zone> GetZoneByIdAsync(Guid zoneId);
     Task<IEnumerable<Zone>> GetZonesForCameraAsync(Guid cameraId);
     Task<object> DeleteZoneAsync(Guid zoneId);

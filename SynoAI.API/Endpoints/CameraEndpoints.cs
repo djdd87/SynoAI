@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Http.HttpResults;
+using SynoAI.API;
+using SynoAI.API.Models;
 using SynoAI.Core.Data;
 using SynoAI.Core.Interfaces;
+using SynoAI.Core.Models.Requests;
 
 namespace SynoAI.API.EndPoints;
 
@@ -14,14 +17,17 @@ public static class CameraEndpoints
             .WithOpenApi();
 
         // Fetch all cameras
-        group.MapGet("/", async (ICameraService cameraService) =>
+        group.MapGet("/", async (ICameraService cameraService, ILoggerFactory loggerFactory) =>
         {
+            var logger = loggerFactory.CreateLogger();
+            logger.LogInformation("Fetching camera list");
+
             var results = await cameraService.GetListAsync();
             return TypedResults.Ok(results);
         })
-        .Produces<IEnumerable<Camera>>(StatusCodes.Status200OK)
-        .WithName("GetCameras")
-        .WithDescription("Returns a list of all cameras added to the application.");
+            .Produces<IEnumerable<Camera>>(StatusCodes.Status200OK)
+            .WithName("GetCameras")
+            .WithDescription("Returns a list of all cameras added to the application.");
 
         // Fetch a specific camera by ID
         group.MapGet("/{id:guid}", async Task<Results<Ok<Camera>, NotFound>> (Guid id, ICameraService cameraService) =>
@@ -34,10 +40,10 @@ public static class CameraEndpoints
 
             return TypedResults.Ok(camera);
         })
-        .Produces<IEnumerable<Camera>>(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status404NotFound)
-        .WithName("GetCameraById")
-        .WithDescription("Returns a camera by the specified ID.");
+            .Produces<IEnumerable<Camera>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithName("GetCameraById")
+            .WithDescription("Returns a camera by the specified ID.");
 
         // Fetch a specific camera by it's name
         group.MapGet("/by-name/{name}", async Task<Results<Ok<Camera>, NotFound>> (string name, ICameraService cameraService) =>
@@ -50,28 +56,79 @@ public static class CameraEndpoints
 
             return TypedResults.Ok(camera);
         })
-        .Produces<IEnumerable<Camera>>(StatusCodes.Status200OK)
-        .Produces(StatusCodes.Status404NotFound)
-        .WithName("GetCameraByName")
-        .WithDescription("Returns a camera with the specified name.");
+            .Produces<IEnumerable<Camera>>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status404NotFound)
+            .WithName("GetCameraByName")
+            .WithDescription("Returns a camera with the specified name.");
 
-        // Create a group for the camera zones
-        var zoneGroup = group.MapGroup("/{cameraId:guid}/zones");
+        // Create a new camera
+        group.MapPost("/", CreateCamera)
+            .Produces<Guid>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .WithName("CreateCamera")
+            .WithDescription("Returns a list of all cameras added to the application.");
 
-        // Fetches all zones for the specified camera
-        zoneGroup.MapGet("/", async (Guid cameraId, ICameraService cameraService) =>
+        // Deletes a camera
+        group.MapDelete("/", DeleteCamera)
+            .Produces<bool>(StatusCodes.Status200OK)
+            .Produces(StatusCodes.Status400BadRequest)
+            .WithName("DeleteCamera")
+            .WithDescription("Deletes a camera by the specified ID.");
+    }
+
+    private static async Task<IResult> CreateCamera(
+        CreateCameraRequest request,
+        ICameraService cameraService,
+        ILoggerFactory loggerFactory)
+    {
+        var logger = loggerFactory.CreateLogger();
+        logger.LogInformation("Calling API to create camera.");
+
+        if (string.IsNullOrWhiteSpace(request.Name))
         {
-            var zones = await cameraService.GetZonesForCameraAsync(cameraId);
-            return TypedResults.Ok(zones);
-        })
-        .WithName("GetZonesForCamera");
+            logger.LogWarning("No camera name was provided.");
+            return Results.BadRequest("Camera name is required.");
+        }
 
-        // Adds a zone to the specified camera
-        zoneGroup.MapPost("/", async (Guid cameraId, Zone zone, ICameraService cameraService) =>
+        var createCamera = new CreateCamera
         {
-            await cameraService.AddZoneToCameraAsync(cameraId, zone);
-            return TypedResults.Created($"/cameras/{cameraId}/zones", zone);
-        })
-        .WithName("AddZoneToCamera");
+            Name = request.Name,
+            QualityProfile = request.QualityProfile
+        };
+
+        var result = await cameraService.CreateAsync(createCamera);
+        if (result.IsSuccess)
+        {
+            Guid cameraId = result.Result!.Id;
+
+            logger.LogInformation("Camera created with ID {id}.", cameraId);
+            return Results.Created($"/{cameraId}", cameraId);
+        }
+        else
+        {
+            logger.LogWarning("Camera creation failed: {error}", result.Error);
+            return Results.BadRequest(result.Error);
+        }
+    }
+
+    private static async Task<IResult> DeleteCamera(
+        Guid cameraId,
+        ICameraService cameraService,
+        ILoggerFactory loggerFactory)
+    {
+        var logger = loggerFactory.CreateLogger();
+        logger.LogInformation("Calling API to delete camera '{id}'.", cameraId);
+
+        var result = await cameraService.DeleteAsync(cameraId);
+        if (result.IsSuccess)
+        {
+            logger.LogInformation("Camera deleted with ID {id}.", cameraId);
+            return Results.Created($"/{cameraId}", cameraId);
+        }
+        else
+        {
+            logger.LogWarning("Camera deletion failed: {error}", result.Error);
+            return Results.BadRequest(result.Error);
+        }
     }
 }

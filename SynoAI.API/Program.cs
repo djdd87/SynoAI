@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SynoAI.API.Endpoints;
 using SynoAI.API.EndPoints;
 using SynoAI.Core.Interfaces;
 using SynoAI.Core.Notifiers;
@@ -47,6 +48,7 @@ app.UseHttpsRedirection();
 
 // Configure the routes
 app.MapCameraEndpoints();
+app.MapCameraZoneEndpoints();
 app.MapDetectionEndpoints();
 
 app.Run();

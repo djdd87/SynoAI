@@ -1,4 +1,4 @@
-using SynoAI.Core.Models;
+using SynoAI.Core.Models.Results;
 
 namespace SynoAI.Core.Interfaces;
 
@@ -8,6 +8,6 @@ public interface IDetectionService
     /// Runs a detection check for the specified camera name.
     /// </summary>
     /// <param name="cameraName">The name of the camera to check.</param>
-    /// <returns></returns>
-    Task<RunDetectionResponse> RunAsync(string cameraName);
+    /// <returns>A <see cref="DetectionResult"/>.</returns>
+    Task<DetectionResult> RunAsync(string cameraName);
 }

@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace SynoAI.Core.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240918134646_InitialCreate")]
+    [Migration("20240918203336_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

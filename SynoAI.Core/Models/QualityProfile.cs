@@ -1,9 +1,9 @@
-namespace SynoAI.Core.Models;
+namespace SynoAI.Core.Data;
 
 /// <summary>
 /// Represents the camera quality options in SSS.
 /// </summary>
-public enum CameraQuality
+public enum QualityProfile
 {
     HighQuality = 0,
     Balanced = 1

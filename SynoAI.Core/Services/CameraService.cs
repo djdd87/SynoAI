@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SynoAI.Core.Data;
 using SynoAI.Core.Interfaces;
+using SynoAI.Core.Models.Requests;
+using SynoAI.Core.Models.Results;
 
 namespace SynoAI.Core.Services;
 
@@ -37,16 +39,62 @@ public class CameraService : ICameraService
         return await _context.Cameras.FirstOrDefaultAsync(x => x.Name == name);
     }
 
-    public async Task AddAsync(Camera camera)
+    public async Task<CreateResult<Camera>> CreateAsync(CreateCamera create)
     {
-        _logger.LogInformation($"Adding camera to database: {camera.Name}");
-        await _context.Cameras.AddAsync(camera);
+        // Validate the create data
+        if (string.IsNullOrWhiteSpace(create.Name))
+        {
+            _logger.LogWarning("No camera name specified.");
+            return CreateResult<Camera>.Failure("Camera name is required.");
+        }
+
+        // Ensure the camera doesn't already exist
+        _logger.LogInformation("Checking if camera '{camera}' exists.", create.Name);
+
+        Camera? existing = await _context.Cameras.FirstOrDefaultAsync(x=> x.Name == create.Name);
+        if (existing is not null)
+        {
+            _logger.LogWarning("A camera with name '{camera}' already exists.", create.Name);
+            return CreateResult<Camera>.Failure($"Camera with the name '{create.Name}' already exists.");
+        }
+
+        // Create the new camera
+        _logger.LogInformation("Saving new camera '{camera}'.", create.Name);
+
+        var camera = new Camera
+        {
+            Id = Guid.NewGuid(),
+            Name = create.Name,
+            QualityProfile = create.QualityProfile
+        };
+
+        _context.Cameras.Add(camera);
         await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Camera name '{camera}' saved with ID {id}.", create.Name, camera.Id);
+        return CreateResult<Camera>.Success(camera);
     }
 
-    public Task AddZoneToCameraAsync(Guid cameraId, Zone zone)
+    public async Task<DeleteResult> DeleteAsync(Guid cameraId)
     {
-        throw new NotImplementedException();
+        // Ensure the camera doesn't already exist
+        _logger.LogInformation("Checking if camera with ID '{id}' exists.", cameraId);
+
+        Camera? camera = await _context.Cameras.FirstOrDefaultAsync(x => x.Id == cameraId);
+        if (camera is null)
+        {
+            _logger.LogWarning("A camera with ID '{cameraId}' was not found.", cameraId);
+            return DeleteResult.Failure($"Camera with ID '{cameraId}' not found.");
+        }
+
+        // Create the new camera
+        _logger.LogInformation("Deleting camera '{cameraId}'.", cameraId);
+
+        _context.Cameras.Remove(camera!);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation("Camera with ID '{cameraId}' deleted.", cameraId);
+        return DeleteResult.Success();
     }
 
     public Task<Zone> GetZoneByIdAsync(Guid zoneId)
