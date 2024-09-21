@@ -13,7 +13,8 @@ public class CameraConfiguration : IEntityTypeConfiguration<Camera>
         builder
             .HasMany(x => x.Zones)
             .WithOne(x => x.Camera)
-            .HasForeignKey(x => x.CameraId);
+            .HasForeignKey(x => x.CameraId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(x => x.Name)
             .IsRequired()

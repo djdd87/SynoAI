@@ -13,12 +13,14 @@ public class ZoneConfiguration : IEntityTypeConfiguration<Zone>
         builder
             .HasMany(x => x.ZonePoints)
             .WithOne(x => x.Zone)
-            .HasForeignKey(x => x.ZoneId);
+            .HasForeignKey(x => x.ZoneId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder
             .HasMany(x => x.ZoneTimeRanges)
             .WithOne(x => x.Zone)
-            .HasForeignKey(x => x.ZoneId);
+            .HasForeignKey(x => x.ZoneId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(x => x.Name)
             .IsRequired()

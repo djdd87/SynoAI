@@ -1,4 +1,3 @@
-
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SynoAI.Core.Data;
@@ -21,20 +20,20 @@ public class CameraService : ICameraService
 
     public async Task<IEnumerable<Camera>> GetListAsync()
     {
-        _logger.LogInformation("Fetching cameras from database");
+        _logger.LogInformation("Fetching cameras");
         return await _context.Cameras.ToListAsync();
     }
 
-    public async Task<Camera?> GetAsync(Guid id)
+    public async Task<Camera?> GetAsync(Guid cameraId)
     {
-        _logger.LogInformation("Fetching camera '{Id}' from database", id);
+        _logger.LogInformation("Fetching camera '{cameraId}'", cameraId);
 
-        return await _context.Cameras.FirstOrDefaultAsync(x => x.Id == id);
+        return await _context.Cameras.FirstOrDefaultAsync(x => x.Id == cameraId);
     }
 
     public async Task<Camera?> GetAsync(string name)
     {
-        _logger.LogInformation("Fetching camera by name '{Name}' from database", name);
+        _logger.LogInformation("Fetching camera by name '{name}'", name);
 
         return await _context.Cameras.FirstOrDefaultAsync(x => x.Name == name);
     }
@@ -49,17 +48,17 @@ public class CameraService : ICameraService
         }
 
         // Ensure the camera doesn't already exist
-        _logger.LogInformation("Checking if camera '{camera}' exists.", create.Name);
+        _logger.LogInformation("Checking if camera '{name}' exists.", create.Name);
 
         Camera? existing = await _context.Cameras.FirstOrDefaultAsync(x=> x.Name == create.Name);
         if (existing is not null)
         {
-            _logger.LogWarning("A camera with name '{camera}' already exists.", create.Name);
+            _logger.LogWarning("A camera with name '{name}' already exists.", create.Name);
             return CreateResult<Camera>.Failure($"Camera with the name '{create.Name}' already exists.");
         }
 
         // Create the new camera
-        _logger.LogInformation("Saving new camera '{camera}'.", create.Name);
+        _logger.LogInformation("Saving new camera '{name}'.", create.Name);
 
         var camera = new Camera
         {
@@ -71,14 +70,13 @@ public class CameraService : ICameraService
         _context.Cameras.Add(camera);
         await _context.SaveChangesAsync();
 
-        _logger.LogInformation("Camera name '{camera}' saved with ID {id}.", create.Name, camera.Id);
+        _logger.LogInformation("Camera name '{name}' saved with ID {cameraId}.", create.Name, camera.Id);
         return CreateResult<Camera>.Success(camera);
     }
 
     public async Task<DeleteResult> DeleteAsync(Guid cameraId)
     {
-        // Ensure the camera doesn't already exist
-        _logger.LogInformation("Checking if camera with ID '{id}' exists.", cameraId);
+        _logger.LogInformation("Checking if camera with ID '{cameraId}' exists.", cameraId);
 
         Camera? camera = await _context.Cameras.FirstOrDefaultAsync(x => x.Id == cameraId);
         if (camera is null)
@@ -87,7 +85,6 @@ public class CameraService : ICameraService
             return DeleteResult.Failure($"Camera with ID '{cameraId}' not found.");
         }
 
-        // Create the new camera
         _logger.LogInformation("Deleting camera '{cameraId}'.", cameraId);
 
         _context.Cameras.Remove(camera!);
@@ -95,20 +92,5 @@ public class CameraService : ICameraService
 
         _logger.LogInformation("Camera with ID '{cameraId}' deleted.", cameraId);
         return DeleteResult.Success();
-    }
-
-    public Task<Zone> GetZoneByIdAsync(Guid zoneId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<IEnumerable<Zone>> GetZonesForCameraAsync(Guid cameraId)
-    {
-        throw new NotImplementedException();
-    }
-
-    public Task<object> DeleteZoneAsync(Guid zoneId)
-    {
-        throw new NotImplementedException();
     }
 }

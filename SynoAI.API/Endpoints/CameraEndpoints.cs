@@ -1,11 +1,24 @@
 using Microsoft.AspNetCore.Http.HttpResults;
-using SynoAI.API;
-using SynoAI.API.Models;
 using SynoAI.Core.Data;
 using SynoAI.Core.Interfaces;
 using SynoAI.Core.Models.Requests;
+using SynoAI.Core.Processors;
 
 namespace SynoAI.API.EndPoints;
+
+/// <summary>
+/// Represents the object required to update a camera.
+/// </summary>
+/// <param name="Name">The name of the camera.</param>
+/// <param name="QualityProfile">The quality profile to use when snapshotting the camera.</param>
+public record CreateCameraRequest(string Name, QualityProfile QualityProfile);
+
+/// <summary>
+/// Represents the object required to create a zone.
+/// </summary>
+/// <param name="Name">The name of the zone.</param>
+/// <param name="ProcessorType">The processor type to use for the zone.</param>
+public record CreateZoneRequest(string Name, ProcessorType ProcessorType);
 
 public static class CameraEndpoints
 {
@@ -117,12 +130,12 @@ public static class CameraEndpoints
         ILoggerFactory loggerFactory)
     {
         var logger = loggerFactory.CreateLogger();
-        logger.LogInformation("Calling API to delete camera '{id}'.", cameraId);
+        logger.LogInformation("Calling API to delete camera '{cameraId}'.", cameraId);
 
         var result = await cameraService.DeleteAsync(cameraId);
         if (result.IsSuccess)
         {
-            logger.LogInformation("Camera deleted with ID {id}.", cameraId);
+            logger.LogInformation("Camera deleted with ID {cameraId}.", cameraId);
             return Results.Created($"/{cameraId}", cameraId);
         }
         else

@@ -38,10 +38,6 @@ public interface ICameraService
     /// Deletes a camera.
     /// </summary>
     /// <param name="cameraId">The data of the camera to create.</param>
-    /// <returns>A <see cref="CreateResult<Camera>"/> result.</returns>
+    /// <returns>A <see cref="DeleteResult"/>.</returns>
     Task<DeleteResult> DeleteAsync(Guid id);
-
-    Task<Zone> GetZoneByIdAsync(Guid zoneId);
-    Task<IEnumerable<Zone>> GetZonesForCameraAsync(Guid cameraId);
-    Task<object> DeleteZoneAsync(Guid zoneId);
 }
