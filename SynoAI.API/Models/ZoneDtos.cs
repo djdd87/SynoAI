@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using SynoAI.Core;
 using SynoAI.Core.Models;
 
 namespace SynoAI.API.Models;
@@ -66,5 +67,24 @@ public record ZoneTargetResponse(
 public record ZoneTimeRangeResponse(
     Guid Id, 
     TimeSpan StartTime, 
+    TimeSpan EndTime
+);
+
+public record CreateZoneRequest(
+    Guid CameraId,
+    ZoneType ZoneType,
+    List<ZonePointRequest> Points,
+    List<string> Targets,
+    List<ZoneTimeRange> TimeRanges
+);
+
+public record ZonePointRequest(
+    int X,
+    int Y,
+    int Order
+);
+
+public record ZoneTimeRangeRequest(
+    TimeSpan StartTime,
     TimeSpan EndTime
 );

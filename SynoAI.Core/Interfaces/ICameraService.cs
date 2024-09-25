@@ -1,5 +1,5 @@
 using SynoAI.Core.Models;
-using SynoAI.Core.Models.Requests;
+using SynoAI.Core.Models.Contracts;
 using SynoAI.Core.Models.Results;
 
 namespace SynoAI.Core.Interfaces;

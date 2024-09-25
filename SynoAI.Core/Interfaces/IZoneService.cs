@@ -1,5 +1,5 @@
 ﻿using SynoAI.Core.Models;
-using SynoAI.Core.Models.Requests;
+using SynoAI.Core.Models.Contracts;
 using SynoAI.Core.Models.Results;
 
 namespace SynoAI.Core.Interfaces;
@@ -33,11 +33,13 @@ public interface IZoneService
     /// <returns>True if the zone was deleted, false if the zone was not found.</returns>
     Task<bool> DeleteAsync(Guid zoneId);
 
+    Task<CreateResult<Zone>> CreateAsync(CreateZone contract);
+
     /// <summary>
     /// Updates a zone.
     /// </summary>
     /// <param name="zoneId">The ID of the zone to update.</param>
-    /// <param name="update">The update details.</param>
+    /// <param name="contract">The update details.</param>
     /// <returns>A <see cref="UpdateResult<Zone>"/></returns>
-    Task<UpdateResult<Zone>> UpdateAsync(Guid zoneId, UpdateZone update);
+    Task<UpdateResult<Zone>> UpdateAsync(Guid zoneId, UpdateZone contract);
 }

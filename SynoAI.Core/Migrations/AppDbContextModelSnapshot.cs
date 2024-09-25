@@ -96,6 +96,9 @@ namespace SynoAI.Core.Migrations
                     b.Property<int>("ProcessorType")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("ZoneType")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CameraId");
@@ -126,6 +129,27 @@ namespace SynoAI.Core.Migrations
                     b.HasIndex("ZoneId");
 
                     b.ToTable("ZonePoints");
+                });
+
+            modelBuilder.Entity("SynoAI.Core.Models.ZoneTarget", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ZoneId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ZoneId");
+
+                    b.ToTable("ZoneTarget");
                 });
 
             modelBuilder.Entity("SynoAI.Core.Models.ZoneTimeRange", b =>
@@ -177,6 +201,17 @@ namespace SynoAI.Core.Migrations
                     b.Navigation("Zone");
                 });
 
+            modelBuilder.Entity("SynoAI.Core.Models.ZoneTarget", b =>
+                {
+                    b.HasOne("SynoAI.Core.Models.Zone", "Zone")
+                        .WithMany("ZoneTargets")
+                        .HasForeignKey("ZoneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Zone");
+                });
+
             modelBuilder.Entity("SynoAI.Core.Models.ZoneTimeRange", b =>
                 {
                     b.HasOne("SynoAI.Core.Models.Zone", "Zone")
@@ -196,6 +231,8 @@ namespace SynoAI.Core.Migrations
             modelBuilder.Entity("SynoAI.Core.Models.Zone", b =>
                 {
                     b.Navigation("ZonePoints");
+
+                    b.Navigation("ZoneTargets");
 
                     b.Navigation("ZoneTimeRanges");
                 });

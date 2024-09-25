@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using SynoAI.Core;
 using SynoAI.Core.Models;
+using SynoAI.Core.Models.Contracts;
 
 namespace SynoAI.API.Models;
 
@@ -13,6 +14,8 @@ public class CameraMappingProfile : Profile
     {
         CreateMap<Camera, CameraResponse>();
         CreateMap<Zone, CameraZoneResponse>();
+
+        CreateMap<CreateCameraRequest, CreateCamera>();
     }
 }
 

@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using SynoAI.Core.Models;
 using SynoAI.Core.Interfaces;
-using SynoAI.Core.Models.Requests;
+using SynoAI.Core.Models.Contracts;
 using SynoAI.Core.Models.Results;
 
 namespace SynoAI.Core.Services;

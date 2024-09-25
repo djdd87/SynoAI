@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http.HttpResults;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
+using SynoAI.API.Models;
 using SynoAI.Core.Interfaces;
 using SynoAI.Core.Models;
-using SynoAI.Core.Models.Requests;
+using SynoAI.Core.Models.Contracts;
 
 namespace SynoAI.API.Endpoints;
 
@@ -21,21 +23,26 @@ public static class ZoneEndPoints
             .WithName("GetZone")
             .WithDescription("Gets a zone by it's unique ID.");
 
-        group.MapGet("/", async (IZoneService zoneService) =>
-        {
-            await zoneService.GetListAsync();
-            return TypedResults.Ok();
-        })
-        .WithName("GetZoneList")
-        .WithDescription("Returns all zones.");
+        group.MapGet("/", GetListAsync)
+            .WithName("GetZoneList")
+            .WithDescription("Returns all zones.");
 
         group.MapPut("/{zoneId:guid}", UpdateAsync)
-        .WithName("UpdateZone")
-        .WithDescription("Updates a zone with the specified ID.");
+            .WithName("UpdateZone")
+            .WithDescription("Updates a zone with the specified ID.");
 
         group.MapDelete("/{zoneId:guid}", DeleteAsync)
             .WithName("DeleteZone")
             .WithDescription("Deletes a zone by it's unique ID.");
+    }
+
+
+    private static async Task<Ok<IEnumerable<ZoneResponse>>> GetListAsync(IZoneService zoneService, IMapper mapper)
+    {
+        var results = await zoneService.GetListAsync();
+
+        var zoneDtos = mapper.Map<IEnumerable<ZoneResponse>>(results);
+        return TypedResults.Ok(zoneDtos);
     }
 
 
@@ -57,11 +64,15 @@ public static class ZoneEndPoints
         return TypedResults.Ok(result);
     }
 
-    private static async Task<Results<Ok, BadRequest<string>>> UpdateAsync(Guid zoneId, UpdateZoneRequest data, IZoneService zoneService)
+    private static async Task<Results<Ok, BadRequest<string>>> UpdateAsync(
+        Guid zoneId, 
+        UpdateZoneRequest data, 
+        IZoneService zoneService, 
+        IMapper mapper)
     {
-        UpdateZone zone = new UpdateZone(data.Name);
+        var contract = mapper.Map<UpdateZone>(data);
 
-        var result = await zoneService.UpdateAsync(zoneId, zone);
+        var result = await zoneService.UpdateAsync(zoneId, contract);
         if (result.IsSuccess)
         {
             return TypedResults.Ok();

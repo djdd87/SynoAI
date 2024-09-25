@@ -2,8 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http.HttpResults;
 using SynoAI.API.Models;
 using SynoAI.Core.Interfaces;
-using SynoAI.Core.Models;
-using SynoAI.Core.Models.Requests;
+using SynoAI.Core.Models.Contracts;
 
 namespace SynoAI.API.EndPoints;
 
@@ -56,13 +55,7 @@ public static class CameraEndpoints
             .WithTags("Cameras")
             .WithOpenApi();
 
-        zoneGroup.MapPost("/", async (Guid zoneId, CameraResponse data, IZoneService zoneService) =>
-        {
-            UpdateZone zone = new UpdateZone(data.Name);
-
-            await zoneService.UpdateAsync(zoneId, zone);
-            return TypedResults.Ok();
-        })
+        zoneGroup.MapPost("/", CreateZoneAsync)
         .WithName("CreateZone")
         .WithDescription("Updates a zone with the specified ID.");
     }
@@ -127,7 +120,8 @@ public static class CameraEndpoints
     private static async Task<Results<Created<Guid>, BadRequest<string>>> CreateCamera(
         CreateCameraRequest request,
         ICameraService cameraService,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        IMapper mapper)
     {
         var logger = loggerFactory.CreateLogger();
         logger.LogInformation("Calling API to create camera.");
@@ -138,11 +132,7 @@ public static class CameraEndpoints
             return TypedResults.BadRequest("Camera name is required.");
         }
 
-        var createCamera = new CreateCamera
-        {
-            Name = request.Name,
-            QualityProfile = request.QualityProfile ?? QualityProfile.HighQuality
-        };
+        var createCamera = mapper.Map<CreateCamera>(request);
 
         var result = await cameraService.CreateAsync(createCamera);
         if (result.IsSuccess)
@@ -178,5 +168,17 @@ public static class CameraEndpoints
             logger.LogWarning("Camera deletion failed: Camera not found");
             return TypedResults.NotFound();
         }
+    }
+
+    private static async Task<Results<Ok, BadRequest>> CreateZoneAsync(
+        Guid cameraId, 
+        CreateZoneRequest data, 
+        IZoneService zoneService,
+        IMapper mapper)
+    {
+        var contract = mapper.Map<CreateZone>(data); // TODO - How to set CameraId? Can use opts, but might be better to just pass the CameraId as a param on the service.
+
+        await zoneService.CreateAsync(contract);
+        return TypedResults.Ok();
     }
 }
