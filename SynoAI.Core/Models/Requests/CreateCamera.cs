@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore.Query.Internal;
-using SynoAI.Core.Data;
+using SynoAI.Core.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

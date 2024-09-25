@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace SynoAI.Core.Data;
+namespace SynoAI.Core.Models;
 
 /// <summary>
 /// Represents a time range that the <see cref="Zone"> will operate within.

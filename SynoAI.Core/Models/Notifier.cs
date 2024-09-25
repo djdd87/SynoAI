@@ -1,9 +1,6 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SynoAI.Core.Notifiers;
-using System.ComponentModel.DataAnnotations;
 
-namespace SynoAI.Core.Data;
+namespace SynoAI.Core.Models;
 
 public class Notifier
 {

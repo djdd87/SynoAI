@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SynoAI.Core.Data;
+using SynoAI.Core.Models;
 using SynoAI.Core.Interfaces;
 using SynoAI.Core.Models.Requests;
 using SynoAI.Core.Models.Results;
@@ -74,7 +74,7 @@ public class CameraService : ICameraService
         return CreateResult<Camera>.Success(camera);
     }
 
-    public async Task<DeleteResult> DeleteAsync(Guid cameraId)
+    public async Task<bool> DeleteAsync(Guid cameraId)
     {
         _logger.LogInformation("Checking if camera with ID '{cameraId}' exists.", cameraId);
 
@@ -82,7 +82,7 @@ public class CameraService : ICameraService
         if (camera is null)
         {
             _logger.LogWarning("A camera with ID '{cameraId}' was not found.", cameraId);
-            return DeleteResult.Failure($"Camera with ID '{cameraId}' not found.");
+            return false;
         }
 
         _logger.LogInformation("Deleting camera '{cameraId}'.", cameraId);
@@ -91,6 +91,6 @@ public class CameraService : ICameraService
         await _context.SaveChangesAsync();
 
         _logger.LogInformation("Camera with ID '{cameraId}' deleted.", cameraId);
-        return DeleteResult.Success();
+        return true;
     }
 }

@@ -1,4 +1,4 @@
-﻿using SynoAI.Core.Data;
+﻿using SynoAI.Core.Models;
 using SynoAI.Core.Models.Requests;
 using SynoAI.Core.Models.Results;
 
@@ -30,8 +30,8 @@ public interface IZoneService
     /// Deletes a camera zone.
     /// </summary>
     /// <param name="zoneId">The ID of the zone to delete.</param>
-    /// <returns></returns>
-    Task<DeleteResult> DeleteAsync(Guid zoneId);
+    /// <returns>True if the zone was deleted, false if the zone was not found.</returns>
+    Task<bool> DeleteAsync(Guid zoneId);
 
     /// <summary>
     /// Updates a zone.

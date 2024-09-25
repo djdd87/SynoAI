@@ -24,5 +24,6 @@
   <ItemGroup>
     <ProjectReference Include="..\SynoAI.Core.Processors\SynoAI.Core.Processors.csproj" />
     <ProjectReference Include="..\SynoAI.Core.Notifiers\SynoAI.Core.Notifiers.csproj" />
+    <ProjectReference Include="..\SynoAI.Core.Templating\SynoAI.Core.Templating.csproj" />
   </ItemGroup>
 </Project>
