@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SynoAI.API.Endpoints;
 using SynoAI.API.EndPoints;
+using SynoAI.API.RateLimiting;
 using SynoAI.Core.Interfaces;
 using SynoAI.Core.Notifiers;
 using SynoAI.Core.Processors;
@@ -24,6 +25,9 @@ builder.Services.AddScoped<ICameraService, CameraService>();
 builder.Services.AddScoped<IDetectionService, DetectionService>();
 builder.Services.AddScoped<ISettingService, SettingService>();
 builder.Services.AddScoped<IZoneService, ZoneService>();
+
+// Register the rate limiter
+builder.Services.AddSingleton(sp => new CameraRateLimiter(sp.GetService<ILogger<CameraRateLimiter>>()));
 
 // Register the notifiers and processors
 builder.Services.RegisterNotifiers();

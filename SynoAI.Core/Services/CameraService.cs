@@ -64,7 +64,8 @@ public class CameraService : ICameraService
         {
             Id = Guid.NewGuid(),
             Name = create.Name,
-            QualityProfile = create.QualityProfile
+            Delay = 0,
+            QualityProfile = create.QualityProfile,
         };
 
         _context.Cameras.Add(camera);
