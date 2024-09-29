@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using SynoAI.Core.Models;
 
 namespace SynoAI.Core.Models;
 

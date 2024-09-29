@@ -29,7 +29,7 @@ builder.Services.AddScoped<ISettingService, SettingService>();
 builder.Services.AddScoped<IZoneService, ZoneService>();
 
 // Register the rate limiter
-builder.Services.AddSingleton(sp => new CameraRateLimiter(sp.GetService<ILogger<CameraRateLimiter>>()));
+builder.Services.AddSingleton<CameraRateLimiter>();
 
 // Register the notifiers and processors
 builder.Services.RegisterNotifiers();
