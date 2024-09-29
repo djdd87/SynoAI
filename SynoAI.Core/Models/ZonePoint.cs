@@ -1,4 +1,4 @@
-﻿namespace SynoAI.Core.Data;
+﻿namespace SynoAI.Core.Models;
 
 /// <summary>
 /// Represents a point to generate a defined area for a <see cref="Zone"/>.

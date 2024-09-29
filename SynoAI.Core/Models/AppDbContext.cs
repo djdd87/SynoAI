@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using SynoAI.Core.Data;
+using SynoAI.Core.Models;
+
+namespace SynoAI.Core.Models;
 
 public class AppDbContext : DbContext
 {

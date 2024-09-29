@@ -57,6 +57,7 @@ namespace SynoAI.Core.Migrations
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     CameraId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ZoneType = table.Column<int>(type: "INTEGER", nullable: false),
                     ProcessorType = table.Column<int>(type: "INTEGER", nullable: false),
                     Enabled = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
@@ -86,6 +87,25 @@ namespace SynoAI.Core.Migrations
                     table.PrimaryKey("PK_ZonePoints", x => x.Id);
                     table.ForeignKey(
                         name: "FK_ZonePoints_Zones_ZoneId",
+                        column: x => x.ZoneId,
+                        principalTable: "Zones",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ZoneTarget",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    ZoneId = table.Column<Guid>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ZoneTarget", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ZoneTarget_Zones_ZoneId",
                         column: x => x.ZoneId,
                         principalTable: "Zones",
                         principalColumn: "Id",
@@ -124,6 +144,11 @@ namespace SynoAI.Core.Migrations
                 column: "CameraId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ZoneTarget_ZoneId",
+                table: "ZoneTarget",
+                column: "ZoneId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ZoneTimeRanges_ZoneId",
                 table: "ZoneTimeRanges",
                 column: "ZoneId");
@@ -140,6 +165,9 @@ namespace SynoAI.Core.Migrations
 
             migrationBuilder.DropTable(
                 name: "ZonePoints");
+
+            migrationBuilder.DropTable(
+                name: "ZoneTarget");
 
             migrationBuilder.DropTable(
                 name: "ZoneTimeRanges");

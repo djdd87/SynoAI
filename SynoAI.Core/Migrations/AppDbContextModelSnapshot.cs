@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using SynoAI.Core.Models;
 
 #nullable disable
 
@@ -16,7 +17,7 @@ namespace SynoAI.Core.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
 
-            modelBuilder.Entity("SynoAI.Core.Data.Camera", b =>
+            modelBuilder.Entity("SynoAI.Core.Models.Camera", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -35,7 +36,7 @@ namespace SynoAI.Core.Migrations
                     b.ToTable("Cameras");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.Notifier", b =>
+            modelBuilder.Entity("SynoAI.Core.Models.Notifier", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -59,7 +60,7 @@ namespace SynoAI.Core.Migrations
                     b.ToTable("Notifiers");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.Setting", b =>
+            modelBuilder.Entity("SynoAI.Core.Models.Setting", b =>
                 {
                     b.Property<string>("Key")
                         .HasMaxLength(100)
@@ -75,7 +76,7 @@ namespace SynoAI.Core.Migrations
                     b.ToTable("Settings");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.Zone", b =>
+            modelBuilder.Entity("SynoAI.Core.Models.Zone", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -95,6 +96,9 @@ namespace SynoAI.Core.Migrations
                     b.Property<int>("ProcessorType")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("ZoneType")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.HasIndex("CameraId");
@@ -102,7 +106,7 @@ namespace SynoAI.Core.Migrations
                     b.ToTable("Zones");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.ZonePoint", b =>
+            modelBuilder.Entity("SynoAI.Core.Models.ZonePoint", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -127,7 +131,28 @@ namespace SynoAI.Core.Migrations
                     b.ToTable("ZonePoints");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.ZoneTimeRange", b =>
+            modelBuilder.Entity("SynoAI.Core.Models.ZoneTarget", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("ZoneId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ZoneId");
+
+                    b.ToTable("ZoneTarget");
+                });
+
+            modelBuilder.Entity("SynoAI.Core.Models.ZoneTimeRange", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -154,9 +179,9 @@ namespace SynoAI.Core.Migrations
                     b.ToTable("ZoneTimeRanges");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.Zone", b =>
+            modelBuilder.Entity("SynoAI.Core.Models.Zone", b =>
                 {
-                    b.HasOne("SynoAI.Core.Data.Camera", "Camera")
+                    b.HasOne("SynoAI.Core.Models.Camera", "Camera")
                         .WithMany("Zones")
                         .HasForeignKey("CameraId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -165,9 +190,9 @@ namespace SynoAI.Core.Migrations
                     b.Navigation("Camera");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.ZonePoint", b =>
+            modelBuilder.Entity("SynoAI.Core.Models.ZonePoint", b =>
                 {
-                    b.HasOne("SynoAI.Core.Data.Zone", "Zone")
+                    b.HasOne("SynoAI.Core.Models.Zone", "Zone")
                         .WithMany("ZonePoints")
                         .HasForeignKey("ZoneId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -176,9 +201,20 @@ namespace SynoAI.Core.Migrations
                     b.Navigation("Zone");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.ZoneTimeRange", b =>
+            modelBuilder.Entity("SynoAI.Core.Models.ZoneTarget", b =>
                 {
-                    b.HasOne("SynoAI.Core.Data.Zone", "Zone")
+                    b.HasOne("SynoAI.Core.Models.Zone", "Zone")
+                        .WithMany("ZoneTargets")
+                        .HasForeignKey("ZoneId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Zone");
+                });
+
+            modelBuilder.Entity("SynoAI.Core.Models.ZoneTimeRange", b =>
+                {
+                    b.HasOne("SynoAI.Core.Models.Zone", "Zone")
                         .WithMany("ZoneTimeRanges")
                         .HasForeignKey("ZoneId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -187,14 +223,16 @@ namespace SynoAI.Core.Migrations
                     b.Navigation("Zone");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.Camera", b =>
+            modelBuilder.Entity("SynoAI.Core.Models.Camera", b =>
                 {
                     b.Navigation("Zones");
                 });
 
-            modelBuilder.Entity("SynoAI.Core.Data.Zone", b =>
+            modelBuilder.Entity("SynoAI.Core.Models.Zone", b =>
                 {
                     b.Navigation("ZonePoints");
+
+                    b.Navigation("ZoneTargets");
 
                     b.Navigation("ZoneTimeRanges");
                 });

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace SynoAI.Core.Data.Configuration;
+namespace SynoAI.Core.Models.Configuration;
 
 public class NotifierConfiguration : IEntityTypeConfiguration<Notifier>
 {

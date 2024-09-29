@@ -1,4 +1,4 @@
-using SynoAI.Core.Data;
+using SynoAI.Core.Models;
 
 namespace SynoAI.Core.Interfaces;
 

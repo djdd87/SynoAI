@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using SynoAI.Core.Data;
+using SynoAI.Core.Models;
 using SynoAI.Core.Interfaces;
-using SynoAI.Core.Models.Requests;
+using SynoAI.Core.Models.Contracts;
 using SynoAI.Core.Models.Results;
 
 namespace SynoAI.Core.Services;
@@ -37,7 +37,7 @@ public class ZoneService : IZoneService
         return await _context.Zones.Where(x => x.CameraId == cameraId).ToListAsync();
     }
 
-    public async Task<DeleteResult> DeleteAsync(Guid zoneId)
+    public async Task<bool> DeleteAsync(Guid zoneId)
     {
         _logger.LogInformation("Checking if zone with ID '{zoneId}' exists.", zoneId);
 
@@ -45,7 +45,7 @@ public class ZoneService : IZoneService
         if (zone is null)
         {
             _logger.LogWarning("A zone with ID '{zoneId}' was not found.", zoneId);
-            return DeleteResult.Failure($"Zone with ID '{zoneId}' not found.");
+            return false;
         }
 
         _logger.LogInformation("Deleting zone '{zoneId}'.", zoneId);
@@ -54,10 +54,15 @@ public class ZoneService : IZoneService
         await _context.SaveChangesAsync();
 
         _logger.LogInformation("Zone with ID '{zoneId}' deleted.", zoneId);
-        return DeleteResult.Success();
+        return true;
     }
 
-    public Task<UpdateResult<Zone>> UpdateAsync(Guid zoneId, UpdateZone update)
+    public Task<CreateResult<Zone>> CreateAsync(CreateZone contract)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<UpdateResult<Zone>> UpdateAsync(Guid zoneId, UpdateZone contract)
     {
         throw new NotImplementedException();
     }

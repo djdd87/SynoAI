@@ -1,4 +1,4 @@
-namespace SynoAI.Core.Data;
+namespace SynoAI.Core.Models;
 
 /// <summary>
 /// Represents a configuration setting in the system.

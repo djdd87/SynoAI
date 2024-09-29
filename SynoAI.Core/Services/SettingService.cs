@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging;
-using SynoAI.Core.Data;
+using SynoAI.Core.Models;
 using SynoAI.Core.Interfaces;
 
 namespace SynoAI.Core.Services;

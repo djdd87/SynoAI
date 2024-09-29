@@ -3,6 +3,7 @@ using SynoAI.API.Endpoints;
 using SynoAI.API.EndPoints;
 using SynoAI.API.RateLimiting;
 using SynoAI.Core.Interfaces;
+using SynoAI.Core.Models;
 using SynoAI.Core.Notifiers;
 using SynoAI.Core.Processors;
 using SynoAI.Core.Services;
@@ -13,6 +14,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAutoMapper(typeof(Program));
 
 // AddDbContext ensures that the context is scoped per request
 string dbPath = Path.Join(builder.Environment.ContentRootPath, "app.db");
@@ -53,7 +55,6 @@ app.UseHttpsRedirection();
 
 // Configure the routes
 app.MapCameraEndpoints();
-app.MapDetectionEndpoints();
 app.MapZoneEndpoints();
 
 app.Run();

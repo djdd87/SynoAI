@@ -1,6 +1,5 @@
-using SynoAI.Core.Data;
 using SynoAI.Core.Models;
-using SynoAI.Core.Models.Requests;
+using SynoAI.Core.Models.Contracts;
 using SynoAI.Core.Models.Results;
 
 namespace SynoAI.Core.Interfaces;
@@ -38,6 +37,6 @@ public interface ICameraService
     /// Deletes a camera.
     /// </summary>
     /// <param name="cameraId">The data of the camera to create.</param>
-    /// <returns>A <see cref="DeleteResult"/>.</returns>
-    Task<DeleteResult> DeleteAsync(Guid id);
+    /// <returns>True if the camera was deleted, false if there was no camera to delete.</returns>
+    Task<bool> DeleteAsync(Guid id);
 }
