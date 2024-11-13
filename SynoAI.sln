@@ -25,6 +25,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E97F702E-633
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5BD3A45B-29AC-447D-89B6-38C2AE2F12EF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SynoAI.AppHost", "SynoAI.AppHost\SynoAI.AppHost.csproj", "{39BE8ADF-BBAD-4FB2-B539-8D345A385506}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SynoAI.ServiceDefaults", "SynoAI.ServiceDefaults\SynoAI.ServiceDefaults.csproj", "{C2FAD66A-CEF4-4B1F-A321-1A6DACAFF967}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +67,14 @@ Global
 		{CC9949FD-A8D7-421D-B272-FC041501DC11}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CC9949FD-A8D7-421D-B272-FC041501DC11}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CC9949FD-A8D7-421D-B272-FC041501DC11}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39BE8ADF-BBAD-4FB2-B539-8D345A385506}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39BE8ADF-BBAD-4FB2-B539-8D345A385506}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39BE8ADF-BBAD-4FB2-B539-8D345A385506}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39BE8ADF-BBAD-4FB2-B539-8D345A385506}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2FAD66A-CEF4-4B1F-A321-1A6DACAFF967}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2FAD66A-CEF4-4B1F-A321-1A6DACAFF967}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2FAD66A-CEF4-4B1F-A321-1A6DACAFF967}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2FAD66A-CEF4-4B1F-A321-1A6DACAFF967}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\SynoAI.Core\SynoAI.Core.csproj" />
+    <ProjectReference Include="..\SynoAI.ServiceDefaults\SynoAI.ServiceDefaults.csproj" />
   </ItemGroup>
 
 </Project>
