@@ -1,5 +1,5 @@
-# UPDATE 2023-08-29
-I've begun working on a new version of SynoAI from the ground up which has an administrative interface instead of a config based approach. I will also be taking the opportunity to implement a number of requested features that have been requested for a long time. 
+# Archived (2025-04-11)
+Due to a lack of time and other commitments, I've decided to archive this project. Personally I'm now using [Frigate](https://github.com/blakeblackshear/frigate) with a cheap £60 Google Coral device - it's far better than this solution.
 
 # SynoAI
 A Synology Surveillance Station notification system utilising DeepStack AI, inspired by Christopher Adams' [sssAI](https://github.com/Christofo/sssAI) implementation.
